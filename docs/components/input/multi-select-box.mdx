@@ -1,0 +1,242 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Multi Select
+description: Render a multi select dropdown.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components"
+
+# Component | Multi Select
+
+Render a multi select dropdown.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.multiSelectBox("multi-select-input-key", ["A", "B", "C", "D"], { 
+        label: "Select options",
+        onChange: (values) => console.log(values) // e.g. ["A", "B"]
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.multi_select_box(
+        "multi-select-input-key",
+        ["A", "B", "C", "D"],
+        label="Select options",
+        on_change=lambda values: print(values) # e.g. ["A", "B"]
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-multi-select" heightPx={325} />
+
+Learn more about [working with inputs](/guides/forms).
+
+## Options
+
+Select components support both a "basic" and "detailed" format for options.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript"></TabItem>
+  <TabItem value="python" label="Python"></TabItem>
+</Tabs>
+
+### Basic
+
+Quick and easy. Pass an array of strings, such as `["A", "B", "C", "D"]`.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.multiSelectBox("multi-select-input-key", ["A", "B", "C", "D"], { 
+        label: "Select options",
+        onChange: (values) => console.log(values)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.multi_select_box(
+        "multi-select-input-key",
+        ["A", "B", "C", "D"],
+        label="Select options",
+        on_change=lambda values: print(values)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Detailed
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    Use separate `label` and `value` fields for each option. The `label` field will be displayed to the user, and the `value` field will be passed to hooks such as `onChange` and `validate`.
+
+    ```js
+    const options = [
+        { label: "Google", value: "GOOG" },
+        { label: "Apple", value: "APPL" },
+        {
+            label: "Microsoft",
+            value: "MSFT",
+            // The detailed format also supports an optional "description" field
+            // to display beneath an option.
+            description: "Current stock price: $423"
+        }
+    ]
+
+    ui.multiSelectBox("companies-key", options, {
+        label: "Select companies",
+        onChange: (values) => console.log(values) // e.g. ["GOOG", "APPL"]
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    Use separate `label` and `value` fields for each option. The `label` field will be displayed to the user, and the `value` field will be passed to hooks such as `on_change` and `validate`.
+
+    ```python
+    options = [
+        { "label": "Google", "value": "GOOG" },
+        { "label": "Apple", "value": "APPL" },
+        {
+            "label": "Microsoft",
+            "value": "MSFT",
+            # The detailed format also supports an optional "description" field
+            # to display beneath an option.
+            "description": "Current stock price: $423"
+        }
+    ]
+
+    ui.multi_select_box(
+        "companies-key",
+        options,
+        label="Select companies",
+        on_change=lambda values: print(values) # e.g. ["GOOG", "APPL"]
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+### Detailed option object properties
+
+<ParameterTemplate.SelectOptionsObject />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type OptionValue = string | number | boolean
+
+    type DetailedOption = {
+        label: string,
+        value: OptionValue,
+        description?: string
+    }
+
+    ui.multiSelectBox(
+        id: string,
+        options: Array<OptionValue | DetailedOption>,
+        properties: Partial<{
+            label: string,
+            description: string,
+            required: boolean,
+            initialValue: DetailedSelectValue,
+            validate: (values: Array<DetailedSelectValue>) => string | void,
+            onChange: (values: Array<DetailedSelectValue>) => void,
+            minSelections: number,
+            maxSelections: number,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    OptionValue = str | float | int | bool
+
+    class DetailedOption(TypedDict):
+        label: str
+        value: OptionValue
+        description: NotRequired[str]
+
+    ui.multi_select_box(
+        id: str,
+        options: list[OptionValue | DetailedOption],
+        *,
+        label: str | None = None,
+        description: str | None = None,
+        required: bool = True,
+        initial_value: list[DetailedSelectValue] = None,
+        validate: Callable[[list[DetailedSelectValue]], str | None] = None,
+        on_change: Callable[[list[DetailedSelectValue]], None] = None,
+        min_selections: int = 0,
+        max_selections: int = 1000000000,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.SelectOptions optionsSectionLink="#options" />
+
+<ParameterTemplate.Label
+    componentName="multiselect box"
+/>
+
+<ParameterTemplate.Description
+    componentName="multiselect box"
+/>
+
+<ParameterTemplate.Required
+    parameter="required"
+    componentName="multiselect box"
+    hookName={lang => lang === "js" ? "onChange" : "on_change"}
+/>
+
+<ParameterTemplate.InitialValue
+    componentName="multiselect box"
+    type={lang => lang === "js" ? "Array<string | number | boolean>" : "Array<str | float | int | bool>"}
+    description={lang => <p>The initial value of the multiselect box. Defaults to <code>{lang === "js" ? "[]" : "[]"}</code> (empty list).</p>}
+/>
+
+<ParameterTemplate.ValidateInput
+    componentName="multiselect"
+    hookInputArgument={lang => lang === "js" ? "value: Array<string | number | boolean>" : "Array<str | float | int | bool>"}
+/>
+
+<ParameterTemplate.OnChange
+    componentName="multiselect"
+    hookInputArgument={lang => lang === "js" ? "value: Array<string | number | boolean>" : "Array<str | float | int | bool>"}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.minSelections" : "min_selections"}
+    required={false}
+    type="int"
+    description={(lang) => <p>Validate that the user has selected at least some number of options. Defaults to 0.</p>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.maxSelections" : "max_selections"}
+    required={false}
+    type="int"
+    description={(lang) => <p>Validate that the user has selected at most some number of options. Defaults to 1000000000.</p>}
+/>
+
+<ParameterTemplate.Style />

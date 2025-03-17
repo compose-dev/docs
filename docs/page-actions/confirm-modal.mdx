@@ -1,0 +1,166 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Confirm Modal
+description: Prompt the user with a confirmation dialog.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+import { Parameter } from "../../src/components";
+
+# Page Action | Confirm Modal
+
+Use `page.confirm()` to display a confirmation modal to the user. This is particularly useful for actions that require user verification before proceeding, such as deletions or other irreversible operations.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    async function onClickDeleteCompany(companyId) {
+        const companyName = companies[companyId].name;
+
+        // highlight-start
+        const confirmed = await page.confirm({
+            message: `Are you sure you want to delete ${companyName}?`
+            typeToConfirmText: companyName,
+            appearance: "danger",
+        });
+        // highlight-end
+
+        if (confirmed === true) {
+            await db.company.deleteById(companyId);
+            page.add(() => ui.text(`${companyName} was successfully deleted`))
+        }
+    }
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    async def on_click_delete_company(company_id: str):
+        company_name = companies[company_id]["name"]
+
+        # highlight-start
+        confirmed = await page.confirm(
+            message=f"Are you sure you want to delete {company_name}?",
+            type_to_confirm_text=company_name,
+            appearance="danger",
+        )
+        # highlight-end
+
+        if confirmed:
+            await db.company.delete_by_id(company_id)
+            page.add(lambda: ui.text(f"{company_name} was successfully deleted"))
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="page-actions-confirm-modal" heightPx={450} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.confirm(properties?: Partial<{
+        title: string,
+        message: string,
+        appearance: "primary" | "outline" | "warning" | "danger",
+        typeToConfirmText: string,
+        confirmButtonLabel: string,
+        cancelButtonLabel: string,
+    }>): Promise<boolean>
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.confirm(
+        *,
+        title: str = "Confirm",
+        message: str = "Are you sure you want to do this?",
+        appearance: Literal["primary", "outline", "warning", "danger"] = "primary",
+        type_to_confirm_text: str | None = None,
+        confirm_button_label: str = "Yes",
+        cancel_button_label: str = "No",
+    ) -> Awaitable[bool]
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="title"
+    required={false}
+    type="string"
+    description={<>
+        The title of the confirmation dialog. Defaults to <code>"Confirm"</code>.
+    </>}
+/>
+
+<Parameter
+    name="message"
+    required={false}
+    type="string" 
+    description={<>
+        The main message or question presented to the user. Defaults to <code>"Are you sure you want to do this?"</code>.
+    </>}
+/>
+
+<Parameter
+    name="appearance"
+    required={false}
+    type="literal"
+    description={<>
+        <p>Sets the visual style of the dialog. For example, use <code>"danger"</code> for destructive actions. Defaults to <code>"primary"</code>.</p>
+        <p>Options:</p>
+        <ul>
+            <li><code>"primary"</code></li>
+            <li><code>"outline"</code></li>
+            <li><code>"warning"</code></li>
+            <li><code>"danger"</code></li>
+        </ul>
+    </>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.typeToConfirmText" : "type_to_confirm_text"}
+    required={false}
+    type="string"
+    description="If provided, the user must type this text to enable the confirm button."
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.confirmButtonLabel" : "confirm_button_label"}
+    required={false}
+    type="string"
+    description={<>
+        Custom label for the confirm button. Defaults to <code>'Yes'</code>.
+    </>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.cancelButtonLabel" : "cancel_button_label"}
+    required={false}
+    type="string"
+    description={<>
+        Custom label for the cancel button. Defaults to <code>'No'</code>.
+    </>}
+/>
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>Promise\<boolean></span></p>
+
+    A promise that resolves to `true` if the user confirms the action, or `false` if they cancel.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>Awaitable\<boolean></span></p>
+
+    An awaitable that resolves to `True` if the user confirms the action, or `False` if they cancel.
+    </TabItem>
+</Tabs>

@@ -1,0 +1,55 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | DataFrame
+description: Render a pandas DataFrame.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+
+# Component | DataFrame
+
+Render a pandas DataFrame.
+
+:::info
+
+This is a Python SDK only component.
+
+:::
+
+```python
+df = pd.DataFrame({
+    'name': ['John', 'Jane', 'Bob'],
+    'age': [30, 25, 35],
+    'city': ['New York', 'London', 'San Francisco']
+})
+
+ui.dataframe(
+    "dataframe-key",
+    df,
+    label="Users",
+)
+```
+
+This component is a light wrapper around the [Table](/components/input/table) component. The only difference is that it accepts a pandas DataFrame as input instead of a list of dictionaries.
+
+Under the hood, Compose will convert the DataFrame into a list of dictionaries and then render a table. That code is pasted below for reference.
+
+```python
+# Replace empty values in the dataframe
+df = df.replace({
+    None: '',
+    pandas.NA: '',
+    float('nan'): ''
+})
+
+# Create the "columns" array
+columns = [
+    {"key": col, "label": col} for col in df.columns
+]
+
+# Create the list of dictionaries.
+table_data = df.to_dict(orient="records")
+```

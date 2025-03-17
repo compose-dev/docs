@@ -1,0 +1,96 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Cond
+description: Conditionally render components based on a boolean expression.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { Parameter } from "../../../src/components";
+
+# Component | Conditionally Render
+
+Conditionally render components based on an expression. Expressions are evaluated for truthiness.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const shouldRender = true
+
+    ui.cond(shouldRender === true, {
+        true: ui.text("It's true!"),
+        false: ui.text("It's false!")
+    })
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    should_render = True
+
+    ui.cond(
+        should_render == True,
+        true=ui.text("It's true!"),
+        false=ui.text("It's false!")
+    )
+    ```
+  </TabItem>
+</Tabs>
+
+In cases where either the `true` or `false` component is not provided, nothing will be rendered if the condition evaluates to that value.
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type Component = ReturnType<typeof ui.textInput> | ReturnType<typeof ui.button> | /* more components */ | ReturnType<typeof ui.stack>
+
+    ui.cond(
+        condition: any,
+        options: Partial<{
+            true: Component,
+            false: Component
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # Return type of all ui components
+    Component = ui.stack | ui.button | ui.text_input | /* more components */ | ui.markdown
+
+    ui.cond(
+        condition: Any,
+        *,
+        true: Component,
+        false: Component
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="condition"
+    required={true}
+    type="any"
+    description="The condition to evaluate. The condition will be evaluated for truthiness"
+/>
+
+<Parameter
+    name="true"
+    required={false}
+    type="Component"
+    description="The component to render if the condition evaluates to true. If not provided, nothing will be rendered."
+/>
+
+<Parameter
+    name="false"
+    required={false}
+    type="Component"
+    description="The component to render if the condition evaluates to false. If not provided, nothing will be rendered."
+/>

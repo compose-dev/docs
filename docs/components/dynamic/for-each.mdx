@@ -1,0 +1,112 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | For Each
+description: Map an iterable of items to a list of components.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { Parameter, ParameterTemplate } from "../../../src/components";
+
+# Component | For Each
+
+:::note
+Introduced in SDK v0.25.3.
+:::
+
+Map a list of items to a list of components.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.add(() =>
+        ui.forEach(["1", "2", "3"], (num) => ui.text(num))
+    );
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    page.add(
+        lambda: ui.for_each(
+            [0, 1, 2],
+            lambda item, idx: ui.text(f"Item: {item} at index {idx}")
+        )
+    )
+    ```
+  </TabItem>
+</Tabs>
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type Component = ReturnType<typeof ui.textInput> | ReturnType<typeof ui.button> | /* more components */ | ReturnType<typeof ui.stack>
+
+    ui.forEach<T>(
+        items: Array<T>,
+        generator: (item: T, index: number) => Component
+        options?: Partial<{
+            direction: "vertical" | "horizontal" | "vertical-reverse" | "horizontal-reverse",
+            justify: "start" | "end" | "center" | "between" | "around" | "evenly",
+            align: "start" | "end" | "center" | "baseline" | "stretch",
+            spacing: string,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # Return type of all ui components
+    Component = ui.stack | ui.button | ui.text_input | # ...
+
+    T = TypeVar("T")
+
+    ui.for_each(
+        items: Iterable[T],
+        generator: Callable[[T], Component] | Callable[[T, int], Component]
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="items"
+    required={true}
+    type={lang => lang === "py" ? "Iterable[T]" : "Array<T>"}
+    description={lang => `The ${lang === "py" ? "iterable" : "array"} of items to map to components.`}
+/>
+
+<Parameter
+    name="generator"
+    required={true}
+    type={lang => lang === "py" ? "Callable[[T], Component] | Callable[[T, int], Component]" : "function(item: T, index: number): Component"}
+    description={lang => lang === "py" ? "A function that takes an item (and optionally an index) and returns a component." : "A function that takes an item and index, and returns a component."}
+/>
+
+<ParameterTemplate.LayoutDirection />
+
+<ParameterTemplate.LayoutJustify
+    componentName="container"
+/>
+
+<ParameterTemplate.LayoutAlign
+    componentName="container"
+/>
+
+<ParameterTemplate.LayoutSpacing />
+
+<ParameterTemplate.Style
+    description={(
+        <>
+            <p>Directly style the underlying <code>div</code> container element using CSS. See the <a href="/guides/styling-your-app#styles">styling guide</a> for more details on available style properties.</p>
+            <p>For example, you could set a border around the stack to create a card component.</p>
+        </>
+    )}
+/>

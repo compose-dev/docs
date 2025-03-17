@@ -1,0 +1,173 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Guide | Troubleshooting Issues
+description: How to troubleshoot issues and bugs with Compose.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Guide | Troubleshooting Issues
+
+This guide outlines common issues with Compose and how to troubleshoot them. You can also always ask questions on [Discord](https://discord.gg/82rk2N8ZE6) to talk to other users and members of the team.
+
+## Slow Performance
+
+Slow performance in Compose applications typically manifests as excessive latency.
+
+### Understanding latency
+
+Latency is caused by the following three factors:
+
+- **Network Travel Time**: Time for messages to travel between browsers and SDK server (typically 50-150ms round trip for US-based users, higher internationally).
+- **SDK Processing Time**: Time to process method calls like `page.add()` and `page.update()` (typically 5-25ms).
+- **Application Processing Time**: Time for your business logic to execute (database queries, API calls, data transformations).
+
+***Before diving into debugging, you should confirm that the latency is not due to time spent executing your own business logic.***
+
+### Use Debug Mode
+
+You can enable debug mode to identify which SDK operations are slow. When enabled, debug mode will log internal Compose operations and performance metrics to your console.
+
+Performance metrics outside normal ranges will appear in <span style={{ color: "orange" }}>orange</span>. Pay special attention to any metrics that take longer than 100ms.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const client = new Compose.Client({
+        apiKey: "...",
+        apps: [/* ... */],
+        // highlight-next-line
+        debug: true,
+    })
+    ``` 
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    client = c.Client(
+        api_key="...",
+        apps=[...],
+        # highlight-next-line
+        debug=True,
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+If you receive performance warnings, you can isolate the slow component by adding a `key` parameter to the `page.add()` and `page.modal()` calls, which will be reflected in the logs.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.add(() => ui.text("Hello, world!"), { key: "hello-text" });
+
+    page.modal(() => ui.text("Hello, world!"), { key: "hello-modal" });
+    ``` 
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.add(lambda: ui.text("Hello, world!"), key="hello-text")
+
+    page.modal(lambda: ui.text("Hello, world!"), key="hello-modal")
+    ```
+    </TabItem>
+</Tabs>
+
+See the [debug mode guide](/guides/debug-mode) for more information on understanding the logs.
+
+### Solutions
+
+Once you've identified the slow `page.add()` or `page.modal()` call, you can try the following solutions:
+
+#### Move business logic outside UI callbacks
+
+When you call `page.update()`, Compose re-executes all callback functions passed to `page.add()` and `page.modal()`, then diffs the results against previously cached ones.
+
+Thus, any business logic embedded inside the callback will also be re-executed. An easy solution is to move business logic outside the callback and only run it when needed.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    // ❌ INCORRECT
+    page.add(() => 
+        ui.table("users-table", db.fetchAllUsers()) // query runs on every update
+    )
+
+    // ✅ CORRECT
+    let users = db.fetchAllUsers(); // query runs only once
+    page.add(() => ui.table("users-table", users));
+
+    users = db.fetchAllUsers(); // re-fetch only when needed
+    page.update();
+    ``` 
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # ❌ INCORRECT
+    page.add(lambda: 
+        ui.table("users-table", db.fetch_all_users())  # query runs on every update
+    )
+
+    # ✅ CORRECT
+    users = db.fetch_all_users()  # query runs only once
+    page.add(lambda: ui.table("users-table", users))
+
+    users = db.fetch_all_users()  # re-fetch only when needed
+    page.update()
+    ```
+    </TabItem>
+</Tabs>
+
+#### Optimize heavy components
+
+Certain components are more expensive to render and update than others.
+
+- **Large tables**: For tables with more than a couple hundred rows, consider using [pagination](/components/input/table#pagination).
+- **Heavy charts**: For charts with many rows, consider pre-formatting the data instead of using the built in data transformation utilities.
+- **Large PDFs/images**: Consider using compressed versions of PDFs and images.
+
+#### Break up large apps
+
+If your app has grown to many dozens of components, you can try breaking up your app into [multiple individual apps](/guides/multipage-apps) that link to each other.
+
+## `page.update()` not working
+
+If `page.update()` is not working as expected, read the [common pitfalls](/page-actions/update#common-pitfalls) section of the `page.update()` documentation.
+
+## SDK issues
+
+For non-performance related issues with the SDK, you can enable debug mode to log profiling information to your console.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const client = new Compose.Client({
+        apiKey: "...",
+        apps: [/* ... */],
+        // highlight-next-line
+        debug: true,
+    })
+    ``` 
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    client = c.Client(
+        api_key="...",
+        apps=[...],
+        # highlight-next-line
+        debug=True,
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+Debug mode can help you see if page method calls are being properly registered and executed by the SDK, and if the SDK is properly communicating with the browser. For a more detailed explanation of the logs, see the [debug mode](/guides/debug-mode) guide.
+
+## Other issues
+
+For all other issues, please reach out to us and we'll look into it ASAP.
+
+- Message us on [Discord](https://discord.gg/82rk2N8ZE6)
+- Email us: atul@composehq.com
+

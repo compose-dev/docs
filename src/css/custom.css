@@ -1,0 +1,346 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital@0;1&display=swap");
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #0056bb;
+  --ifm-color-primary-dark: #004da8;
+  --ifm-color-primary-darker: #00499f;
+  --ifm-color-primary-darkest: #003c83;
+  --ifm-color-primary-light: #005fce;
+  --ifm-color-primary-lighter: #0063d7;
+  --ifm-color-primary-lightest: #0070f3;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  --ifm-tabs-padding-vertical: 0.5rem;
+  --ifm-tabs-padding-horizontal: 0.5rem;
+
+  --ifm-font-family-base: "Inter";
+  --ifm-heading-font-family: "Inter";
+  --ifm-font-family-monospace: "JetBrains Mono";
+
+  --doc-sidebar-width: 240px !important;
+
+  --custom-letter-spacing: -0.0125em;
+
+  --custom-h1-font-size: 1.875rem;
+  --custom-h1-font-weight: 750;
+
+  --custom-h2-font-size: 1.5rem;
+  --custom-h2-font-weight: 750;
+
+  --custom-h3-font-size: 1.25rem;
+  --custom-h3-font-weight: 750;
+
+  --custom-h4-font-size: 1rem;
+  --custom-h4-font-weight: 750;
+
+  --custom-h5-font-size: 0.875rem;
+  --custom-h5-font-weight: 750;
+
+  --custom-h6-font-size: 0.75rem;
+  --custom-h6-font-weight: 750;
+
+  --custom-border-color: #d6d3d1;
+
+  --custom-sidebar-item-margin: 0.3125rem;
+
+  /* --ifm-navbar-shadow: none; */
+  --ifm-h1-font-size: var(--custom-h1-font-size);
+  --ifm-h2-font-size: var(--custom-h2-font-size);
+  --ifm-h3-font-size: var(--custom-h3-font-size);
+  --ifm-h4-font-size: var(--custom-h4-font-size);
+  --ifm-h5-font-size: var(--custom-h5-font-size);
+  --ifm-h6-font-size: var(--custom-h6-font-size);
+
+  --ifm-color-content: var(--ifm-color-emphasis-800);
+
+  --danger-bg-color: hsla(0, 93%, 94%, 0.5);
+  --danger-text-color: rgb(220, 38, 38);
+
+  --ifm-leading-desktop: 1.1;
+
+  --ifm-hr-background-color: var(--ifm-color-emphasis-300) !important;
+}
+
+.markdown h1 {
+  --ifm-h1-font-size: var(--custom-h1-font-size) !important;
+  font-weight: var(--custom-h1-font-weight) !important;
+  margin-top: 1rem !important;
+  letter-spacing: var(--custom-letter-spacing) !important;
+}
+
+.markdown > h2 {
+  --ifm-h2-font-size: var(--custom-h2-font-size) !important;
+  font-weight: var(--custom-h2-font-weight) !important;
+  letter-spacing: var(--custom-letter-spacing) !important;
+}
+
+.markdown > h3 {
+  --ifm-h3-font-size: var(--custom-h3-font-size) !important;
+  font-weight: var(--custom-h3-font-weight) !important;
+}
+
+.markdown > h4 {
+  --ifm-h4-font-size: var(--custom-h4-font-size) !important;
+  font-weight: var(--custom-h4-font-weight) !important;
+}
+
+.markdown > h5 {
+  --ifm-h5-font-size: var(--custom-h5-font-size) !important;
+  font-weight: var(--custom-h5-font-weight) !important;
+}
+
+.markdown > h6 {
+  --ifm-h6-font-size: var(--custom-h6-font-size) !important;
+  font-weight: var(--custom-h6-font-weight) !important;
+}
+
+/* For readability concerns, you should choose a lighter palette in dark mode. */
+[data-theme="dark"] {
+  --ifm-color-primary: #b3d6ff;
+  --ifm-color-primary-dark: #88bfff;
+  --ifm-color-primary-darker: #72b3ff;
+  --ifm-color-primary-darkest: #3190ff;
+  --ifm-color-primary-light: #deedff;
+  --ifm-color-primary-lighter: #f4f9ff;
+  --ifm-color-primary-lightest: #ffffff;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-content: #d3d3d3 !important;
+  --ifm-heading-color: #e3e3e3 !important;
+
+  --danger-text-color: rgb(252, 165, 165);
+  --danger-bg-color: hsla(0, 91%, 71%, 0.1);
+
+  --custom-border-color: #57534e;
+
+  --docsearch-highlight-color: var(--ifm-color-primary-darkest) !important;
+}
+
+/* Target the category label */
+.menu__list-item-collapsible > .menu__link {
+  font-weight: 750 !important;
+  font-size: 0.875rem !important;
+  color: var(--ifm-color-emphasis-900) !important; /* Use default color */
+  letter-spacing: 0em;
+  text-transform: uppercase;
+}
+
+/* .menu__list-item-collapsible:hover {
+  background-color: transparent !important;
+} */
+
+/* Remove indentation from all menu items */
+.menu__list {
+  padding-left: 0 !important;
+  margin-left: 0 !important;
+}
+
+#sidebar-divider {
+  border-bottom: 1px dashed var(--ifm-color-emphasis-200) !important;
+  width: 4rem !important;
+  margin-top: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+  margin-left: 0.75rem !important;
+}
+
+[data-theme="light"] #sidebar-divider {
+  border-bottom: 1px dashed var(--ifm-color-emphasis-500) !important;
+}
+
+#parameter-divider {
+  border: none !important;
+  background-color: transparent !important;
+  border-bottom: 1px dashed var(--ifm-color-emphasis-200) !important;
+  width: 100% !important;
+  margin: 1rem 0 !important;
+}
+
+[data-theme="light"] #parameter-divider {
+  border-bottom: 1px dashed var(--ifm-color-emphasis-500) !important;
+}
+
+.theme-doc-sidebar-item-category-level-1 {
+  margin-bottom: 2rem !important;
+}
+
+.menu__list-item {
+  /* margin-left: 0.25rem !important; */
+  font-size: 1rem !important;
+  font-weight: 450 !important;
+  color: var(--ifm-color-content) !important;
+}
+
+.menu__list-item > .menu__link {
+  color: var(--ifm-color-content);
+  font-size: 0.875rem !important;
+  padding-top: var(--custom-sidebar-item-margin) !important;
+  padding-bottom: var(--custom-sidebar-item-margin) !important;
+}
+
+.theme-doc-sidebar-item-category-level-2
+  > .menu__list-item-collapsible
+  > .menu__link {
+  font-weight: 450 !important;
+  font-size: 0.875rem !important;
+  padding-top: var(--custom-sidebar-item-margin) !important;
+  padding-bottom: var(--custom-sidebar-item-margin) !important;
+  color: var(--ifm-color-content) !important;
+  text-transform: capitalize !important;
+}
+
+/* Adjust padding for nested items to align with parent */
+.menu__list .menu__list {
+  padding-left: 0 !important;
+}
+
+.hide_tabs {
+  display: none;
+}
+
+.menu {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ifm-color-emphasis-600) transparent;
+}
+
+[data-theme="dark"] .menu {
+  scrollbar-color: var(--ifm-color-emphasis-200) transparent;
+}
+
+.container {
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.menu {
+  padding: 0.5rem !important;
+  margin-top: 1.5rem;
+}
+
+.no-top-margin {
+  margin-top: -1rem !important;
+}
+
+.table-of-contents {
+  margin-top: 1rem !important;
+}
+
+.rounded {
+  border-radius: 8px;
+}
+
+.theme-doc-sidebar-item-category-level-1 {
+  margin-bottom: 2rem;
+}
+
+.theme-doc-sidebar-item-category-level-2
+  > .menu__list-item-collapsible
+  > .menu__link--sublist-caret::after {
+  height: 1rem !important;
+  background: var(--ifm-menu-link-sublist-icon) 50% / 1rem 1rem;
+  transform: rotate(180deg);
+  transition: transform var(--ifm-transition-fast) linear;
+}
+
+.theme-doc-sidebar-item-category-level-2
+  > .menu__list-item-collapsible
+  > .menu__link--sublist-caret[aria-expanded="true"]::after {
+  transform: rotate(0deg);
+}
+
+.theme-doc-sidebar-item-link-level-3 > .menu__link {
+  color: var(--ifm-color-emphasis-700) !important;
+  font-size: 1rem !important;
+  padding-left: 1rem !important;
+  font-size: 15px !important;
+}
+
+.theme-doc-sidebar-item-link-level-3 > .menu__link--active {
+  color: var(--ifm-menu-color-active) !important;
+}
+
+/* .theme-doc-sidebar-item-link-level-3:last-child {
+  padding-bottom: 0.5rem !important;
+} */
+
+.api_parameter_container {
+  margin: var(--ifm-heading-margin-top) 0 var(--ifm-heading-margin-bottom) 0;
+}
+
+.api_parameter {
+  font-size: 0.875rem !important;
+  font-weight: 750 !important;
+  font-family: var(--ifm-font-family-monospace) !important;
+  color: var(--ifm-color-primary) !important;
+}
+
+.prism-code {
+  border-color: var(--custom-border-color) !important;
+  border-width: 1px !important;
+  border-radius: 4px !important;
+  border-style: dashed !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.tabs__item {
+  border-bottom-width: 2px !important;
+}
+
+.theme-doc-sidebar-item-link-level-3 > .menu__link {
+  color: var(--ifm-color-content) !important;
+  font-size: 0.875rem !important;
+  padding-left: 1.25rem !important;
+}
+
+.menu__list-item > .menu__link--active {
+  color: var(--ifm-menu-color-active) !important;
+}
+
+/* Dividers for the components section of the sidebar */
+.sidebar-component-divider {
+  /* Style the section */
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+
+  /* Spacing */
+  margin-left: 0.75rem !important;
+  margin-top: 0.75rem !important;
+  margin-bottom: 0.75rem !important;
+  margin-right: 0.75rem !important;
+}
+
+.sidebar-component-divider > span {
+  font-size: 0.75rem !important;
+  text-transform: uppercase !important;
+  color: var(--ifm-color-emphasis-700) !important;
+}
+
+[data-theme="dark"] .sidebar-component-divider > span {
+  color: var(--ifm-color-emphasis-400) !important;
+}
+
+.sidebar-component-divider-line {
+  flex-grow: 1 !important;
+  height: 1px !important;
+  background-color: var(--ifm-color-emphasis-300) !important;
+}
+
+[data-theme="dark"] .sidebar-component-divider-line {
+  background-color: var(--ifm-color-emphasis-200) !important;
+}
+
+/* Will hide an item from being displayed in the sidebar */
+.hidden-sidebar-item {
+  display: none !important;
+}
+
+.theme-doc-sidebar-container {
+  border-right: none !important;
+}

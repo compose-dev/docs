@@ -1,0 +1,87 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | JSON
+description: Render a formatted JSON object.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components";
+
+# Component | JSON
+
+Render a formatted JSON object.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.json({
+        "first": "John",
+        "last": "Doe",
+        "age": 50,
+        "address": {
+            "street": "123 Main St",
+            "city": "Anytown",
+            "state": "CA",
+            "zip": "12345"
+        }
+    })
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    ui.json({
+        "first": "John",
+        "last": "Doe",
+        "age": 50,
+        "address": {
+            "street": "123 Main St",
+            "city": "Anytown",
+            "state": "CA",
+            "zip": "12345"
+        }
+    })
+    ```
+  </TabItem>
+</Tabs>
+
+<IFrame type="components-display-json" heightPx={400} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.json(
+        json: object,
+        options: Partial<{
+            style: Style | null
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.json(
+        json: object,
+        *,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="json"
+    required={true}
+    type="object"
+    description="The JSON object to be rendered."
+/>
+
+<ParameterTemplate.Style />

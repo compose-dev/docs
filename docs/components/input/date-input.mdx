@@ -1,0 +1,315 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Date Input
+description: Render a date input box.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate } from "../../../src/components"
+
+
+# Component | Date Input
+
+Render a date input box.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.dateInput("date-input-key", { 
+        label: "Enter your birthday",
+        onEnter: (value) => console.log(value)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.date_input(
+        "date-input-key",
+        label="Enter your birthday",
+        on_enter=lambda value: print(value)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-date" heightPx={150} />
+
+Learn more about [working with inputs](/guides/forms).
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    /**
+     * One of the following:
+     * - A JS Date object in UTC
+     * - A human readable object with year, month (1-12), and day (1-31)
+     * - `null` to ignore the parameter and use the default value
+     */
+    type DateInput = 
+        | {
+            year: number;
+            month: number; // 1-12
+            day: number; // 1-31
+        }
+        | Date // Assumes UTC for the given date
+        | null
+
+    /**
+     * An object with human readable values for year, month (1-12), and day (1-31)
+     * and a JS Date object in UTC for the selected date.
+     */
+    type DateOutput = 
+        | {
+            year: number;
+            month: number; // 1-12
+            day: number; // 1-31
+            jsDate: Date; // UTC midnight of the selected date
+        }
+        | null // Passes `null` if no date was selected
+
+    ui.dateInput(
+        id: string,
+        properties: Partial<{
+            label: string,
+            description: string,
+            required: boolean,
+            min: DateInput,
+            max: DateInput,
+            initialValue: DateInput,
+            validate: (value: DateOutput | null) => string | void,
+            onEnter: (value: DateOutput | null) => void,
+            style: Style | null
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    DateInputType = datetime.date | datetime.datetime | None
+    DateOutputType = datetime.date | None
+
+    ui.date_input(
+        id: str,
+        *,
+        label: str = None,
+        description: str = None,
+        required: bool = True,
+        min: DateInputType | None = None,
+        max: DateInputType | None = None,
+        initial_value: DateInputType | None = None,
+        validate: Callable[[DateOutputType | None], str | None] = None,
+        on_enter: Callable[[DateOutputType | None], None] = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Label componentName="date input" />
+
+<ParameterTemplate.Description
+    componentName="date input box"
+/>
+
+<ParameterTemplate.Required
+    parameter="required"
+    componentName="date input"
+    hookName={lang => lang === "js" ? "onEnter" : "on_enter"}
+/>
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.min</span> <span className="optional-pill">Optional</span> <span className="type-pill">DateInput | null</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">min</span> <span className="optional-pill">Optional</span> <span className="type-pill">DateInputType | None</span>
+    </TabItem>
+</Tabs>
+
+The earliest date that can be selected. If not provided, there is no minimum date.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The parameter expects either a JS Date in UTC or a human readable object with year, month (1-12), and day (1-31).
+
+    ```js
+    type DateInput = 
+        | {
+            year: number;
+            month: number; // 1-12
+            day: number; // 1-31
+        }
+        | Date // Assumes UTC for the given date
+        | null // Use default value (i.e. no minimum date)
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The parameter expects either a `datetime.date` or `datetime.datetime` object or `None` to ignore the parameter and use the default value.
+
+    ```python
+    DateInputType = datetime.date | datetime.datetime | None
+    ```
+    </TabItem>
+</Tabs>
+
+---
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.max</span> <span className="optional-pill">Optional</span> <span className="type-pill">DateInput | null</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">max</span> <span className="optional-pill">Optional</span> <span className="type-pill">DateInputType | None</span>
+    </TabItem>
+</Tabs>
+
+The latest date that can be selected. If not provided, there is no maximum date.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The parameter expects either a JS Date in UTC or a human readable object with year, month (1-12), and day (1-31).
+
+    ```js
+    type DateInput = 
+        | {
+            year: number;
+            month: number; // 1-12
+            day: number; // 1-31
+        }
+        | Date // Assumes UTC for the given date
+        | null // Use default value (i.e. no maximum date)
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The parameter expects either a `datetime.date` or `datetime.datetime` object or `None` to ignore the parameter and use the default value.
+
+    ```python
+    DateInputType = datetime.date | datetime.datetime | None
+    ```
+    </TabItem>
+</Tabs>
+
+---
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.initialValue</span> <span className="optional-pill">Optional</span> <span className="type-pill">DateInput | null</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">initial_value</span> <span className="optional-pill">Optional</span> <span className="type-pill">DateInputType | None</span>
+    </TabItem>
+</Tabs>
+
+The initial value to set for the date input. If not provided, the date input will be empty initially.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The parameter expects either a JS Date in UTC or a human readable object with year, month (1-12), and day (1-31).
+
+    ```js
+    type DateInput = 
+        | {
+            year: number;
+            month: number; // 1-12
+            day: number; // 1-31
+        }
+        | Date // Assumes UTC for the given date
+        | null // Use default value (i.e. no initial value)
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The parameter expects either a `datetime.date` or `datetime.datetime` object or `None` to ignore the parameter and use the default value.
+
+    ```python
+    DateInputType = datetime.date | datetime.datetime | None
+    ```
+    </TabItem>
+</Tabs>
+
+---
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.validate</span> <span className="optional-pill">Optional</span> <span className="type-pill">(value: DateOutput) => string | void</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">validate</span> <span className="optional-pill">Optional</span> <span className="type-pill">Callable[[DateOutputType], str | None]</span>
+    </TabItem>
+</Tabs>
+
+Supply a custom function to validate the date input.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The validator will be passed an object with the following properties:
+
+    ```js
+    type DateOutput = 
+        | {
+            year: number;
+            month: number; // 1-12
+            day: number; // 1-31
+            jsDate: Date; // UTC midnight of the selected date
+        }
+        | null // Passes `null` if no date was selected
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The validator will be passed a `datetime.date` variable with the selected date or `None` if no date was selected.
+
+    ```python
+    DateOutputType = datetime.date | None
+    ```
+    </TabItem>
+</Tabs>
+
+---
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.onEnter</span> <span className="optional-pill">Optional</span> <span className="type-pill">(value: DateOutput) => void</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">on_enter</span> <span className="optional-pill">Optional</span> <span className="type-pill">Callable[[DateOutputType], None]</span>
+    </TabItem>
+</Tabs>
+
+Supply a callback function that is called when the user presses enter while the date input is focused.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The callback will be passed an object with the following properties:
+
+    ```js
+    type DateOutput = 
+        | {
+            year: number;
+            month: number; // 1-12
+            day: number; // 1-31
+            jsDate: Date; // UTC midnight of the selected date
+        }
+        | null // Passes `null` if no date was selected
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The callback will be passed a `datetime.date` variable with the selected date or `None` if no date was selected.
+
+    ```python
+    DateOutputType = datetime.date | None
+    ```
+    </TabItem>
+</Tabs>
+---
+
+<ParameterTemplate.Style />

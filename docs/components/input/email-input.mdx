@@ -1,0 +1,121 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Email Input
+description: Render an email input box.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate } from "../../../src/components"
+
+# Component | Email Input
+
+Render an email input box.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.emailInput("email-input-key", { 
+        label: "Enter your email",
+        onEnter: (value) => console.log(value)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.email_input(
+        "email-input-key",
+        label="Enter your email",
+        on_enter=lambda value: print(value)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-email" heightPx={150} />
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node">
+    This component is a light wrapper on top of `ui.textInput` with email validation built in.
+    </TabItem>
+    <TabItem value="python">
+    This component is a light wrapper on top of `ui.text_input` with email validation built in.
+    </TabItem>
+</Tabs>
+
+Learn more about [working with inputs](/guides/forms).
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.emailInput(
+        id: string,
+        properties?: Partial<{
+            label: string,
+            description: string,
+            required: boolean,
+            initialValue: string | null,
+            validate: (value: string | null) => string | void,
+            onEnter: (value: string | null) => void,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.email_input(
+        id: str,
+        *,
+        label: str | None = None,
+        description: str | None = None,
+        required: bool = True,
+        initial_value: str | None = None,
+        validate: Callable[[str | None], str | None] | None = None,
+        on_enter: Callable[[str | None], None] | None = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Label
+    componentName="email input"
+/>
+
+<ParameterTemplate.Description
+    componentName="email input box"
+/>
+
+<ParameterTemplate.Required
+    parameter="required"
+    componentName="email input"
+    hookName={lang => lang === "js" ? "onEnter" : "on_enter"}
+/>
+
+<ParameterTemplate.InitialValue
+    componentName="email input"
+    type={lang => lang === "js" ? "string | null" : "str | None"}
+/>
+
+<ParameterTemplate.ValidateInput
+    componentName="email input"
+    hookInputArgument={lang => lang === "js" ? "value: string | null" : "str | None"}
+/>
+
+<ParameterTemplate.OnEnter
+    componentName="email input"
+    hookInputArgument={lang => lang === "js" ? "value: string | null" : "str | None"}
+/>
+
+<ParameterTemplate.Style />

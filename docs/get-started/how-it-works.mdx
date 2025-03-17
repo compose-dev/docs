@@ -1,0 +1,78 @@
+---
+sidebar_position: 2
+hide_title: true
+title: Get Started | How Compose Works
+description: How Compose works under the hood.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# How Compose Works
+
+Compose employs a hybrid architecture under which business logic and secrets live within your infra, while UI rendering and network communication is handled by Compose.
+
+## Connecting to the Compose servers
+
+When you run your script, the Compose SDK opens a secure, background websocket connection to our servers. This websocket connection facilitates two-way communication between the SDK and the browser.
+
+Method calls such as `page.add()` and `page.toast()` are serialized into JSON, and sent to the browser for rendering. Similarly, user interactions in the browser (e.g. a button click) are serialized and sent back to the SDK for you to handle.
+
+<img src="/img/compose-architecture.png" className="rounded" />
+
+The SDK never connects directly to the browser. Instead, all communication is encrypted and proxied through Compose's servers, ensuring security by allowing us to authenticate both the browser and SDK.
+
+## Running an app
+
+When you load an app in the browser, Compose will send a message to the SDK to run that app's `handler` function. 
+
+The handler function is evaluated like any other function. As it runs, `page` method calls are serialized and sent to the browser, while browser events are sent back and exposed as callbacks. Beyond that, you're free to run whatever code you want within the handler. Seamlessly mixing your own code and services alongside Compose SDK methods is precisely what makes Compose such a powerful approach to building software.
+
+## Reactive apps
+
+The handler function is only run once, even for reactive apps that use `page.update()`. This means that you can safely call db queries, do data transformation, etc. inside the handler function without worrying that they'll be called multiple times.
+
+Compose manages reactivity by re-running callback functions, instead of the entire handler. For example:
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        function handler({ page, ui }) {
+            let count = 0;
+
+            page.add(() => ui.text(`Count: ${count}`));
+
+            page.add(() => ui.button("increment", {
+                onClick: () => {
+                    count += 1;
+                    page.update();
+                }
+            })
+        )
+        ```
+
+        There are two callbacks in this example:
+        1. The `onClick` callback, which is called everytime the button is clicked.
+        2. The callbacks within `page.add()`, which are re-run whenever `page.update()` is called. Re-running these callbacks allows Compose to generate an updated UI, which is then sent to the browser.
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        def handler(page: c.Page, ui: c.UI):
+            count = 0
+
+            def on_click():
+                nonlocal count
+                count += 1
+                page.update()
+
+            page.add(lambda: ui.text(f"Count: {count}"))
+            page.add(lambda: ui.button("increment", on_click=on_click))
+        ```
+
+        There are two callbacks in this example:
+        1. The `on_click` callback, which is called everytime the button is clicked.
+        2. The callbacks within `page.add()`, which are re-run whenever `page.update()` is called. Re-running these callbacks allows Compose to generate an updated UI, which is then sent to the browser.
+    </TabItem>
+</Tabs>
+
+The handler function itself is never re-run.

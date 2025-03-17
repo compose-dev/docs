@@ -1,0 +1,177 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Header
+description: Render header text.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components";
+
+# Component | Header
+
+Render header text.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.header("Hello world!")
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    ui.header("Hello world!")
+    ```
+  </TabItem>
+</Tabs>
+
+<IFrame type="components-display-header" heightPx={150} />
+
+## Color & Size
+
+Use the `color` and `size` properties to quickly change the appearance of the header. See the API reference below for the full list of supported values for each.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.add(() => ui.stack(
+        [
+            ui.header("Users Dashboard", { size: "lg" }),
+            ui.header("Section 1: Existing users", { 
+              color: "text-secondary", 
+              size: "xs" 
+            })
+        ]
+    ))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.add(lambda: ui.stack(
+        [
+            ui.header("Users Dashboard", size="lg"),
+            ui.header(
+              "Section 1: Existing users",
+              color="text-secondary",
+              size="xs"
+            )
+        ]
+    ))
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-display-header-appearance" heightPx={200} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.header(
+        text: string,
+        properties?: Partial<{
+            color: "text" | "text-secondary" | "primary" | "success" | "warning" | "danger" | "background",
+            size: "xs" | "sm" | "md" | "lg" | "xl",
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.header(
+        text: str,
+        *,
+        color: Literal["text", "text-secondary", "primary", "success", "warning", "danger", "background"] = "text",
+        size: Literal["xs", "sm", "md", "lg", "xl"] = "md",
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="text"
+    required={true}
+    type="string"
+    description="The text to be displayed."
+/>
+
+<Parameter
+    name="color"
+    required={false}
+    type="literal"
+    description={
+        <>
+            <p>
+              Specifies the color of the header. Defaults to <code>"text"</code>
+            </p>
+            <p>Options:</p>
+            <ul>
+              <li>
+                <code>"text"</code>: Default text color
+              </li>
+              <li>
+                <code>"text-secondary"</code>: Secondary text color, uses a lighter shade of the default text color
+              </li>
+              <li>
+                <code>"primary"</code>: Primary color. Defaults to a shade of blue. Can be set via the <a href="/guides/styling-your-app#theming">theme</a>.
+              </li>
+              <li>
+                <code>"success"</code>: Success color, green.
+              </li>
+              <li>
+                <code>"warning"</code>: Warning color, orange.
+              </li>
+              <li>
+                <code>"danger"</code>: Danger color, red.
+              </li>
+              <li>
+                <code>"background"</code>: Background color. Can be used over inverted backgrounds.
+              </li>
+            </ul>
+        </>
+    }
+    version="0.19.1"
+/>
+
+<Parameter
+    name="size"
+    required={false}
+    type="literal"
+    description={
+        <>
+            <p>
+              Specifies the size of the header. Defaults to <code>"md"</code>
+            </p>
+            <p>Options:</p>
+            <ul>
+              <li>
+                <code>"xs"</code>: Extra small header
+              </li>
+              <li>
+                <code>"sm"</code>: Small header
+              </li>
+              <li>
+                <code>"md"</code>: Medium header
+              </li>
+              <li>
+                <code>"lg"</code>: Large header
+              </li>
+              <li>
+                <code>"xl"</code>: Extra large header
+              </li>
+            </ul>
+        </>
+    }
+    version="0.19.1"
+/>
+
+<ParameterTemplate.Style />

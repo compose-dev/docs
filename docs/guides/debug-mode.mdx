@@ -1,0 +1,159 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Guide | Debug Mode
+description: How to use debug mode in Compose.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+
+# Guide | Debug Mode
+
+Turning on `debug` mode will log internal Compose operations and performance metrics to your console. This is useful when:
+
+1. Debugging slow performance.
+2. Debugging issues where Compose does not execute a method call, or otherwise behaves unexpectedly.
+
+You can always join the [Discord server](https://discord.gg/82rk2N8ZE6) to talk to engineers on the team - we're happy to help, and want to make sure you get the most out of Compose.
+
+## Enabling debug mode
+
+To enable `debug` mode, pass `debug: true` to the `Client` constructor.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const client = new Compose.Client({
+        apiKey: "...",
+        apps: [/* ... */],
+        // highlight-next-line
+        debug: true,
+    })
+    ``` 
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    client = c.Client(
+        api_key="...",
+        apps=[...],
+        # highlight-next-line
+        debug=True,
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+## Understanding the logs
+
+Debug mode will produce logs that look like this:
+
+```text
+Send websocket message event | INITIALIZE | 2025-02-09T02:40:32.314Z
+Browser event | Start app execution (route: mega-test) | 2025-02-09T02:40:32.384Z
+Page event | add (fragment: page header) | 2025-02-09T02:40:32.385Z
+Page add (fragment: page header) event | Compressed layout in 0.02 ms | 2025-02-09T02:40:32.434Z
+```
+
+Each message breaks down into three parts:
+
+1. Event type
+2. Abbreviated event information
+3. Event timestamp
+
+### Event types
+
+There are five event types:
+
+- `Browser event`: Represents a message received from the browser (e.g. a button click).
+- `Send websocket message event`: Represents a message sent to the browser (e.g. render some UI).
+- `Page event`: Indicates that a page method was invoked (e.g. `page.add()`, `page.modal()`, etc.).
+- `Page add event`: Logs the internal operations performed to prepare a UI fragment after invoking `page.add()`.
+- `Page update event`: Logs the internal operations performed to prepare a UI update after invoking `page.update()`.
+
+You'll likely only need to inspect some of these logs depending on the issue you're trying to debug.
+
+## Debugging slow performance
+
+When debugging performance issues, you mainly want to understand which UI fragment (i.e. which `page.add()` or `page.modal()` function) is slow to render or re-render.
+
+Operations that take longer than normal will appear in <span style={{ color: "orange" }}>orange</span>. While the exact thresholds may vary, you should pay special attention to any operations that take longer than 100ms.
+
+To further isolate the slow operation, you can add a `key` parameter to `page.add()` and `page.modal()` calls, which will be reflected in the logs.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.add(() => ui.text("Hello, world!"), { key: "hello-text" });
+
+    page.modal(() => ui.text("Hello, world!"), { key: "hello-modal" });
+    ``` 
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.add(lambda: ui.text("Hello, world!"), key="hello-text")
+
+    page.modal(lambda: ui.text("Hello, world!"), key="hello-modal")
+    ```
+    </TabItem>
+</Tabs>
+
+### Debug `page.add()`
+
+If the issue is the initial rendering of a fragment, you should look at the page add events. For example:
+
+```
+Browser event | Start app execution (route: test-app) | 2025-02-09T02:40:32.384Z
+Page event | add (fragment: hello-text) | 2025-02-09T02:40:32.433Z
+Page add (fragment: hello-text) event | Generated static layout in 48.71 ms | 2025-02-09T02:40:32.434Z
+Send websocket message event | RENDER_UI | 2025-02-09T02:40:32.434Z
+```
+
+These logs tell us:
+
+1. When the app was first executed.
+2. When the `page.add()` method was invoked.
+3. How long it took for the layout model to be generated.
+4. When the processed UI fragment was sent to the browser.
+
+From this, we can figure out:
+
+- If there's a large delay between app execution and `page.add()` being invoked, there's likely some logic prior to `page.add()` in your handler function that's slow to execute.
+- If the layout model generation is slow (>100ms), then the issue lies within the actual UI components that are passed to `page.add()`. This usually happens when there's business logic (e.g. db queries, data transformations, etc.) embedded within the components. [You should always pre-process data](/guides/troubleshooting-issues#solutions) outside of the `page.add()` method.
+
+For other issues, you can join the [Discord server](https://discord.gg/82rk2N8ZE6) to talk to the engineers on the team.
+
+### Debug `page.update()`
+
+If the issue is slow re-rendering when you call `page.update()`, you should look at the page update events. For example:
+
+```
+Page event | update | 2025-02-09T10:58:14.286
+Page update (fragment: hello-text) event | generated new layout in 0.20 ms | 2025-02-09T10:58:14.288
+Page update (fragment: hello-text) event | validated layout in 0.01 ms | 2025-02-09T10:58:14.288
+Page update (fragment: hello-text) event | generated diff in 0.10 ms | 2025-02-09T10:58:14.288
+Page update (fragment: hello-modal) event | generated new layout in 0.07 ms | 2025-02-09T10:58:14.288
+Page update (fragment: hello-modal) event | validated layout in 0.00 ms | 2025-02-09T10:58:14.288
+Page update (fragment: hello-modal) event | generated diff in 0.05 ms | 2025-02-09T10:58:14.289
+Page update event | computed page diff in 13.08 ms | 2025-02-09T10:58:14.301
+Send websocket message event | Rerender UI V2 | 2025-02-09T10:58:14.301 // the event name may be slightly different depending on the SDK
+```
+
+These logs tell us:
+
+1. When the `page.update()` method was invoked.
+2. How long it took to generate a new layout, validate it, and generate a diff for each UI fragment.
+3. How long the entire update algorithm took.
+4. When the rerendered UI was sent to the browser.
+
+From this, we can figure out:
+
+- Which fragments are responsible for the slow update. Often, the issue is a single fragment that's much slower than others.
+- For that fragment, if the layout generation is slow (>100ms), or the diff generation is slow (>100ms).
+    - If the layout generation is slow, the issue lies within the UI components that are passed to `page.add()` or `page.modal()`. This usually happens when there's business logic (e.g. db queries, data transformations, etc.) embedded within the components. [You should always pre-process data](/guides/troubleshooting-issues#solutions) outside of the `page.add()` method.
+    - If the diff generation is slow, the issue is usually within the size of the UI fragment (e.g. a PDF, very large table, etc.). In this case, you can try reducing the size of the fragment by paginating your table, using smaller PDF files, etc.
+
+## Debugging other issues
+
+For other issues, you can use the logs more generally to see what's going on. For example, ensure that `page` methods are being invoked, that the proper websocket messages are being sent, that browser messages are being received, etc.

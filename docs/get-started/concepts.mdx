@@ -1,0 +1,481 @@
+---
+# This file appears in llm.txt! Update there too.
+sidebar_position: 2
+hide_title: true
+title: Get Started | Core Concepts
+description: Quick overview of the main concepts to learn Compose.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+
+# Get Started | Core Concepts
+
+The SDK is made up of two parts:
+- a `client` that manages the connection between your backend and the browser.
+- a list of `apps` that you pass to the `client` to serve.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```ts
+        // 1: Import Compose from the SDK
+        import { Compose, Page, UI } from "@composehq/sdk"
+
+        // 2: Define a handler function for your app
+        const handler = ({ page, ui }: { page: Page, ui: UI }) => {
+            const users = database.fetchUsers() // do your own business logic
+            page.add(() => ui.table("users", users)) // call SDK method to render UI
+        }
+
+        // 3: Create an app by passing a unique route key and a handler function
+        const usersApp = new Compose.App({
+            route: "users-dashboard",
+            handler
+        });
+
+        // 4: Create the client by passing in the API key and the list of apps to serve
+        const client = new Compose.Client({
+            apiKey: "<API_KEY_HERE>",
+            apps: [usersApp]
+        });
+
+        // 5: Initialize the connection to the Compose servers
+        client.connect();
+        ```
+
+        Then, run your script:
+
+        ```bash
+        node --watch your_script.js
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        # 1: Import Compose from the SDK
+        import compose_sdk as c
+
+        # 2: Define a handler function for your app
+        def handler(page: c.Page, ui: c.UI):
+            users = database.fetch_users()
+            page.add(lambda: ui.table("users", users))
+
+        # 3: Create an app by passing a unique route key and a handler function
+        users_app = c.App(route="users-dashboard", handler=handler)
+
+        # 4: Create the client by passing in the API key and the list of apps to serve
+        client = c.Client(
+            api_key="<API_KEY_HERE>",
+            apps=[users_app],
+        )
+
+        # 5: Initialize the connection to the Compose servers
+        client.connect()
+        ```
+        Then, run your script:
+
+        ```bash
+        python your_script.py
+        # or, use pymon to automatically restart your server as you save changes
+        pymon your_script.py
+        ```
+    </TabItem>
+</Tabs>
+
+## App structure
+
+Compose apps are just async functions. Perform your own business logic and call SDK methods to render UI.
+
+There are two types of SDK methods:
+
+1. **Page methods** do things on the page. For example, use `page.add()` to render UI components to the page, `page.toast()` to display a toast notification, or `page.confirm()` to display a confirmation dialog.
+2. **UI methods** let you quickly construct common UI elements. For example, `ui.header()` creates a header, `ui.table()` creates a table, and `ui.button()` creates a button.
+
+Commands can be combined like legos inside your handler function to quickly build powerful apps with minimal code.
+
+## Render UI
+
+### Add UI to the page
+
+The [`page.add()` method](/page-actions/add) is the foundational method for adding any sort of UI to the page. You can use it in conjunction with any UI components to quickly build UIs for your apps.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        page.add(() => ui.header("Users"))
+        page.add(() => ui.button("Add user"))
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        page.add(lambda: ui.header("Users"))
+        page.add(lambda: ui.button("Add user"))
+        ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="get-started-fundamentals-add-ui" heightPx={175} />
+
+### Control the layout
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+Layout elements like `ui.stack()` and `ui.row()` let you [group and arrange child components](/guides/styling-your-app) on the page. Compose also offers opinionated layout components like `ui.card()` and `ui.distributedRow()` to help you quickly build complex layouts.
+    </TabItem>
+    <TabItem value="python" label="Python">
+Layout elements like `ui.stack()` and `ui.row()` let you [group and arrange child components](/guides/styling-your-app) on the page. Compose also offers opinionated layout components like `ui.card()` and `ui.distributed_row()` to help you quickly build complex layouts.
+    </TabItem>
+</Tabs>
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        page.add(() => ui.card(
+            ui.distributedRow([
+                ui.header("Users"),
+                ui.button("Add user")
+            ])
+        ))
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        page.add(lambda: ui.card(
+            ui.distributed_row([
+                ui.header("Users"),
+                ui.button("Add user")
+            ])
+        ))
+        ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="get-started-fundamentals-control-layout" heightPx={150} />
+
+### Re-render the UI
+
+Easily create reactive apps by updating the UI with [`page.update()`](/page-actions/update). Compose will diff the previous UI against the new one and intelligently update any components that have changed.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        import { Compose, Page, UI } from "@composehq/sdk"
+
+        function handler({ page, ui }: { page: Page, ui: UI }) {
+            let count = 0;
+
+            page.add(() => ui.stack([
+                ui.header(`Count: ${count}`),
+                ui.button("Increment", {
+                    onClick: () => {
+                        count += 1
+                        // highlight-next-line
+                        page.update()
+                    }
+                }),
+            ]))
+        }
+
+        const app = new Compose.App({ route: "counter", handler })
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        import compose_sdk as c
+
+        def handler(page: c.Page, ui: c.UI):
+            count = 0
+
+            def on_click():
+                nonlocal count
+                count += 1
+                # highlight-next-line
+                page.update()
+
+            page.add(lambda: ui.stack([
+                ui.header(f"Count: {count}"),
+                ui.button("Increment", on_click=on_click),
+            ]))
+
+        counter_app = c.App(route="counter", handler=handler)
+        ```
+    </TabItem>
+
+</Tabs>
+
+<IFrame type="get-started-fundamentals-state" heightPx={200} />
+
+:::note
+When working with objects, you need to [reassign the variable itself](/page-actions/update#common-pitfalls) rather than just modifying a nested property for `page.update()` to detect the change.
+:::
+
+## Collect user input
+
+### Input components
+
+Compose offers an extensive set of inputs that make it easy to collect user input.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        page.add(() => ui.radioGroup("ice-cream", ["yes", "no"], { 
+            label: "Do you like ice cream?", 
+            onChange: (value) => page.toast(`You selected: ${value}`) 
+        }))
+
+        page.add(() => ui.textInput("name", { 
+            label: "Enter your name", 
+            onEnter: (name) => page.toast(`Hello, ${name}!`) 
+        }))
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        page.add(lambda: ui.radio_group(
+            "ice-cream", 
+            ["yes", "no"], 
+            label="Do you like ice cream?", 
+            on_change=lambda value: page.toast(f"You selected: {value}")
+        ))
+
+        page.add(lambda: ui.text_input(
+            "name",
+            label="Enter your name", 
+            on_enter=lambda name: page.toast(f"Hello, {name}!")
+        ))
+        ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="get-started-fundamentals-inputs" heightPx={260} />
+
+:::note
+Interactive UI components require a unique id as their first argument so Compose can correctly pass user interactions back to the component.
+:::
+
+### Forms
+
+You can group inputs into [forms](/guides/forms) to add validation and receive the user input as a single, sanitized object.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        function validateForm(form) {
+            if (form.age < 18 && form.role === "admin") {
+                return "You must be at least 18 years old to be an admin."
+            }
+        }
+
+        function submitForm(form) {
+            createUser(form.email, form.role, form.age)
+            page.toast("User created successfully!")
+        }
+        
+        page.add(() => ui.form(
+            "form-id", 
+            [
+                ui.emailInput("email"),
+                ui.selectBox("role", ["Admin", "User", "Guest"]),
+                ui.numberInput("age"),
+            ], 
+            { validate: validateForm, onSubmit: submitForm }
+        ))
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        def validate(form):
+            if form["age"] < 18 and form["role"] == "admin":
+                return "You must be at least 18 years old to be an admin."
+        
+        def on_submit(form):
+            createUser(form["email"], form["role"], form["age"])
+            page.toast("User created successfully!")
+
+        page.add(lambda: ui.form(
+            "form-id", 
+            [
+                ui.email_input("email"),
+                ui.select_box("role", ["Admin", "User", "Guest"]),
+                ui.number_input("age"),
+            ],
+            validate=validate,
+            on_submit=on_submit
+        ))
+        ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="get-started-fundamentals-forms" heightPx={375} />
+
+### Feedback and loading states
+
+Polished applications include feedback and loading states to keep users informed and confident that their actions are being processed.
+
+For this, Compose includes two powerful abstractions: [`page.toast()`](/page-actions/toast) for displaying notifications, and [`page.loading()`](/page-actions/loading) for displaying a loading spinner.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    function refundBilling(userId) {
+        page.loading(true, { text: "Processing refund...", disableInteraction: true })
+
+        try {
+            await stripe.refundUser(userId)
+            page.toast("Billing refunded successfully!", { appearance: "success" })
+        } catch (error) {
+            page.toast(error.message, { appearance: "error", title: "Error refunding billing" })
+        } finally {
+            page.loading(false)
+        }
+    }
+    ```    
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        def refund_billing(user_id):
+            page.loading(True, text="Processing refund...", disable_interaction=True)
+
+            try:
+                stripe.refund_user(user_id)
+                page.toast("Billing refunded successfully!", appearance="success")
+            except Exception as e:
+                page.toast(str(e), appearance="error", title="Error refunding billing")
+            finally:
+                page.loading(False)
+        ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="get-started-fundamentals-feedback-and-loading" heightPx={200} />
+
+## Tables
+
+Tables are a foundational part of most internal tools. Compose's [`ui.table()` component](/components/input/table) makes it easy to display, customize, and take action on tabular data.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const companies = [
+       { name: "Apple", tier: "Enterprise", headquarters: "Cupertino, CA", arr: 150000 },
+        { name: "Asana", tier: "Basic", headquarters: "San Francisco, CA", arr: 12000 },
+        /* ... */
+        { name: "Notion", tier: "Basic", headquarters: "San Francisco, CA", arr: 8000 }, 
+    ]
+
+    ui.table(
+        "table-key",
+        companies,
+        { 
+            label: "Companies",
+            actions: [{ 
+                label: "View Details", 
+                onClick: (row) => page.modal(() => ui.json(row), { title: "Company Details" }) 
+            }],
+            columns: [
+                "name",
+                { key: "tier", format: "tag" },
+                "headquarters",
+                { key: "arr", label: "ARR", format: "currency" }
+            ]
+        }
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    companies = [
+        { "name": "Apple", "tier": "Enterprise", "headquarters": "Cupertino, CA", "arr": 150000 },
+        { "name": "Asana", "tier": "Basic", "headquarters": "San Francisco, CA", "arr": 12000 },
+        # ...
+        { "name": "Notion", "tier": "Basic", "headquarters": "San Francisco, CA", "arr": 8000 },
+    ]
+
+    ui.table(
+        "table-key",
+        companies,
+        label="Companies",
+        actions=[{ 
+            "label": "View Details", 
+            "on_click": lambda row: page.modal(lambda: ui.json(row), title="Company Details") 
+        }],
+        columns=[
+            "name",
+            { "key": "tier", "format": "tag" },
+            "headquarters",
+            { "key": "arr", "label": "ARR", "format": "currency" }
+        ]
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-table" heightPx={685} />
+
+It's easy to connect your table to forms that enable you to create, update, and delete rows. See the [CRUD example app](/examples/crud-app) for a complete example.
+
+## Charts
+
+Compose includes powerful [charts](/components/chart/bar-chart) that make it easy to produce visualizations with your data.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const salesData = [
+      { month: "Jan", California: 95, Texas: 120, "New York": 310 },
+      { month: "Feb", California: 105, Texas: 135, "New York": 290 },
+      /* ... */
+      { month: "Dec", California: 250, Texas: 300, "New York": 520 },
+    ];
+
+    page.add(() =>
+      ui.barChart("sales-chart", salesData, {
+        group: "month",
+        series: ["California", "Texas", "New York"],
+        groupMode: "grouped",
+        label: "Monthly Sales by Region",
+      })
+    );
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    sales_data = [
+      { "month": "Jan", "California": 95, "Texas": 120, "New York": 310 },
+      { "month": "Feb", "California": 105, "Texas": 135, "New York": 290 },
+      # ...
+      { "month": "Dec", "California": 250, "Texas": 300, "New York": 520 },
+    ]
+
+    page.add(() =>
+      ui.bar_chart(
+        "sales-chart",
+        sales_data,
+        group="month",
+        series=["California", "Texas", "New York"],
+        group_mode="grouped",
+        label="Monthly Sales by Region"
+      )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="bar-chart-component" heightPx="520" />
+
+## Integrate with AI tools
+
+If you use Cursor, we highly recommend [indexing Compose's docs](/guides/ai-integration), then using AI to help you build your apps!
+
+## Next Steps
+
+That's it! We've covered Compose's core concepts in just a couple minutes.
+
+Compose includes a comprehensive library of 40+ page methods, UI components, and more. It scales easily from simple tools to complex, multi-page applications. It's useful to refer to the [cheat sheet](https://app.composehq.com/app/025ac441-ea1d-42f3-9c39-9db492a8146a/compose-cheat-sheet) for a quick overview all the available features.
+
+We also recommend joining the [Discord community](https://discord.gg/2ceKHSBuHH) to get help from engineers on the team and other users.
+
+Now go forth and build something great!
+
+
+

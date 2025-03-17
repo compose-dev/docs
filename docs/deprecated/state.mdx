@@ -1,0 +1,272 @@
+---
+sidebar_position: 1
+hide_title: true
+title: State (Deprecated)
+description: Use state to make your apps reactive
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+
+# Deprecated | State
+
+:::warning
+The `state` API is deprecated in favor of the simpler, more powerful [`page.update()` API](/page-actions/update). We recommend all users migrate to the new API as soon as possible, but we will continue to support `state` indefinitely for backwards compatibility.
+:::
+
+Easily create reactive apps by using `state`, which is a key-value store that allows you to store data that will update the UI when it changes.
+
+Anytime you reassign the value of a key in the `state` object, or add a new key, Compose will automatically re-render the UI to reflect the changes
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        import { Compose, Page, UI } from "@composehq/sdk"
+
+        function handler({ page, ui, state }: { page: Page, ui: UI, state: State }) {
+            state.count = 0;
+
+            page.add(() => ui.stack([
+                ui.header(`Count: ${state.count}`),
+                ui.button("increment-btn", {
+                    label: "Increment",
+                    onClick: () => state.count += 1
+                }),
+            ]))
+        }
+
+        const app = new Compose.App({ route: "counter", handler })
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        import compose_sdk as c
+
+        def handler(page: c.Page, ui: c.UI, state: c.State):
+            state["count"] = 0
+
+            def on_click():
+                state["count"] = state["count"] + 1
+
+            page.add(lambda: ui.stack([
+                ui.header(f"Count: {state['count']}"),
+                ui.button("increment-btn", label="Increment", on_click=on_click),
+            ]))
+
+        counter_app = c.App(route="counter", handler=handler)
+        ```
+    </TabItem>
+
+</Tabs>
+
+<IFrame type="get-started-fundamentals-state" heightPx={200} />
+
+## Common pitfalls
+
+When working with objects, you need to reassign the variable itself rather than just modifying a nested property for Compose to detect the change.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        import { Compose, Page, UI, State } from "@composehq/sdk"
+
+        function handler({ page, ui, state }: { page: Page, ui: UI, state: State }) {
+            state.data = { count: 0 };
+
+            // highlight-start
+            function onClick() {
+                // This won't work
+                state.data.count += 1
+
+                // Do this instead
+                state.data = { ...state.data, count: state.data.count + 1 }
+            }
+            // highlight-end
+
+            page.add(() => ui.stack([
+                ui.json(state.data),
+                ui.button("increment-btn", {
+                    label: "Increment",
+                    onClick
+                }),
+            ]))
+        }
+
+        const app = new Compose.App({ route: "counter", handler })
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        import compose_sdk as c
+
+        def handler(page: c.Page, ui: c.UI, state: c.State):
+            state["data"] = {"count": 0}
+
+            # highlight-start
+            def on_click():
+                # This won't work
+                state["data"]["count"] += 1
+
+                # Do this instead
+                state["data"] = {**state["data"], "count": state["data"]["count"] + 1}
+            # highlight-end
+
+            page.add(lambda: ui.stack([
+                ui.json(data),
+                ui.button("increment-btn", label="Increment", on_click=on_click),
+            ]))
+
+        counter_app = c.App(route="counter", handler=handler)
+        ```
+    </TabItem>
+</Tabs>
+
+## Merge state
+
+You can merge new state into the old object using the reserved `merge` key, which allows you to easily update multiple keys at once.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        import { Compose, Page, UI, State } from "@composehq/sdk"
+
+        function handler({ page, ui, state }: { page: Page, ui: UI, state: State }) {
+            state.email = "n/a";
+            state.name = "n/a";
+
+            // highlight-start
+            function onSubmit(formData: Record<string, any>) {
+                state.merge({
+                    email: formData.email,
+                    name: formData.name,
+                })
+            }
+            // highlight-end
+
+            page.add(() => ui.form(
+                "form",
+                [ui.textInput("email"), ui.textInput("name")],
+                { onSubmit }
+            ))
+
+            page.add(() => ui.stack([
+                ui.header("Current response:"),
+                ui.text(state.email),
+                ui.text(state.name),
+            ]))
+        }
+
+        const app = new Compose.App({ route: "form", handler })
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        import compose_sdk as c
+
+        def handler(page: c.Page, ui: c.UI, state: c.State):
+            state["email"] = "n/a"
+            state["name"] = "n/a"
+
+            # highlight-start
+            def on_submit(form_data: dict):
+                state.merge({
+                    "email": form_data["email"],
+                    "name": form_data["name"],
+                })
+            # highlight-end
+            
+            page.add(lambda: ui.form(
+                "form",
+                [ui.text_input("email"), ui.text_input("name")],
+                on_submit=on_submit
+            ))
+
+            page.add(lambda: ui.stack([
+                ui.header("Current response:"),
+                ui.text(state["email"]),
+                ui.text(state["name"]),
+            ]))
+
+        form_app = c.App(route="form", handler=handler)
+        ```
+    </TabItem>
+</Tabs>
+
+## Overwrite state
+
+You can overwrite the entire state object using the reserved `overwrite` key. This will replace the entire state object with the new object you provide.
+
+We mainly recommend using `merge` to update the state, but `overwrite` can be useful in certain situations, like when you want to create the initial state object.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        import { Compose, Page, UI, State } from "@composehq/sdk"
+
+        function handler({ page, ui, state }: { page: Page, ui: UI, state: State }) {
+            // highlight-start
+            state.overwrite({
+                email: "n/a",
+                name: "n/a",
+            })
+            // highlight-end
+
+            function onSubmit(formData: Record<string, any>) {
+                state.merge({
+                    email: formData.email,
+                    name: formData.name,
+                })
+            }
+
+            page.add(() => ui.form(
+                "form",
+                [ui.textInput("email"), ui.textInput("name")],
+                { onSubmit }
+            ))
+
+            page.add(() => ui.stack([
+                ui.header("Current response:"),
+                ui.text(state.email),
+                ui.text(state.name),
+            ]))
+        }
+
+        const app = new Compose.App({ route: "form", handler })
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        import compose_sdk as c
+
+        def handler(page: c.Page, ui: c.UI, state: c.State):
+            # highlight-start
+            state.overwrite({
+                "email": "n/a",
+                "name": "n/a",
+            })
+            # highlight-end
+
+            def on_submit(form_data: dict):
+                state.merge({
+                    "email": form_data["email"],
+                    "name": form_data["name"],
+                })
+
+            page.add(lambda: ui.form(
+                "form",
+                [ui.text_input("email"), ui.text_input("name")],
+                on_submit=on_submit
+            ))
+
+            page.add(lambda: ui.stack([
+                ui.header("Current response:"),
+                ui.text(state["email"]),
+                ui.text(state["name"]),
+            ]))
+
+        form_app = c.App(route="form", handler=handler)
+        ```
+    </TabItem>
+</Tabs>
+

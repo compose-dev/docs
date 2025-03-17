@@ -1,0 +1,117 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Navigation
+description: Render a navigation pane.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+import { ParameterTemplate, Parameter, CustomCodeBlock } from "../../src/components";
+
+# Component | Navigation
+
+Render a navigation pane that links to other apps. Useful for creating [multi-page apps](/guides/multipage-apps).
+
+*Introduced in SDK v0.26.0*
+
+<IFrame type="components-navigation" heightPx={300} />
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Compose } from "@composehq/sdk";
+
+    // Create a navigation pane.
+    const nav = new Compose.Navigation(
+        // list of app routes to include in the navigation pane
+        ["home-page", "settings"],
+        {
+            // optional: a URL to a logo image to display in the navigation pane. 
+            logoUrl: "https://composehq.com/dark-logo-with-text.svg",
+        }
+    );
+
+    const homePage = new Compose.App({
+        route: "home-page",
+        handler: () => page.add(() => ui.header("Home Page"));
+        navigation: nav, // show nav pane on home page
+    });
+
+    const settings = new Compose.App({
+        route: "settings",
+        handler: () => page.add(() => ui.header("Settings Page"));
+        navigation: nav, // show nav pane on settings page
+    });
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+
+    # Create a navigation pane.
+    nav = c.Navigation(
+        # list of app routes to include in the navigation pane
+        ["home-page", "settings"],
+        # optional: a URL to a logo image to display in the navigation pane. 
+        logo_url="https://composehq.com/dark-logo-with-text.svg",
+    )
+
+    home_page = c.App(
+        route="home-page",
+        handler=lambda page, ui: page.add(ui.header("Home Page")),
+        navigation=nav, # show nav pane on home page
+    )
+
+    settings = c.App(
+        route="settings",
+        handler=lambda page, ui: page.add(ui.header("Settings Page")),
+        navigation=nav, # show nav pane on settings page
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    class Navigation {
+        constructor(items: string[], properties?: { logoUrl?: string }): void;
+    }
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    class Navigation:
+        def __init__(
+            self,
+            items: List[str],
+            *,
+            logo_url: Optional[str] = None
+        ) -> None:
+            ...
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="items"
+    required={true}
+    type={(lang) => lang === "js" ? "string[]" : "list[str]"}
+    description={"A list of app routes to include in the navigation pane."}
+/>
+
+<Parameter
+    name={(lang) => lang === "js" ? "properties.logoUrl" : "logo_url"}
+    required={false}
+    type="string"
+    description={lang => "The URL for a logo wordmark image to display in the navigation pane. The easiest way to provide a logo is to go to your product's website, right click on your logo, and select 'Copy image address'. Then paste that URL here."}
+/>

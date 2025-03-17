@@ -1,0 +1,75 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Spinner
+description: Render a loading spinner.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components";
+
+# Component | Spinner
+
+:::tip
+
+Looking to show loading states in your app? We recommend using the [`page.loading()` method](/page-actions/loading) for the vast majority of use cases. It's far simpler to use and comes with additional features such as disabling user interactions while loading.
+
+The `spinner` component is useful for complex UI situations when you need more control over exactly where the spinner is displayed.
+
+:::
+
+Render a loading spinner.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.spinner()
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.spinner()
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-display-spinner" heightPx={150} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.spinner(
+        options: Partial<{
+            text: string
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.spinner(
+        *,
+        text: str | None = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="text"
+    required={false}
+    type="string"
+    description="Text to display next to the spinner."
+/>
+
+<ParameterTemplate.Style />

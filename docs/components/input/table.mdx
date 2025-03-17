@@ -1,0 +1,686 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Table
+description: Render a table.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter, CustomCodeBlock } from "../../../src/components";
+
+# Component | Table
+
+Render a table. Tables offer:
+
+- **Actions** to add interactivity to each row.
+- **Customizable columns** to format data in a variety of ways.
+- **Built-in search** to filter rows.
+- **Pagination and virtualization** to efficiently scale to millions of rows.
+
+<IFrame type="components-input-table" heightPx={685} />
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const companies = [
+       { name: "Apple", tier: "Enterprise", headquarters: "Cupertino, CA", arr: 150000 },
+        { name: "Asana", tier: "Basic", headquarters: "San Francisco, CA", arr: 12000 },
+        /* ... */
+        { name: "Notion", tier: "Basic", headquarters: "San Francisco, CA", arr: 8000 }, 
+    ]
+
+    ui.table(
+        "table-key",
+        companies,
+        { 
+            label: "Companies",
+            actions: [{ 
+                label: "View Details", 
+                onClick: (row) => page.modal(() => ui.json(row), { title: "Company Details" }) 
+            }],
+            columns: [
+                "name",
+                { key: "tier", format: "tag" },
+                "headquarters",
+                { key: "arr", label: "ARR", format: "currency" }
+            ]
+        }
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    companies = [
+        { "name": "Apple", "tier": "Enterprise", "headquarters": "Cupertino, CA", "arr": 150000 },
+        { "name": "Asana", "tier": "Basic", "headquarters": "San Francisco, CA", "arr": 12000 },
+        # ...
+        { "name": "Notion", "tier": "Basic", "headquarters": "San Francisco, CA", "arr": 8000 },
+    ]
+
+    ui.table(
+        "table-key",
+        companies,
+        label="Companies",
+        actions=[{ 
+            "label": "View Details", 
+            "on_click": lambda row: page.modal(lambda: ui.json(row), title="Company Details") 
+        }],
+        columns=[
+            "name",
+            { "key": "tier", "format": "tag" },
+            "headquarters",
+            { "key": "arr", "label": "ARR", "format": "currency" }
+        ]
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node">
+    By default, each row in the table will render with a checkbox. This can be disabled by passing the `allowSelect` property as `false`, which will render the table as a display only component.
+    </TabItem>
+    <TabItem value="python">
+    By default, each row in the table will render with a checkbox. This can be disabled by passing the `allow_select` parameter as `False`, which will render the table as a display only component.
+    </TabItem>
+</Tabs>
+
+Learn more about [working with inputs](/guides/forms).
+
+## Row Actions
+
+Actions are a powerful construct that allows you to add row-level interactivity to your table. Tables can have an unlimited number of actions, rendered either as buttons or nested inside a dropdown menu.
+
+Actions are often used as a foundation to create robust [multipage apps](/guides/multipage-apps).
+
+Each action's callback will receive the row as an argument.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.table("table-key",
+    <list-of-users>,
+    { 
+        actions: [
+            { label: "Edit", onClick: (row) => doSomething(row) },
+            { label: "Delete", onClick: (row) => doSomething(row) },
+            // The optional surface field will render the action as a button instead of inside a dropdown (or vice-versa if false).
+            { label: "View", onClick: (row, idx) => doSomething(row, idx), surface: true }
+        ]
+        allowSelect: false
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.table(
+        "table-key",
+        <list-of-users>,
+        actions=[
+            { "label": "Edit", "on_click": lambda row: do_something(row) },
+            { "label": "Delete", "on_click": lambda row: do_something(row) },
+            # The optional surface field will render the action as a button instead of inside a dropdown (or vice-versa if false).
+            { "label": "View", "on_click": lambda row, idx: do_something(row, idx), "surface": True }
+        ]
+        allow_select=False
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-table-actions" heightPx={350} />
+
+### Action object properties
+
+<Parameter
+    name="label"
+    required={true}
+    type="string"
+    description="The user-facing label to display for the action."
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "onClick" : "on_click"}
+    required={true}
+    type={lang => lang === "js" ? "(row: TableRow, idx: number) => void" : "Callable[[TableRow, int], None]"}
+    description="Callback to execute when the action is clicked. The row and index will be passed as arguments."
+/>
+
+<Parameter
+    name={() => "surface"}
+    required={false}
+    type="boolean"
+    description={lang =>
+        <>
+        <p>
+            Set to <code>{lang === "js" ? "true" : "True"}</code> render the action as a button. Set to <code>{lang === "js" ? "false" : "False"}</code> to render the action inside a dropdown.
+        </p>
+        <p>
+            By default, if the table has only one action, it will render as a button. If there are multiple actions, they'll render inside a dropdown.
+        </p>
+        </>
+    }
+/>
+
+## Columns
+
+By default, Compose infers the table columns and how to render them. This can be overriden by passing the `columns` property.
+
+### Basic Usage
+
+You can pass a list of `key` strings, which Compose uses to map to the data. This allows you to control which columns are rendered, and in what order, while still leveraging Compose to infer the label and data type.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const users = [
+        { name: "John", age: 30, createdAt: new Date("2021-01-01"), isActive: true },
+        { name: "Jane", age: 25, createdAt: new Date("2021-01-02"), isActive: false },
+    ]
+
+    ui.table("table-key", users, { columns: ["name", "age", "isActive"] })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    users = [
+        {"name": "John", "age": 30, "created_at": datetime(2021, 1, 1), "is_active": True},
+        {"name": "Jane", "age": 25, "created_at": datetime(2021, 1, 2), "is_active": False},
+    ]
+
+    ui.table("table-key", users, columns=["name", "age", "is_active"])
+    ```
+    </TabItem>
+
+</Tabs>
+
+### Advanced Usage
+
+Instead of strings, you can also pass objects that allows you to more granularly control each column. Each column object must have a `key` field to map to the data.
+
+You can also include optional fields like `label`, `width`, and `format` to override Compose's attempt to infer them.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const users = [
+        { name: "John", age: 30, createdAt: new Date("2021-01-01"), isActive: true },
+        { name: "Jane", age: 25, createdAt: new Date("2021-01-02"), isActive: false },
+    ]
+
+    ui.table("table-key", users, {
+        columns: [
+            { key: "name", width: "150px" },
+            "age",
+            { key: "createdAt", format: "date" },
+            { key: "isActive", label: "Status", format: "boolean" }
+        ]
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    users = [
+        {"name": "John", "age": 30, "created_at": datetime(2021, 1, 1), "is_active": True},
+        {"name": "Jane", "age": 25, "created_at": datetime(2021, 1, 2), "is_active": False},
+    ]
+
+    ui.table(
+        "table-key",
+        users,
+        columns=[
+            {"key": "name", "width": "150px"},
+            "age",
+            {"key": "created_at", "format": "date"},
+            {"key": "is_active", "label": "Status", "format": "boolean"}
+        ]
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+### Column object properties
+
+<Parameter
+    name="key"
+    required={true}
+    type="string"
+    description="Specify which property of the data object should be displayed in that column."
+/>
+
+<Parameter
+    name={() => "label"}
+    required={false}
+    type="string"
+    description={<p>Specify a custom label for the column. If not provided, the label will be inferred from the <code>key</code></p>}
+/>
+
+<Parameter
+    name={() => "width"}
+    required={false}
+    type="string"
+    description={<p>Specify a custom width for the column (e.g. <code>"150px"</code> or <code>"3rem"</code>). If not provided, the width will be inferred from the content.</p>}
+/>
+
+<Parameter
+    name={() => "format"}
+    required={false}
+    type="literal"
+    description={lang =>
+        <>
+            <p>
+                The data type of the column. Specifying this allows Compose to render the column in a more user-friendly format, and sort and filter correctly. If not provided, the format will be inferred from the data.
+            </p>
+            <p>Options:</p>
+            <ul>
+                <li>
+                    <code>"date"</code>: Render a date in a human-friendly format (e.g. <code>Oct 10, 2000</code>). {lang === "js" ? <>Expects a <code>Date</code> object or ISO string.</> : <>Expects a <code>datetime</code> object or ISO string.</>}
+                </li>
+                <li>
+                    <code>"datetime"</code>: Render a datetime in a human-friendly format (e.g. <code>Oct 10, 2000, 11:14 AM</code>). {lang === "js" ? <>Expects a <code>Date</code> object or ISO string.</> : <>Expects a <code>datetime</code> object or ISO string.</>}
+                </li>
+                <li>
+                    <code>"number"</code>: Render a number in a human-friendly format (e.g. <code>1,234</code>).
+                </li>
+                <li>
+                    <code>"currency"</code>: Render a number in a currency format (e.g. <code>$1,234.56</code>).
+                </li>
+                <li>
+                    <code>"boolean"</code>: Render a boolean in a human-friendly format (e.g. `✅` or `❌`). Will perform a truthiness check on non-boolean values.
+                </li>
+                <li>
+                    <code>"tag"</code>: Render values (or lists of values) as <span className="colored-pill colored-pill-purple">colored</span> <span className="colored-pill colored-pill-green">pills</span>. Useful for enum-type data. You can pass a <code>{lang === "js" ? "tagColors" : "tag_colors"}</code> property to specify the colors of the tags. If not provided, Compose will randomly assign colors to each value.
+                </li>
+                <li>
+                    <code>"string"</code>: Stringify the value and render as is. Use when you don't want any special formatting.
+                </li>
+            </ul>
+        </>
+    }
+/>
+
+<Parameter
+    name={(lang) => lang === "js" ? "tagColors" : "tag_colors"}
+    required={false}
+    type={(lang) => lang === "js" ? "Record<string, string | string[]>"  : "dict[str, str | list[str]]"}
+    description={lang =>
+        <>
+            <p>
+                Map tag colors to column values when using <code>format: "tag"</code>. If this property is not provided, Compose will randomly assign colors to each value.
+            </p>
+            <p>
+                Colors can be mapped to single values or arrays of values. If a value isn't mapped to a color, it will use the <code>_default</code> color if specified, or be automatically assigned a color.
+            </p>
+            <p>Available colors: <span className="colored-pill colored-pill-red">red</span>, <span className="colored-pill colored-pill-orange">orange</span>, <span className="colored-pill colored-pill-yellow">yellow</span>, <span className="colored-pill colored-pill-green">green</span>, <span className="colored-pill colored-pill-blue">blue</span>, <span className="colored-pill colored-pill-purple">purple</span>, <span className="colored-pill colored-pill-pink">pink</span>, <span className="colored-pill colored-pill-gray">gray</span>, <span className="colored-pill colored-pill-brown">brown</span>.</p>
+            <p>Example:</p>
+            <CustomCodeBlock.TagColors lang={lang} />
+            <p>
+                Compose tags support <code>{lang === "js" ? "string" : "str"}</code>, <code>{lang === "js" ? "number" : "int"}</code>, {lang === "js" ? "" : <> <code>float</code>,</>} and <code>{lang === "js" ? "boolean" : "bool"}</code> values, or lists of these values. Any other value will be rendered as plain text.
+            </p>
+        </>
+    }
+    version="0.23.0"
+/>
+
+## Pagination
+
+Introduced in SDK v0.24.0.
+
+### Automatic Pagination
+
+Tables with more than 5000 rows are automatically paginated without any additional configuration on your end, enabling Compose to remain performant at scale.
+
+An important caveat is that auto-pagination disables client-side search since the browser only has a paginated subset of the data. You can re-enable search by manually paginating the table.
+
+### Manual Pagination
+
+For very large datasets, you can manually paginate tables by passing a getter function to the `data` parameter. Manual pagination enables you to:
+- fetch data from your data store as needed, instead of having to load everything into memory at once.
+- manage search using your own custom logic.
+- scale endlessly (millions of rows) without performance degradation.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    import { TablePageChangeParams, TablePageChangeResponse } from "@composehq/sdk"
+
+    async function onPageChange(params: TablePageChangeParams): TablePageChangeResponse {
+        const { offset, pageSize, searchQuery, prevTotalRecords, prevSearchQuery } = params;
+
+        // Only refetch total records on initial load and when the search query changes.
+        const refetchTotal =
+            prevTotalRecords === null || prevSearchQuery !== searchQuery;
+
+        const totalRecords = refetchTotal
+            ? await postgres.countUsers(searchQuery)
+            : prevTotalRecords;
+
+        const pageOfUsers = await postgres.getUsers(offset, pageSize, searchQuery);
+
+        return {
+            data: pageOfUsers,
+            totalRecords,
+        };
+    }
+
+    page.add(() => ui.table("users-table", onPageChange))
+    ```
+
+
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+
+    def on_page_change(args: c.TablePageChangeArgs) -> c.TablePageChangeResponse:
+        # Unpack arguments
+        offset = args["offset"]
+        page_size = args["page_size"]
+        search_query = args["search_query"]
+        prev_total_records = args["prev_total_records"]
+        prev_search_query = args["prev_search_query"]
+
+        # Only refetch total records on initial load and when the search query changes
+        refetch_total = prev_total_records is None or prev_search_query != search_query
+
+        total_records = (
+            postgres.count_users(search_query) if refetch_total else prev_total_records
+        )
+
+        page_of_users = postgres.get_users(offset, page_size, search_query)
+
+        return {"data": page_of_users, "total_records": total_records}
+
+    page.add(lambda: ui.table("users-table", on_page_change))
+    ```
+    </TabItem>
+</Tabs>
+
+Type definitions:
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    // Passed to the onPageChange callback as a single object.
+    interface TablePageChangeParams {
+        // The number of rows to skip.
+        offset: number;
+        // The number of rows to return. You can return less than this if there
+        // aren't enough rows to fill the page (e.g. the last page).
+        pageSize: number;
+        // The search query to filter the rows by. Will be null if no search
+        // is being performed.
+        searchQuery: string | null;
+        // The previous total number of records. This is provided so that you
+        // only recalculate the total record count when needed.
+        prevTotalRecords: number | null;
+        // The previous search query. This is provided so that you only
+        // recalculate the total record count when needed.
+        prevSearchQuery: string | null;
+    }
+
+    // Expected return type of the onPageChange callback.
+    interface TablePageChangeResponse {
+        // The data for the current page. Should be an array of objects.
+        data: TableData;
+        // The total number of records. This is used to calculate the number
+        // of pages.
+        totalRecords: number;
+    }
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # Passed to the on_page_change callback as a single positional argument.
+    class TablePageChangeArgs(TypedDict):
+        # The number of rows to skip.
+        offset: int
+        # The number of rows to return. You can return less than this if there
+        # aren't enough rows to fill the page (e.g. the last page).
+        page_size: int
+        # The search query to filter the rows by. Will be null if no search
+        # is being performed.
+        search_query: str | None
+        # The previous total number of records. This is provided so that you
+        # only recalculate the total record count when needed.
+        prev_total_records: int | None
+        # The previous search query. This is provided so that you only
+        # recalculate the total record count when needed.
+        prev_search_query: str | None
+
+    # The expected return type of the on_page_change callback.
+    class TablePageChangeResponse(TypedDict):
+        # The data for the current page. Should be a list of dictionaries.
+        data: TableData
+        # The total number of records. This is used to calculate the number
+        # of pages.
+        total_records: int
+    ```
+    </TabItem>
+</Tabs>
+
+:::note
+If you're not yet ready to handle search, you can disable it by passing the `searchable: false` property to the table.
+:::
+
+### Row Selections
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    Compose disables row selections by default for paginated tables. Due to constraints introduced by server-side pagination, it's not possible for Compose to pass a list of table rows to callbacks (e.g. `onChange` or `onSubmit`) when the user selects rows.
+
+    You can re-enable row selections by passing a `selectionReturnType: "index"` property to the table. When this is enabled, Compose will pass a list of row indices to any callbacks instead of the rows themselves.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    Compose disables row selections by default for paginated tables. Due to constraints introduced by server-side pagination, it's not possible for Compose to pass a list of table rows to callbacks (e.g. `on_change` or `on_submit`) when the user selects rows.
+
+    You can re-enable row selections by passing a `selection_return_type: "index"` property to the table. When this is enabled, Compose will pass a list of row indices to any callbacks instead of the rows themselves.
+    </TabItem>
+</Tabs>
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    ui.table(
+        "users-table",
+        onPageChange,
+        {
+            selectionReturnType: "index",
+            onChange: (selectedRows) => {
+                console.log(selectedRows) // [0, 1, 2, ...]
+            }
+        }
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.table(
+        "users-table",
+        on_page_change,
+        selection_return_type="index",
+        on_change=lambda selected_rows: print(selected_rows) # [0, 1, 2, ...]
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    type TableRow = {
+        [key: string]: string | number | boolean | Date | null | undefined | object
+    }
+
+    ui.table<T extends TableRow>(
+        id: string,
+        data: T[] | TablePageChangeCallback<T>,
+        properties?: Partial<{
+            allowSelect: boolean,
+            label: string,
+            description: string,
+            required: boolean 
+            initialSelectedRows: number[],
+            validate: (values: T[]) => string | void,
+            onChange: (values: T[]) => void,
+            columns: TableColumn[],
+            actions: TableAction<T>[],
+            minSelections: number,
+            maxSelections: number,
+            selectionReturnType: "full" | "index",
+            searchable: boolean,
+            style: Style,
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    TableDataRow = Dict[str, Any]
+    TableData = List[TableDataRow]
+
+    ui.table(
+        id: str,
+        data: TableData | TablePageChangeCallback,
+        *,
+        allow_select: bool = True,
+        label: str | None = None,
+        description: str | None = None,
+        required: bool = True,
+        initial_selected_rows: list[int] | None = None,
+        validate: Callable[[TableData], str | None] | None = None,
+        on_change: Callable[[TableData], None] | None = None,
+        columns: TableColumns | None = None,
+        actions: list[TableAction] | None = None,
+        min_selections: int = 0,
+        max_selections: int = 1000000000,
+        selection_return_type: Literal["full", "index"] = "full",
+        searchable: bool = True,
+        style: Style | None = None,
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<Parameter
+    name="data"
+    required={true}
+    type={(lang) => lang === "js" ? "TableRow[] | TablePageChangeCallback" : "TableData | TablePageChangeCallback"}
+    description={(lang) =>
+        <>
+            <p>The data to be displayed in the table. Each item in the {lang === "js" ? "array" : "list"} represents a row in the table, and should be {lang === "js" ? "an object" : "a dictionary"} where the keys correspond to column names and the values are the cell contents.</p>
+            <p>Compose supports most data types including strings, numbers, booleans, dates, and objects.</p>
+            <p>For larger datasets, you can paginate the table server-side by passing a function that returns one page of data at a time. See the <a href="#pagination">pagination</a> section for more details.</p>
+        </>
+    }
+/>
+
+<Parameter
+    name={(lang) => lang === "js" ? "properties.allowSelect" : "allow_select"}
+    required={false}
+    type="boolean"
+    description={lang => <p>Whether to show the selections column. Defaults to <code>{lang === "js" ? "true" : "True"}</code>.</p>}
+/>
+
+<ParameterTemplate.Label
+    componentName="table"
+/>
+
+<ParameterTemplate.Description
+    componentName="table"
+/>
+
+<ParameterTemplate.Required
+    parameter="required"
+    componentName="table"
+    hookName={lang => lang === "js" ? "onChange" : "on_change"}
+    description={lang => <p>Validate that the table has at least one row selected before submitting the form it's part of or calling it's <code>{lang === "js" ? "onChange" : "on_change"}</code> hook. Defaults to <code>{lang === "js" ? "true" : "True"}</code>.</p>}
+/>
+
+<Parameter
+    name={(lang) => lang === "js" ? "properties.initialSelectedRows" : "initial_selected_rows"}
+    required={false}
+    type={(lang) => lang === "js" ? "number[]" : "list[int]"}
+    description={lang => <p>A list of row indices to pre-select when the table is first rendered. Defaults to <code>{lang === "js" ? "[]" : "[]"}</code> (empty list).</p>}
+/>
+
+<ParameterTemplate.ValidateInput
+    componentName="table"
+    description={lang => <p>Validate the selected rows before submitting. If the function returns a string, it will be displayed as an error message.</p>}
+    hookInputArgument={lang => lang === "js" ? "selectedRows: TableRow[]" : "TableData"}
+/>
+
+<ParameterTemplate.OnChange
+    componentName="table"
+    description={lang => <p>A callback function that is called when the table selection(s) change. The callback is passed the list of currently selected rows.</p>}
+    hookInputArgument={lang => lang === "js" ? "selectedRows: TableRow[]" : "TableData"}
+/>
+
+<Parameter
+    name="columns"
+    required={false}
+    type={(lang) => lang === "js" ? "TableColumn[]" : "list[TableColumn]"}
+    description={lang => <p>Control how columns are rendered in the table. If not provided, Compose will default to using the keys from the first row of data, then do it's best to infer human readable column names, data types, etc. See the <a href="#columns">columns</a> section for more details.</p>}
+/>
+
+<Parameter
+    name="actions"
+    required={false}
+    type={(lang) => lang === "js" ? "TableAction[]" : "list[TableAction]"}
+    description={lang => <p>Add row-level action buttons that execute custom functions when clicked. See the <a href="#row-actions">row actions</a> section for more details.</p>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.minSelections" : "min_selections"}
+    required={false}
+    type="int"
+    description={(lang) => <p>Validate that the user has selected at least some number of rows. Defaults to 0.</p>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.maxSelections" : "max_selections"}
+    required={false}
+    type="int"
+    description={(lang) => <p>Validate that the user has selected at most some number of rows. Defaults to 1000000000.</p>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.selectionReturnType" : "selection_return_type"}
+    required={false}
+    type="literal"
+    version="0.24.0"
+    description={(lang) => <>
+        <p>Options:</p>
+        <ul>
+            <li><code>"full"</code>: Return the full row data to callback functions when the user selects rows.</li>
+            <li><code>"index"</code>: Return the row indices to callback functions when the user selects rows.</li>
+        </ul>
+        <p>By default, this property is set to <code>"full"</code>.</p>
+        <p>Paginated tables only support row selections by index. If you're using a paginated table, you'll need to set this property to <code>"index"</code> to enable row selections. If not, Compose will disable row selections for the paginated table.</p>
+    </>}
+/>
+
+<Parameter
+    name="searchable"
+    required={false}
+    type="boolean"
+    version="0.24.0"
+    description={(lang) => <>
+        <p>Whether to show the search input. Defaults to <code>{lang === "js" ? "true" : "True"}</code>.</p>
+        <p>The exception is auto-paginated tables (i.e. tables with more than 5000 rows). Client-side search is not possible for these tables, and you'll need to manage search yourself using <a href="#manual-pagination">manual pagination</a>.</p>
+    </>}
+/>
+
+<ParameterTemplate.Style />

@@ -1,0 +1,112 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Text Area
+description: Render a text area input box.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate } from "../../../src/components"
+
+
+# Component | Text Area
+
+Render a text area input box.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.textArea("text-area-key", { 
+        label: "Write your story...",
+        onEnter: (value) => console.log(value)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.text_area(
+        "text-area-key",
+        label="Write your story...",
+        on_enter=lambda value: print(value)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-textarea" heightPx={250} />
+
+Learn more about [working with inputs](/guides/forms).
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.textArea(
+        id: string,
+        properties?: Partial<{
+            label: string,
+            description: string,
+            required: boolean,
+            initialValue: string | null,
+            validate: (value: string | null) => string | void,
+            onEnter: (value: string | null) => void,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.text_area(
+        id: str,
+        *,
+        label: str | None = None,
+        description: str | None = None,
+        required: bool = True,
+        initial_value: str | None = None,
+        validate: Callable[[str | None], str | None] | None = None,
+        on_enter: Callable[[str | None], None] | None = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Label
+    componentName="text area"
+/>
+
+<ParameterTemplate.Description
+    componentName="text area box"
+/>
+
+<ParameterTemplate.Required
+    componentName="text area"
+    hookName={lang => lang === "js" ? "onEnter" : "on_enter"}
+/>
+
+<ParameterTemplate.InitialValue
+    componentName="text area"
+    type={lang => lang === "js" ? "string | null" : "str | None"}
+/>
+
+<ParameterTemplate.ValidateInput
+    componentName="text area"
+    hookInputArgument={lang => lang === "js" ? "value: string | null" : "str | None"}
+/>
+
+<ParameterTemplate.OnEnter
+    componentName="text area"
+    hookInputArgument={lang => lang === "js" ? "value: string | null" : "str | None"}
+/>
+
+<ParameterTemplate.Style />

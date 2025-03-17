@@ -1,0 +1,73 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Download
+description: Download a file to the user's device.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+import { Parameter } from "../../src/components";
+
+
+# Page Action | File Download
+
+Use `page.download()` to download a file to the user's device.
+
+Learn more in the [file download guide](/guides/working-with-files#file-download).
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.download(
+        file: Buffer,
+        filename: string,
+    ): void; 
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.download(
+        # Must be either bytes or a bytes-like object (e.g. BytesIO)
+        file: bytes | io.BufferedIOBase,
+        filename: str,
+    ) -> None
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="file"
+    required={true}
+    type={lang => lang === "js" ? "Buffer" : "bytes | io.BufferedIOBase"}
+    description={<>
+        The file content to download.
+    </>}
+/>
+
+<Parameter
+    name="filename"
+    required={true}
+    type="string"
+    description={<>
+        The name of the file to download.
+    </>}
+/>
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>void</span></p>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>None</span></p>
+    </TabItem>
+</Tabs>

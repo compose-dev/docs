@@ -1,0 +1,486 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Guide | Build Forms
+description: How to create forms in Compose.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+
+
+# Guide | Build Forms
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    Compose forms offer:
+    - **A streamlined way to group inputs** and collect data as a single, sanitized data structure.
+    - **Built-in validation methods** that will surface errors to the user based on your business logic.
+    - **Layout customization** to control how inputs are arranged in the form.
+    - **End-to-end type safety** with TypeScript.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    Compose forms offer:
+    - **A streamlined way to group inputs** and collect data as a single, sanitized data structure.
+    - **Built-in validation methods** that will surface errors to the user based on your business logic.
+    - **Layout customization** to control how inputs are arranged in the form.
+    </TabItem>
+</Tabs>
+
+<IFrame type="guides-form" heightPx={700} />
+
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    function createUser() {
+        // highlight-start
+        page.modal(({ resolve }) => 
+            ui.form(
+                "create-user-form", 
+                [
+                    ui.textInput("name"),
+                    ui.emailInput("email"),
+                    ui.radioGroup("role", ["Admin", "User", "Guest"]),
+                ],
+                {
+                    onSubmit: (form) => {
+                        users = [insertUser(form.name, form.email, form.role), ...users]
+                        page.toast("User created successfully", { appearance: "success" })
+                        page.update() // refresh table with new user
+                        resolve() // close modal
+                    }
+                }
+            ),
+            { title: "Create User" }
+        )
+        // highlight-end
+    }
+
+    page.add(() => ui.table("users", users))
+    page.add(() => ui.button("createUser", { onClick: createUser }))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    def create_user(form, resolve):
+        new_user = insert_user(form["name"], form["email"], form["role"])
+        users = [new_user, *users]
+
+        page.toast("User created successfully", appearance="success")
+        page.update() # refresh table with new user
+        resolve() # close modal
+
+    def create_user_modal():
+        # highlight-start
+        page.modal(lambda resolve: 
+            ui.form(
+                "create-user-form", 
+                [
+                    ui.text_input("name"),
+                    ui.email_input("email"),
+                    ui.radio_group("role", ["Admin", "User", "Guest"]),
+                ],
+                on_submit=lambda form: create_user(form, resolve)
+            ),
+            title="Create User"
+        )
+        # highlight-end
+
+    page.add(lambda: ui.table("users", users))
+    page.add(lambda: ui.button("createUser", on_click=create_user))
+    ```
+    </TabItem>
+</Tabs>
+
+:::tip
+Place forms inside modals, then trigger the modal from a button or table action. The example above demonstrates this pattern. Also see the [CRUD example app](/examples/crud-app) for a more in-depth example.
+:::
+
+## Validate forms
+
+Forms include a `validate` hook that can be used to validate your forms using your own business logic.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.add(() => 
+        ui.form(
+            "create-user-form", 
+            [
+                ui.radioGroup("role", ["Admin", "User", "Guest"]),
+                ui.numberInput("age"),
+            ],
+            {
+                // highlight-start
+                validate: (form) => {
+                    if (form.role === "Admin" && form.age < 18) {
+                        // display error to user
+                        return "Admins must be at least 18 years old"
+                    }
+
+                    return; // or return undefined to indicate no errors
+                },
+                // highlight-end
+                onSubmit: (form) => createUser(form)
+            }
+        )
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # highlight-start
+    def validate_form(form):
+        if form["role"] == "Admin" and form["age"] < 18:
+            return "Admins must be at least 18 years old" # display error to user
+
+        return None # or return None to indicate no errors
+    # highlight-end
+
+    page.add(lambda: 
+        ui.form(
+            "create-user-form", 
+            [
+                ui.radio_group("role", ["Admin", "User", "Guest"]),
+                ui.number_input("age"),
+            ],
+            {
+                # highlight-next-line
+                "validate": validate_form,
+                "on_submit": lambda form: create_user(form)
+            }
+        )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+Many components also include built in validators. For example:
+- `ui.emailInput` and `ui.urlInput` will validate that the input is a valid email or URL.
+- `ui.fileDrop` includes parameters to limit the accepted file types, or control the min/max count of submitted files.
+
+## Set initial input values
+
+You can specify the initial value of an input by setting the `initialValue` parameter for an input.
+
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    function editUser(user) {
+        page.modal(({ resolve }) => 
+            ui.form(
+                "edit-user", 
+                [
+                    // highlight-start
+                    ui.textInput("name", { initialValue: user.name }),
+                    ui.emailInput("email", { initialValue: user.email }),
+                    // highlight-end
+                ],
+                {
+                    onSubmit: (form) => {
+                        editUser(user.id, form.name, form.email)
+                        resolve() // close modal
+                    }
+                }
+            )
+        )
+    }
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    def edit_user(user_id, name, email, resolve):
+        update_user(user_id, name, email)
+        resolve() # close modal
+
+    def edit_user_modal(user):
+        page.modal(lambda resolve: 
+            ui.form(
+                "edit-user", 
+                [
+                    # highlight-start
+                    ui.text_input("name", initial_value=user["name"]),
+                    ui.email_input("email", initial_value=user["email"]),
+                    # highlight-end
+                ],
+                "on_submit": lambda form: edit_user(user["id"], form["name"], form["email"], resolve)
+            )
+        )
+    ```
+    </TabItem>
+</Tabs>
+
+## Change input values programmatically
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    You can change the current value of an input programmatically at any time using the `page.setInputs` method.
+    </TabItem>
+    <TabItem value="python">
+    You can change the current value of an input programmatically at any time using the `page.set_inputs` method.
+    </TabItem>
+</Tabs>
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.add(() =>
+        ui.selectBox(
+            "email-template",
+            ["Invoice", "Welcome", "Order Confirmation"],
+            {
+                // highlight-start
+                onChange: (value) => {
+                    // Pass an object that maps input IDs to the new values.
+                    page.setInputs({
+                        "emailBody": emailTemplates[value]
+                    })
+                }
+                // highlight-end
+            }
+        )
+    )
+
+    page.add(() =>
+        ui.form(
+            "email-form",
+            [
+                ui.textInput("emailSubject"),
+                // highlight-start
+                ui.textArea("emailBody"),
+                // highlight-end
+            ],
+            {
+                onSubmit: (form) => {
+                    sendEmail(form.emailSubject, form.emailBody)
+                }
+            }
+        )
+    )
+    ```
+
+    :::warning
+    Notice that `ui.selectBox` is not part of the form. This is intentional since inputs inside of forms will ignore their own callbacks such as `onChange`.
+    :::
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # highlight-start
+    def on_select_email_template(value):
+        # Pass an object that maps input IDs to the new values.
+        page.set_inputs({
+            "email_body": email_templates[value]
+        })
+    # highlight-end
+
+    page.add(lambda:
+        ui.select_box(
+            "email-template",
+            ["Invoice", "Welcome", "Order Confirmation"],
+            # highlight-start
+            on_change=on_select_email_template
+            # highlight-end
+        )
+    )
+
+    page.add(lambda:
+        ui.form(
+            "email-form",
+            [
+                ui.text_input("email_subject"),
+                # highlight-start
+                ui.text_area("email_body"),
+                # highlight-end
+            ],
+            on_submit=lambda form: send_email(form["email_subject"], form["email_body"])
+        )
+    )
+    ```
+
+    :::warning
+    Notice that `ui.select_box` is not part of the form. This is intentional since inputs inside of forms will ignore individual callbacks such as `on_change`.
+    :::
+    </TabItem>
+</Tabs>
+
+## Customize form layout
+
+Forms have no special requirements for customizing the layout. Feel free to nest layout components and leverage styling parameters to customize the layout. For example:
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    page.add(() => ui.form(
+        "form-id",
+        [
+            ui.textInput("addressLineOne"),
+            ui.textInput("addressLineTwo"),
+            // render inputs in a row
+            ui.row(
+                [
+                    ui.textInput("city"),
+                    ui.selectBox("state", LIST_OF_STATES),
+                    ui.numberInput("zipCode"),
+                ],
+                {
+                    spacing: "8px" // reduce spacing between inputs from default 16px
+                }
+            ),
+            ui.row(
+                ui.submitButton("save"),
+                { justify: "end" } // align submit button to the right
+            )
+        ],
+        {
+            spacing: "24px", // increase spacing between rows from default 16px
+            onSubmit: (form) => saveAddress(form)
+        }
+    ))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">    
+    ```python
+    page.add(lambda: ui.form(
+        "form-id",
+        [
+            ui.text_input("address_line_one"),
+            ui.text_input("address_line_two"),
+            # render inputs in a row
+            ui.row(
+                [
+                    ui.text_input("city"),
+                    ui.select_box("state", LIST_OF_STATES),
+                    ui.number_input("zip_code"),
+                ],
+                spacing="8px" # reduce spacing between inputs from default 16px
+            ),
+            ui.row(
+                ui.submit_button("save"),
+                justify="end" # align submit button to the right
+            )
+        ],
+        spacing="24px", # increase spacing between rows from default 16px
+        on_submit=lambda form: save_address(form)
+    ))
+    ```
+    </TabItem>
+</Tabs>
+
+
+## Customize submit button
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    Forms render with a submit button at the bottom by default. You can override the default position and styling of the button by including your own `ui.submitButton` component anywhere inside the form.
+    
+    Or you can use the [`properties.hideSubmitButton`](/components/layout/form#api-reference) parameter to hide the submit button entirely.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    Forms render with a submit button at the bottom by default. You can override the default position and styling of the button by including your own `ui.submit_button` component anywhere inside the form.
+    
+    Or you can use the [`hide_submit_button`](/components/layout/form#api-reference) parameter to hide the submit button entirely.
+    </TabItem>
+</Tabs>
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    page.add(() => ui.form(
+        "form-id",
+        [
+            // Render the submit button at the top of the form with custom styling.
+            ui.submitButton("submit", { label: "Save changes", appearance: "primary" }),
+            ui.textInput("firstName")
+        ]
+    ))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">    
+    ```python
+    page.add(lambda: ui.form(
+        "form-id",
+        [
+            # Render the submit button at the top of the form with custom styling.
+            ui.submit_button("submit", label="Save changes", appearance="primary"),
+            ui.text_input("first_name")
+        ]
+    ))
+    ```
+    </TabItem>
+</Tabs>
+
+Submit buttons are a thin wrapper on top of the [`ui.button` component](/components/input/button), and include all of the same parameters.
+
+## Using inputs without a form
+
+There are many situations where you may want to use an input without it being part of a form. For example, a custom dropdown that filters table values, or a persistent file drop that uploads files to a database as soon as they are dropped.
+
+That's completely possible, and quite straightforward. Simple use the input component directly, and hook into the callback functions exposed directly by the input component.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    let users = fetchUsers()
+
+    // highlight-start
+    function filterUsers(filter) {
+        users = users.filter(user => user.role === filter)
+        page.update()
+    }
+    // highlight-end
+
+    page.add(() =>
+        ui.selectBox(
+            "role",
+            ["Admin", "User", "Guest"],
+            {
+                // highlight-start
+                onChange: filterUsers
+                // highlight-end
+            }
+        )
+    )
+
+    page.add(() => ui.table("users", users))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">    
+    ```python
+    users = fetch_users()
+
+    # highlight-start
+    def filter_users(filter):
+        users = [user for user in users if user["role"] == filter]
+        page.update()
+    # highlight-end
+
+    page.add(lambda:
+        ui.select_box(
+            "role",
+            ["Admin", "User", "Guest"],
+            # highlight-start
+            on_change=filter_users
+            # highlight-end
+        )
+    )
+
+    page.add(lambda: ui.table("users", users))
+    ```
+    </TabItem>
+</Tabs>
+
+## Notes and best practices
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    - Inputs nested inside a form component will ignore their own direct callback functions such as `onEnter` and `onChange`.
+    - Forms cannot be nested inside other forms.
+    </TabItem>
+    <TabItem value="python">
+    - Inputs nested inside a form component will ignore their own direct callback functions such as `on_enter` and `on_change`.
+    - Forms cannot be nested inside other forms.
+    </TabItem>
+</Tabs>

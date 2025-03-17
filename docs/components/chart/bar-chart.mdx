@@ -1,0 +1,613 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Bar Chart
+description: Render a bar chart.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { ParameterTemplate, Parameter, IFrame } from "../../../src/components";
+
+# Component | Bar Chart
+
+:::info
+Introduced in SDK v0.25.0
+:::
+
+Render a bar chart. Bar charts offer:
+
+- **Aesthetic defaults** for a clean, professional look.
+- **Flexible customization** options for orientation, scale, grouping, etc.
+- **Built-in data transformation utilities** for easy formatting.
+- **Canvas rendering** for efficient scaling to thousands of bars.
+
+<IFrame type="bar-chart-component" heightPx="520" />
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const salesData = [
+      { month: "Jan", California: 95, Texas: 120, "New York": 310 },
+      { month: "Feb", California: 105, Texas: 135, "New York": 290 },
+      /* ... */
+      { month: "Dec", California: 250, Texas: 300, "New York": 520 },
+    ];
+
+    page.add(() =>
+      ui.barChart("sales-chart", salesData, {
+        group: "month",
+        series: ["California", "Texas", "New York"],
+        groupMode: "grouped",
+        label: "Monthly Sales by Region",
+      })
+    );
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    sales_data = [
+      { "month": "Jan", "California": 95, "Texas": 120, "New York": 310 },
+      { "month": "Feb", "California": 105, "Texas": 135, "New York": 290 },
+      # ...
+      { "month": "Dec", "California": 250, "Texas": 300, "New York": 520 },
+    ]
+
+    page.add(() =>
+      ui.bar_chart(
+        "sales-chart",
+        sales_data,
+        group="month",
+        series=["California", "Texas", "New York"],
+        group_mode="grouped",
+        label="Monthly Sales by Region"
+      )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+## Group rows
+
+You'll likely need to re-format your data in order to chart it. Compose provides simple utilities to help you do this.
+
+First, you'll need to group your data. For example, for a monthly chart, you'd group by month. Specify the `group` parameter to specify how rows in your data should be grouped:
+
+- A string key from your data
+- A function that receives each row and its index, returning a group label
+- If not provided, defaults to using the `"group"` key from your data
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const salesData = [
+      { date: "2023-01-15", product: "Laptop", revenue: 2500 },
+      { date: "2023-02-22", product: "Monitor", revenue: 800 },
+      { date: "2023-02-05", product: "Laptop", revenue: 2200 },
+      { date: "2023-02-18", product: "Monitor", revenue: 900 },
+      { date: "2023-03-10", product: "Laptop", revenue: 2800 },
+      { date: "2023-03-25", product: "Monitor", revenue: 750 },
+    ];
+
+    function getMonth(row) {
+      return new Date(row.date).toLocaleString('default', { month: 'long' });
+    }
+
+    page.add(() =>
+      ui.barChart("monthly-chart", salesData, {
+        group: (row) => getMonth(row), // Group the data by month
+        series: ["revenue"],
+        label: "Monthly Revenue"
+      })
+    );
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    from datetime import datetime
+
+    sales_data = [
+      { "date": "2023-01-15", "product": "Laptop", "revenue": 2500 },
+      { "date": "2023-02-22", "product": "Monitor", "revenue": 800 },
+      { "date": "2023-02-05", "product": "Laptop", "revenue": 2200 },
+      { "date": "2023-02-18", "product": "Monitor", "revenue": 900 },
+      { "date": "2023-03-10", "product": "Laptop", "revenue": 2800 },
+      { "date": "2023-03-25", "product": "Monitor", "revenue": 750 },
+    ]
+
+    def get_month(row):
+      return datetime.strptime(row["date"], "%Y-%m-%d").strftime("%B")
+
+    page.add(lambda:
+      ui.bar_chart(
+        "monthly-chart",
+        sales_data,
+        group=get_month, # Group the data by month
+        series=["revenue"],
+        label="Monthly Revenue"
+      )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="bar-chart-group-data" heightPx="520" />
+
+## Aggregate rows
+
+Compose will aggregate rows with the same group value according to the `aggregate` parameter.
+
+By default, the rows are aggregated by `sum`. You can also aggregate by `count`, `average`, `min`, or `max`.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const salesData = [
+      { date: "2023-01-15", product: "Laptop", revenue: 2500 },
+      /* ... */
+      { date: "2023-03-25", product: "Monitor", revenue: 750 },
+    ];
+
+    function getMonth(row) {
+      return new Date(row.date).toLocaleString('default', { month: 'long' });
+    }
+
+    page.add(() =>
+      ui.barChart("monthly-chart", salesData, {
+        group: (row) => getMonth(row),
+        series: ["product"],
+        aggregate: "count", // Aggregate by count
+        label: "Products Sold by Month"
+      })
+    );
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    from datetime import datetime
+
+    sales_data = [
+      { "date": "2023-01-15", "product": "Laptop", "revenue": 2500 },
+      # ...
+      { "date": "2023-03-25", "product": "Monitor", "revenue": 750 },
+    ]
+
+    def get_month(row):
+      return datetime.strptime(row["date"], "%Y-%m-%d").strftime("%B")
+
+    page.add(lambda:
+      ui.bar_chart(
+        "monthly-chart",
+        sales_data,
+        group=get_month,
+        series=["product"],
+        aggregate="count", # Aggregate by count
+        label="Products Sold by Month"
+      )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="bar-chart-aggregate-data" heightPx="520" />
+
+## Segment within groups
+
+Within each group, you can further segment your data by using the `series` parameter, which controls the bars that render for each group.
+
+For example, you may want to break down your monthly sales by region.
+
+### Basic usage
+
+You can pass a list of keys from your data to the  `series` parameter, which will map to the bars that render for each group.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const salesData = [
+      { month: "Jan", California: 95, Texas: 120, "New York": 310 },
+      { month: "Feb", California: 105, Texas: 135, "New York": 290 },
+      /* ... */
+      { month: "Dec", California: 250, Texas: 300, "New York": 520 },
+    ];
+
+    page.add(() =>
+      ui.barChart("sales-chart", salesData, {
+        group: "month",
+        series: ["California", "Texas"]
+        groupMode: "grouped",
+        label: "Monthly Sales by Region",
+      })
+    );
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    sales_data = [
+      { "month": "Jan", "California": 95, "Texas": 120, "New York": 310 },
+      { "month": "Feb", "California": 105, "Texas": 135, "New York": 290 },
+      # ...
+      { "month": "Dec", "California": 250, "Texas": 300, "New York": 520 },
+    ]
+
+    page.add(() =>
+      ui.bar_chart(
+        "sales-chart",
+        sales_data,
+        group="month",
+        series=["California", "Texas"]
+        label="Monthly Sales by Region (CA & TX)"
+      )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="bar-chart-simple-series" heightPx="520" />
+
+### Advanced usage
+
+Alternatively, you can pass an object with configuration properties to further customize the series.
+
+Each object must have a `value` property that can be either a key from your data or a function that receives each row and returns a numeric value.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const salesData = [
+      { month: "Jan", California: 95, Texas: 120, "New York": 310 },
+      { month: "Feb", California: 105, Texas: 135, "New York": 290 },
+      /* ... */
+      { month: "Dec", California: 250, Texas: 300, "New York": 520 },
+    ];
+
+    page.add(() =>
+      ui.barChart("sales-chart", salesData, {
+        group: "month",
+        series: [
+            {
+                label: "Midwest",
+                value: (row) => row.California + row.Texas
+            }
+        ],
+        groupMode: "grouped",
+        label: "Monthly Sales by Region",
+      })
+    );
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    sales_data = [
+      { "month": "Jan", "California": 95, "Texas": 120, "New York": 310 },
+      { "month": "Feb", "California": 105, "Texas": 135, "New York": 290 },
+      # ...
+      { "month": "Dec", "California": 250, "Texas": 300, "New York": 520 },
+    ]
+
+    def get_midwest(row):
+        return row["California"] + row["Texas"]
+
+    page.add(() =>
+      ui.bar_chart(
+        "sales-chart",
+        sales_data,
+        group="month",
+        series=[{
+            label: "Midwest",
+            value: get_midwest
+        }]
+        label="Monthly Sales for Midwest"
+      )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="bar-chart-advanced-series" heightPx="520" />
+
+### Series object properties
+
+<Parameter
+    name="value"
+    required={true}
+    type={lang => lang === "js" ? "string | (row: DataRow, idx: number) => number | null | undefined" : "Callable[[DataRow, int], int | float | None]"}
+    description={lang => <>
+        <p>
+            The row's value to be used for the series. Either:
+        </p>
+        <ul>
+            <li>A string that maps to a key in the data.</li>
+            <li>A function that receives each row and its index and returns a numeric value. You can also return {lang === "js" ? <><code>null</code> or <code>undefined</code></> : <code>None</code>} to exclude the row from the dataset.</li>
+        </ul>
+        <p>
+            The returned value will be aggregated by group (e.g. if you are grouping data by month, all rows for a month will be aggregated together).
+        </p>
+    </>}
+/>
+
+<Parameter
+    name={() => "label"}
+    required={false}
+    type="string"
+    description="The label to use for the series in the legend, tooltips, etc."
+/>
+
+<Parameter
+    name={() => "aggregate"}
+    required={false}
+    type="literal"
+    description={lang => <>
+        <p>
+            The aggregate function to be used for the series. Use this if you want this series to be aggregated differently than the others.
+        </p>
+        <p>
+            Options: <code>sum</code>, <code>count</code>, <code>average</code>, <code>min</code>, <code>max</code>.
+        </p>
+        <p>
+            Defaults to the chart-level aggregate function (which itself defaults to <code>sum</code>).
+        </p>
+    </>}
+/>
+
+## Kitchen sink example
+
+The example below demonstrates how to create a bar chart with dynamic series and custom grouping.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const PRODUCT_TO_COST = {
+        "Laptop": 1000,
+        "Monitor": 500,
+        "Keyboard": 100,
+    }
+
+    const PRODUCTS_LIST = Object.keys(PRODUCT_TO_COST);
+
+    const salesData = [
+      { date: "2023-01-15", product: "Laptop", },
+      { date: "2023-02-22", product: "Monitor", },
+      { date: "2023-02-05", product: "Keyboard", },
+      /* ... */
+      { date: "2023-02-18", product: "Monitor", },
+      { date: "2023-03-10", product: "Laptop", },
+      { date: "2023-03-25", product: "Monitor", },
+    ];
+
+    function getMonth(row) {
+      return new Date(row.date).toLocaleString('default', { month: 'short', year: '2-digit' });
+    }
+
+    page.add(() =>
+      ui.barChart("monthly-chart", salesData, {
+        group: (row) => getMonth(row), // Group the data by month
+        series: PRODUCTS_LIST.map(product => ({
+            label: product,
+            value: (row) => {
+                if (row.product === product) {
+                    return PRODUCT_TO_COST[product];
+                }
+                return 0;
+            }
+        })),
+        label: "Monthly Revenue by Product"
+      })
+    );
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    from datetime import datetime
+
+    PRODUCT_TO_COST = {
+        "Laptop": 1000,
+        "Monitor": 500,
+        "Keyboard": 100,
+    }
+
+    PRODUCTS_LIST = Object.keys(PRODUCT_TO_COST);
+
+    sales_data = [
+      { "date": "2023-01-15", "product": "Laptop" },
+      { "date": "2023-02-22", "product": "Monitor" },
+      { "date": "2023-02-05", "product": "Keyboard" },
+      # ...
+      { "date": "2023-02-18", "product": "Monitor" },
+      { "date": "2023-03-10", "product": "Laptop" },
+      { "date": "2023-03-25", "product": "Monitor" },
+    ]
+
+    def get_month(row):
+      return datetime.strptime(row["date"], "%Y-%m-%d").strftime("%b %y")
+
+    def get_series_value(row, product):
+        if row["product"] == product:
+            return PRODUCT_TO_COST[product]
+        return 0
+
+    page.add(lambda:
+      ui.bar_chart(
+        "monthly-chart",
+        sales_data,
+        group=get_month, # Group the data by month
+        series=[
+            {
+                "label": product,
+                "value": lambda row: get_series_value(row, product)
+            }
+            for product in PRODUCTS_LIST
+        ],
+        label="Monthly Revenue by Product"
+      )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="bar-chart-kitchen-sink" heightPx="520" />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type DataRow = Record<string, any>
+
+    ui.barChart<T extends DataRow>(
+        id: string,
+        data: T[]
+        properties?: Partial<{
+            group: string | ((row: T, idx: number) => string | null | undefined),
+            series: Array<string | SeriesObject<T>>,
+            aggregate: "sum" | "count" | "average" | "min" | "max",
+            groupMode: "grouped" | "stacked",
+            label: string,
+            description: string,
+            orientation: "horizontal" | "vertical",
+            scale: "linear" | "symlog",
+            style: Style,
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    DataRow = Dict[str, Any]
+
+    ui.bar_chart(
+        id: str,
+        data: List[DataRow],
+        *,
+        group: str | Callable[[DataRow, int], str | None],
+        series: List[str | SeriesObject],
+        aggregate: Literal["sum", "count", "average", "min", "max"] = "sum",
+        group_mode: Literal["grouped", "stacked"] = "stacked",
+        label: str | None = None,
+        description: str | None = None,
+        orientation: Literal["horizontal", "vertical"] = "vertical",
+        scale: Literal["linear", "symlog"] = "linear",
+        style: Style,
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<Parameter
+    name="data"
+    required={true}
+    type={lang => lang === "js" ? "DataRow[]" : "List[DataRow]"}
+    description="The data to be displayed in the bar chart."
+/>
+
+<Parameter
+    name="group"
+    required={false}
+    type={lang => lang === "js" ? "string | ((row: DataRow, idx: number) => string | null | undefined)" : "Callable[[DataRow, int], str | None]"}
+    description={lang => <>
+        <p>
+            How to group the data. If not provided, Compose will look for a key named <code>group</code> in the data.
+        </p>
+        <p>
+            Learn more in the <a href="#group-rows">group rows</a> section.
+        </p>
+    </>}
+/>
+
+<Parameter
+    name="series"
+    required={false}
+    type={lang => lang === "js" ? "Array<string | SeriesObject>" : "List[str | SeriesObject]"}
+    description={lang => <>
+        <p>
+            The series to be displayed in the bar chart. If not provided, Compose will use all keys found in the first row of the data (excluding the <code>group</code> key) as separate series.
+
+        </p>
+        <p>
+            Learn more in the <a href="#segment-within-groups">series</a> section.
+        </p>
+    </>}
+/>
+
+<Parameter
+    name="aggregate"
+    required={false}
+    type="literal"
+    description={lang => <>
+        <p>
+            How to aggregate rows that are in the same group. Choose from <code>sum</code>, <code>count</code>, <code>average</code>, <code>min</code>, or <code>max</code>.
+        </p>
+        <p>
+            Defaults to <code>sum</code>.
+        </p>
+        <p>
+            Learn more in the <a href="#aggregate-rows">aggregate rows</a> section.
+        </p>
+    </>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.groupMode" : "group_mode"}
+    required={false}
+    type="literal"
+    description={lang => <>
+        <p>
+            How to display the bars within each group. Either:
+        </p>
+        <ul>
+            <li><code>grouped</code>: Display the bars side-by-side.</li>
+            <li><code>stacked</code>: Stack the bars on top of each other.</li>
+        </ul>
+        <p>
+            Defaults to <code>stacked</code>.
+        </p>
+    </>}
+/>
+
+<ParameterTemplate.Label componentName="bar chart" />
+
+<ParameterTemplate.Description componentName="bar chart" />
+
+<Parameter
+    name="orientation"
+    required={false}
+    type="literal"
+    description={lang => <>
+        <p>
+            The orientation of the bar chart. Either:
+        </p>
+        <ul>
+            <li><code>horizontal</code>: Display the bars horizontally.</li>
+            <li><code>vertical</code>: Display the bars vertically.</li>
+        </ul>
+        <p>
+            Defaults to <code>vertical</code>.
+        </p>
+    </>}
+/>
+
+<Parameter
+    name="scale"
+    required={false}
+    type="literal"
+    description={lang => <>
+        <p>
+            How to scale the value axis. Either:
+        </p>
+        <ul>
+            <li><code>linear</code>: Scale linearly. Best for most cases.</li>
+            <li><code>symlog</code>: Scale logarithmically. Best for cases where data differs by orders of magnitude.</li>
+        </ul>
+        <p>
+            Defaults to <code>linear</code>.
+        </p>
+    </>}
+/>
+
+<ParameterTemplate.Style componentName="bar chart" />

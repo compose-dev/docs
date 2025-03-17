@@ -1,0 +1,224 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Set Config
+description: Edit default configuration parameters (e.g. width, padding, spacing) for the page.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+import { Parameter } from "../../src/components";
+
+# Page Action | Set Config
+
+Use `page.set()` to edit the default configuration of the page, such as the width, padding, and spacing between components.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        import { Compose, Page, UI } from "@composehq/sdk"
+
+        function handler({ page, ui }: { page: Page, ui: UI }) {
+            page.set({
+                width: "600px",
+                spacingY: "3rem",
+            })
+
+            page.add(() => ui.stack([
+                ui.header("Section 1"),
+                ui.text("This is a section of text"),
+            ]))
+        }
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        import compose_sdk as c
+
+        def handler(page: c.Page, ui: c.UI):
+            page.set({
+                "width": "600px",
+                "spacing_y": "3rem",
+            })
+
+            page.add(lambda: ui.stack([
+                ui.header("Section 1"),
+                ui.text("This is a section of text"),
+            ]))
+        ```
+    </TabItem>
+</Tabs>
+
+Since `page.set()` is just a regular function, it can be called multiple times to update the page configuration throughout the lifetime of the app. Passed values will be merged with the existing default config.
+
+## Available properties
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>`width`</td>
+                    <td>`72rem`</td>
+                    <td>The width of the page.</td>
+                </tr>
+                <tr>
+                    <td>`paddingX`</td>
+                    <td>`1rem`</td>
+                    <td>The padding at the left and right of the page.</td>
+                </tr>
+                <tr>
+                    <td>`paddingY`</td>
+                    <td>`4rem`</td>
+                    <td>The padding at the top and bottom of the page.</td>
+                </tr>
+                <tr>
+                    <td>`spacingY`</td>
+                    <td>`2rem`</td>
+                    <td>Vertical spacing between `page.add()` renders.</td>
+                </tr>
+                <tr>
+                    <td>`paddingTop`</td>
+                    <td>`4rem`</td>
+                    <td>The padding at the top of the page. Supersedes `paddingY`.</td>
+                </tr>
+                <tr>
+                    <td>`paddingBottom`</td>
+                    <td>`4rem`</td>
+                    <td>The padding at the bottom of the page. Supersedes `paddingY`. Must be at least `4rem` to account for the floating Compose menu.</td>
+                </tr>
+                <tr>
+                    <td>`paddingLeft`</td>
+                    <td>`1rem`</td>
+                    <td>The padding at the left of the page. Supersedes `paddingX`.</td>
+                </tr>
+                <tr>
+                    <td>`paddingRight`</td>
+                    <td>`1rem`</td>
+                    <td>The padding at the right of the page. Supersedes `paddingX`.</td>
+                </tr>
+            </tbody>
+        </table>
+    </TabItem>
+    <TabItem value="python" label="Python">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Default</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>`width`</td>
+                    <td>`72rem`</td>
+                    <td>The width of the page.</td>
+                </tr>
+                <tr>
+                    <td>`padding_x`</td>
+                    <td>`1rem`</td>
+                    <td>The padding at the left and right of the page.</td>
+                </tr>
+                <tr>
+                    <td>`padding_y`</td>
+                    <td>`4rem`</td>
+                    <td>The padding at the top and bottom of the page.</td>
+                </tr>
+                <tr>
+                    <td>`spacing_y`</td>
+                    <td>`2rem`</td>
+                    <td>Vertical spacing between `page.add()` renders.</td>
+                </tr>
+                <tr>
+                    <td>`padding_top`</td>
+                    <td>`4rem`</td>
+                    <td>The padding at the top of the page. Supersedes `padding_y`.</td>
+                </tr>
+                <tr>
+                    <td>`padding_bottom`</td>
+                    <td>`4rem`</td>
+                    <td>The padding at the bottom of the page. Supersedes `padding_y`. Must be at least `4rem` to account for the floating Compose menu.</td>
+                </tr>
+                <tr>
+                    <td>`padding_left`</td>
+                    <td>`1rem`</td>
+                    <td>The padding at the left of the page. Supersedes `padding_x`.</td>
+                </tr>
+                <tr>
+                    <td>`padding_right`</td>
+                    <td>`1rem`</td>
+                    <td>The padding at the right of the page. Supersedes `padding_x`.</td>
+                </tr>
+            </tbody>
+        </table>
+    </TabItem>
+</Tabs>
+
+Note that `1rem` is equal to `16px` in CSS. Prefer using `rem` over `px` for better readability and consistency - `rem` automatically scales with the user's system font size, whereas `px` does not.
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```ts
+        interface Config {
+            width?: string;
+            paddingX?: string;
+            paddingY?: string;
+            spacingY?: string;
+            paddingTop?: string;
+            paddingBottom?: string;
+            paddingLeft?: string;
+            paddingRight?: string;
+        }
+
+        page.set(config: Config): void
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        class Config(TypedDict):
+            width: NotRequired[str]
+            padding_x: NotRequired[str]
+            padding_y: NotRequired[str]
+            spacing_y: NotRequired[str]
+            padding_top: NotRequired[str]
+            padding_bottom: NotRequired[str]
+            padding_left: NotRequired[str]
+            padding_right: NotRequired[str]
+
+        page.set(config: Config) -> None
+        ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="config"
+    required={true}
+    type="Config"
+    description="The configuration to set for the page. Will be merged with the existing default config."
+/>
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>void</span></p>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>None</span></p>
+    </TabItem>
+</Tabs>

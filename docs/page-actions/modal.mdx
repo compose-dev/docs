@@ -1,0 +1,202 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Modal
+description: Add UI components to the page inside a modal.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+import { Parameter } from "../../src/components";
+
+
+# Page Action | Modal
+
+The `page.modal()` method is a drop-in replacement for `page.add()` that automatically wraps the content inside a modal.
+
+It also provides minor additions on top of the `page.add()` interface for configuring aspects of the modal's appearance and behavior.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const users = await db.users.selectAll();
+
+    page.add(() => ui.table("users-table", users, {
+        columns: ["name"],
+        actions: [{
+            label: "View Details",
+            // highlight-start
+            onClick: (row) => {
+                page.modal(() => ui.json(row), { title: "User Details" })
+            }
+            // highlight-end
+        }]
+    }))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    users = db.select_all_users()
+
+    page.add(lambda: ui.table(
+        "users-table",
+        users,
+        columns=["name"],
+        actions=[
+            ui.action(
+                label="View Details",
+                # highlight-start
+                on_click=lambda row: page.modal(
+                    lambda: ui.json(row),
+                    title="User Details"
+                )
+                # highlight-end
+            )
+        ]
+    ))
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="page-actions-modal" heightPx={450} />
+
+## Closing the modal
+
+By default, every modal renders a small close icon in the top-right corner that can be used to close the modal.
+
+Alternatively, you can close the modal manually by calling the included `resolve` method, which will both close the modal
+and resolve the promise with the value you pass to it.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const response = await page.modal(({ resolve }) => ui.stack([
+        ui.text("Is three slices of bread a sandwich?"),
+        ui.button("yes", { label: "Yes", onClick: () => resolve(true) }),
+        ui.button("no", { label: "No", onClick: () => resolve(false) }),
+    ]))
+
+    // Modal was closed with the "x" icon in the top right corner
+    if (response === undefined) {
+        page.add(lambda: ui.text("You didn't answer the question!"))
+    }
+
+    if (response === true) {
+        page.add(lambda: ui.text("You answered correctly!"))
+    }
+
+    if (response === false) {
+        page.add(lambda: ui.text("You answered incorrectly :("))
+    }
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    response = await page.modal(lambda resolve: ui.stack([
+        ui.text("Is three slices of bread a sandwich?"),
+        ui.button("yes", label="Yes", on_click=lambda: resolve(True)),
+        ui.button("no", label="No", on_click=lambda: resolve(False)),
+    ]))
+
+    # Modal was closed with the "x" icon in the top right corner
+    if response is None:
+        page.add(lambda: ui.text("You didn't answer the question!"))
+
+    if response is True:
+        page.add(lambda: ui.text("You answered correctly!"))
+
+    if response is False:
+        page.add(lambda: ui.text("You answered incorrectly :("))
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="page-actions-modal-close" heightPx={450} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type Component = ReturnType<typeof ui.textInput> | ReturnType<typeof ui.button> | /* more components */ | ReturnType<typeof ui.stack>
+    type Resolve = (value: Any) => void
+
+    page.modal(
+        content: (() => Component) | (({ resolve }: { resolve: Resolve }) => Component),
+        properties?: Partial<{
+            title: string;
+            width: "sm" | "md" | "lg" | "xl" | "2xl";
+        }>
+    ): Promise<Any>
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # Return type of all ui components
+    Component = ui.stack | ui.button | ui.text_input | /* more components */ | ui.markdown
+    Resolve = Union[Callable[[], None], Callable[[Any], None]]
+
+    page.modal(
+        content: Callable[[], Component] | Callable[[Resolve], Component],
+        *,
+        title: str | None = None,
+        width: Literal["sm", "md", "lg", "xl", "2xl"] = "md"
+    ) -> Awaitable[Any]
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="content"
+    required={true}
+    type="RenderContent"
+    description={<>
+        A function that returns the component to render inside the modal. Accepts the same content format as <a href="/page-actions/add#api-reference">page.add()</a>. See that page for more details.
+    </>}
+/>
+
+<Parameter
+    name="title"
+    required={false}
+    type="string"
+    description={<>
+        Specify a custom title for the modal. If not provided, the title will be left blank.
+    </>}
+/>
+
+<Parameter
+    name="width"
+    required={false}
+    type="literal"
+    description={<>
+        <p>Specify the width of the modal. Defaults to <code>"md"</code>.</p>
+        <p>Options:</p>
+        <ul>
+            <li><code>"sm"</code>: <code>448px</code></li>
+            <li><code>"md"</code>: <code>512px</code></li>
+            <li><code>"lg"</code>: <code>576px</code></li>
+            <li><code>"xl"</code>: <code>768px</code></li>
+            <li><code>"2xl"</code>: <code>1024px</code></li>
+        </ul>
+    </>}
+/>
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>Promise\<Any></span></p>
+
+    A promise that resolves to `undefined` or the value of whatever is passed to the `resolve` callback.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>Awaitable\<Any></span></p>
+
+    An awaitable that resolves to `None` or the value of whatever is passed to the `resolve` callback.
+    </TabItem>
+</Tabs>

@@ -1,0 +1,112 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Checkbox
+description: Render a checkbox.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate } from "../../../src/components";
+
+# Component | Checkbox
+
+:::info
+Introduced in v0.22.0 of the SDK.
+:::
+
+Render a checkbox.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.checkbox("checkbox-key", { 
+        label: "I agree that Compose is the best thing since sliced bread",
+        onChange: (value) => console.log(value)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.checkbox(
+        "checkbox-key",
+        label="I agree that Compose is the best thing since sliced bread",
+        on_change=lambda value: print(value)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-checkbox" heightPx={150} />
+
+Learn more about [working with inputs](/guides/forms).
+
+## API reference
+
+## Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.checkbox(
+        id: string,
+        properties?: Partial<{
+            label: string,
+            description: string,
+            initialValue: boolean, // Default: false
+            validate: (value: boolean) => string | void,
+            onChange: (value: boolean) => void,
+            style: Style | null
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.checkbox(
+        id,
+        *,
+        label=None,
+        description=None,
+        initial_value=False,
+        validate=None,
+        on_change=None,
+        style=None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Label
+    componentName="checkbox"
+    direction="beside"
+/>
+
+<ParameterTemplate.Description
+    componentName="checkbox"
+    position="below"
+/>
+
+<ParameterTemplate.InitialValue
+    componentName="checkbox"
+    position="below"
+    type="boolean"
+    description={lang => <p>The initial value of the checkbox. Defaults to <code>{lang === "js" ? "false" : "False"}</code> (unchecked).</p>}
+/>
+
+<ParameterTemplate.ValidateInput
+    componentName="checkbox"
+    hookInputArgument={lang => lang === "js" ? "value: boolean" : "bool"}
+/>
+
+<ParameterTemplate.OnChange
+    componentName="checkbox"
+    hookInputArgument={lang => lang === "js" ? "value: boolean" : "bool"}
+/>
+
+<ParameterTemplate.Style />

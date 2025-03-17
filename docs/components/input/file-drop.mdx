@@ -1,0 +1,182 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | File Drop
+description: Render a file drop zone that allows users to upload files from the browser to your app.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { Parameter, ParameterTemplate, CustomCodeBlock } from "../../../src/components"
+
+
+# Component | File Drop
+
+Render a file drop zone that allows users to upload files from the browser to your app.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import path from 'path';
+    import { fileURLToPath } from 'url';
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    function onFiles(files: { buffer: Buffer, name: string, type: string }[]) {
+        files.forEach(file => {
+            const filePath = path.join(__dirname, file.name);
+
+            // write to disk
+            fs.writeFileSync(filePath, file.buffer);
+        });
+    }
+
+    ui.fileDrop("pdf-file-drop", {
+        label: "Drop files here",
+        acceptedFileTypes: ["application/pdf"],
+        onChange: onFiles
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    def on_files(files):
+        print(files)
+
+    ui.file_drop(
+        "pdf-file-drop",
+        label="Drop files here",
+        accepted_file_types=["application/pdf"],
+        on_change=on_files
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+<IFrame type="components-input-filedrop" heightPx={325} />
+
+Learn more about [file uploads](/guides/working-with-files#file-upload).
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type ComposeFile = {
+        buffer: Buffer;
+        name: string;
+        type: string;
+    }
+
+    ui.fileDrop(
+        id: string,
+        properties: Partial<{
+            label: string,
+            description: string,
+            required: bool,
+            validate: (value: ComposeFile[]) => string | void,
+            onChange: (value: ComposeFile[]) => void,
+            acceptedFileTypes: string[],
+            minCount: int,
+            maxCount: int,
+            style: Style | null
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    class File(BytesIO):
+        def __init__(self, content: bytes, file_name: str, file_type: str):
+            super().__init__(content)
+            self.name = file_name
+            self.type = file_type
+
+    ui.file_drop(
+        id: str,
+        *,
+        label: str = None,
+        description: str = None,
+        required: bool = True,
+        validate: Callable[[File[]], str | None] = None,
+        on_change: Callable[[File[]], None] = None,
+        accepted_file_types: list[str] = None,
+        min_count: int = 0,
+        max_count: int = 1000000000,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Label
+    componentName="file drop"
+/>
+
+<ParameterTemplate.Description
+    componentName="file drop"
+/>
+
+<ParameterTemplate.Required
+    componentName="file drop"
+    hookName={lang => lang === "js" ? "onChange" : "on_change"}
+    description={lang => <p>Validate that the user has dropped at least one file before submitting the form it's part of or calling it's <code>{lang === "js" ? "onChange" : "on_change"}</code> hook. Defaults to <code>{lang === "js" ? "true" : "True"}</code>.</p>}
+/>
+
+<ParameterTemplate.ValidateInput
+    componentName="file drop"
+    hookInputArgument={lang => lang === "js" ? "files: ComposeFile[]" : "File[]"}
+    description={lang => (<>
+        <p>Validate the file drop value before submitting it. If the function returns a string, it will be displayed as an error message.</p>
+        <p>The validator will be passed a list of files. {lang === "js" ? "Each file is an object with the following properties:" : <span>Each file is an instance of the <code>File</code> class with the following properties:</span>}</p>
+        <CustomCodeBlock.ComposeFile lang={lang} />
+    </>)
+    }
+/>
+
+<ParameterTemplate.OnChange
+    componentName="file drop"
+    hookInputArgument={lang => lang === "js" ? "files: ComposeFile[]" : "File[]"}
+    description={lang => (<>
+        <p>A callback function that is called when the user changes the value of the file drop.</p>
+        <p>The callback will be passed a list of files. {lang === "js" ? "Each file is an object with the following properties:" : <span>Each file is an instance of the <code>File</code> class with the following properties:</span>}</p>
+        <CustomCodeBlock.ComposeFile lang={lang} />
+    </>)
+    }
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.acceptedFileTypes" : "accepted_file_types"}
+    required={false}
+    type={lang => lang === "js" ? "string[]" : "list[str]"}
+    description={<>
+        <p>A list of file types that the user can upload. Defaults to all file types.</p>
+        <p>The file types should be MIME type strings. For example, <code>image/png</code> or <code>application/pdf</code>. Learn more about MIME types <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/MIME_types">here</a>.</p>
+    </>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.minCount" : "min_count"}
+    required={false}
+    type={lang => lang === "js" ? "number" : "int"}
+    description={(lang) => <p>Validate that the user has dropped at least some number of files. Defaults to 0.</p>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.maxCount" : "max_count"}
+    required={false}
+    type={lang => lang === "js" ? "number" : "int"}
+    description={(lang) => <p>Validate that the user has dropped at most some number of files. Defaults to 1000000000.</p>}
+/>
+
+<ParameterTemplate.Style />

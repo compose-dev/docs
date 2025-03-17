@@ -1,0 +1,139 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Code
+description: Render a formatted code block.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components";
+
+# Component | Code
+
+Render a formatted code block.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.code(`
+    function add(a, b) {
+      return a + b;
+    }
+
+    const result = add(1, 2);
+    `)
+    ```
+
+    <IFrame type="components-display-code-js" heightPx={350} />
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    ui.code("""
+    def add(a, b):
+        return a + b
+
+    result = add(1, 2)
+    """)
+    ```
+    <IFrame type="components-display-code-python" heightPx={350} />
+  </TabItem>
+</Tabs>
+
+## Syntax Highlighting
+
+Compose will try it's best to infer the language automatically. You can also specify the language manually using the `lang` property.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    type LanguageName =
+      | "ada" | "clojure" | "coffeescript" | "dart" | "django"
+      | "dockerfile" | "dust" | "elixir" | "elm" | "erlang"
+      | "graphql" | "haskell" | "java" | "javascript" | "julia"
+      | "kotlin" | "python" | "typescript" | "json" | "html"
+      | "css" | "scss" | "jsx" | "bash" | "c" | "c++" | "csharp"
+      | "go" | "markdown" | "php" | "ruby" | "rust" | "sql"
+      | "swift" | "xml" | "yaml" | "zig" | "r"
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    LanguageName = Literal[
+      "ada" | "clojure" | "coffeescript" | "dart" | "django"
+      | "dockerfile" | "dust" | "elixir" | "elm" | "erlang"
+      | "graphql" | "haskell" | "java" | "javascript" | "julia"
+      | "kotlin" | "python" | "typescript" | "json" | "html"
+      | "css" | "scss" | "jsx" | "bash" | "c" | "c++" | "csharp"
+      | "go" | "markdown" | "php" | "ruby" | "rust" | "sql"
+      | "swift" | "xml" | "yaml" | "zig" | "r"
+    ]
+    ```
+  </TabItem>
+</Tabs>
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    ui.code(
+        text: string,
+        options?: {
+            label?: string,
+            description?: string,
+            lang?: "ada" | "clojure" | "coffeescript" | /* ... */ | "r"
+            style?: Style
+        }
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.code(
+        text: str,
+        *,
+        label: str = None,
+        description: str = None,
+        lang: Literal["ada", "clojure", "coffeescript", /* ... */, "r"] | None = None,
+        style: Style | None = None,
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="text"
+    required={true}
+    type="string"
+    description="The code to format and display."
+/>
+
+<Parameter
+    name="label"
+    required={false}
+    type="string"
+    description="Display a label above the code block."
+/>
+
+<Parameter
+    name="description"
+    required={false}
+    type="string"
+    description="Display a description between the label and the code block."
+/>
+
+<Parameter
+    name="lang"
+    required={false}
+    type="literal"
+    description="The language to use for syntax highlighting. If not specified, Compose will attempt to infer the language from the code."
+/>
+
+<ParameterTemplate.Style />
+

@@ -1,0 +1,165 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Button
+description: Render a button.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { Parameter, ParameterTemplate } from "../../../src/components"
+
+# Component | Button
+
+Render a button.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.button("button-id", { 
+        label: "Click me",
+        onClick: () => console.log("clicked")
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.button(
+        "button-id",
+        label="Click me",
+        on_click=lambda: print("clicked")
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+<IFrame type="components-input-button" heightPx={150} />
+
+## Appearance
+
+Use the `appearance` property to easily style the button from a predefined set of options.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.button("1", { label: "Primary", appearance: "primary" })
+    ui.button("2", { label: "Outline", appearance: "outline" })
+    ui.button("3", { label: "Warning", appearance: "warning" })
+    ui.button("4", { label: "Danger", appearance: "danger" })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.button("1", label="Primary", appearance="primary")
+    ui.button("2", label="Outline", appearance="outline")
+    ui.button("3", label="Warning", appearance="warning")
+    ui.button("4", label="Danger", appearance="danger")
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-button-appearance" heightPx={300} />
+
+Or, use the `style` property to apply custom styles to the button.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.button("custom", { 
+        label: "Custom button", 
+        style: { 
+            backgroundColor: "black", 
+            color: "white", 
+            padding: "10px 20px", 
+            borderRadius: "999px" 
+        } 
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.button(
+        "custom", 
+        label="Custom button", 
+        style={
+            "backgroundColor": "black", 
+            "color": "white", 
+            "padding": "10px 20px", 
+            "borderRadius": "999px"
+        }
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-button-custom-style" heightPx={150} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.button(
+        id: string,
+        properties?: Partial<{
+            label: string,
+            appearance: "primary" | "outline" | "warning" | "danger",
+            onClick: () => void,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.button(
+        id: str,
+        *,
+        label: str | None = None,
+        appearance: Literal["primary", "outline", "warning", "danger"] = "primary",
+        on_click: Callable[[], None] | None = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Label
+    componentName="button"
+    direction="inside"
+/>
+
+<Parameter
+    name="appearance"
+    required={false}
+    type="literal"
+    description={
+        <>
+            <p>The appearance of the button. Defaults to <code>primary</code>.</p>
+            <p>Options include:</p>
+            <ul>
+                <li><code>"primary"</code></li>
+                <li><code>"outline"</code></li>
+                <li><code>"warning"</code></li>
+                <li><code>"danger"</code></li>
+            </ul>
+        </>
+    }
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.onClick" : "on_click"}
+    required={false}
+    type="no-arguments-void-fn"
+    description={<p>A callback function that is called when the button is clicked.</p>}
+/>
+
+<ParameterTemplate.Style />

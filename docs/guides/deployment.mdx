@@ -1,0 +1,131 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Guide | Deployment
+description: How to deploy Compose to production.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+
+# Guide | Deployment
+
+Start by creating a production environment from the [home page](https://app.composehq.com/home). This generates a new API key that should used for the deployment.
+
+<details>
+<summary>What are environments?</summary>
+
+Every app in Compose exists within one of two environments: **Development** and **Production**.
+
+**Production** is for live apps to be shared with your whole organization, while **Development** is designed for engineers to rapidly develop apps in a local environment. Every engineer is automatically assigned a personal development environment and API key for connecting to it.
+</details>
+
+## Deployment Options
+
+Compose is designed to be run on your own infrastructure - **we can't see your code or secrets by design.**
+
+You're able host Compose however you want. The only requirement is that your environment is able to maintain an internet connection so that it can connect to our servers.
+
+### Embedded Deployment
+
+The easiest way to deploy Compose is as a dependency inside your existing server environment. Compose runs safely in the background via a secure websocket connection to the Compose servers.
+
+This approach enables you to leverage your existing deployment tooling and infrastructure.
+
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    // Example Express app
+
+    import { Compose } from "@composehq/sdk";
+    import express from "express";
+
+    const PORT = process.env.PORT || "3000";
+
+    const server = express();
+
+    server.get("*", (req, res) => {
+        res.send("Hello World");
+    });
+
+    const helloWorldApp = new Compose.App({
+        route: "hello-world",
+        handler: async ({ page, ui }) => {
+            page.add(() => ui.text("Hello World"));
+        }
+    })
+
+    const client = new Compose.Client({
+        apiKey: process.env.COMPOSE_API_KEY,
+        apps: [helloWorldApp],
+    });
+
+    client.connect();
+
+    server.listen(PORT);
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    :::info
+
+    When embedding Compose inside an existing server environment, you'll need to switch out your `client.connect()` call with `client.connect_async()`. `client.connect()` is a blocking call, while `client.connect_async()` is non-blocking, allowing Compose to run without blocking the main server thread.
+
+    :::
+    ```python
+    # Example Flask app
+
+    import compose_sdk as c
+    from flask import Flask
+
+    server = Flask(__name__)
+
+    @server.route("/")
+    def say_hello():
+        return "<p>Hello, World!</p>"
+
+    def main(page: c.Page, ui: c.UI):
+        page.add(lambda: ui.text("Hello world!"))
+
+    client = c.Client(
+        api_key=os.environ.get("COMPOSE_API_KEY"),
+        apps=[ c.App(route="hello-world", handler=main) ],
+    )
+
+    # Use `client.connect_async()` instead of `client.connect()` when
+    # embedding Compose inside an existing server environment.
+    client.connect_async()
+    ```
+    </TabItem>
+</Tabs>
+
+### Standalone Deployment
+
+Of course, it's also possible to run Compose as a standalone service. The process would be the same as deploying any other Node.js or Python service. You simply need to get the code running on a server somewhere.
+
+Compose is designed so that your server only needs to support outbound internet access, enhancing security.
+
+Looking for help with deploying? We'd be happy to help! Just email atul@composehq.com or message us in our [Discord](https://discord.gg/82rk2N8ZE6).
+
+## System Requirements
+
+Compose is designed to be lightweight and efficient, and is fine to run on entry-level hardware for most use-cases (e.g. the cheapest available virtual machine on AWS).
+
+#### CPU
+
+CPU requirements are generally minimal and not a bottleneck for most applications.
+
+#### Memory
+
+For best results, we recommend 512MB of RAM or more, though usage generally remains far below this limit. 
+
+For very data-intensive applications (e.g. rendering large PDFs or tables with tens of thousands of rows) with many simultaneous users, you may need to increase the amount of memory allocated. As always, you should monitor your server's performance and scale up resources as needed.
+
+### Location
+
+Compose's servers are hosted in Salt Lake City, Utah. To minimize latency, we recommend you deploy your own server that will run the SDK as close to this location as possible. Though in general, deploying anywhere in the US will be fine.
+
+## Notes
+
+If you have multiple servers that try to connect to the same Compose environment, Compose will choose one at random and disregard any others. This is because Compose apps are stateful, i.e. they maintain the same server process for the lifetime of the app.

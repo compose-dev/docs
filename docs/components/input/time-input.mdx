@@ -1,0 +1,306 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Time Input
+description: Render a time input box.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate } from "../../../src/components"
+
+
+# Component | Time Input
+
+:::info
+Introduced in v0.22.0 of the SDK.
+:::
+
+Render a time input box.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.timeInput("time-input-key", { 
+        label: "What time is it right now?",
+        onEnter: (value) => console.log(value)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.time_input(
+        "time-input-key",
+        label="What time is it right now?",
+        on_enter=lambda value: print(value)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-time" heightPx={150} />
+
+Learn more about [working with inputs](/guides/forms).
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    /**
+     * One of the following:
+     * - A JS Date object in UTC
+     * - A human readable object with hour (0-23) and minute (0-59)
+     * - `null` to ignore the parameter and use the default value
+     */
+    type TimeInput = 
+        | {
+            hour: number; // 0-23
+            minute: number; // 0-59
+        }
+        | Date // Assumes UTC for the given date
+        | null
+
+    /**
+     * An object with human readable values for hour (0-23) and minute (0-59)
+     */
+    type TimeOutput = 
+        | {
+            hour: number; // 0-23
+            minute: number; // 0-59
+        }
+        | null // Passes `null` if no date was selected
+
+    ui.timeInput(
+        id: string,
+        properties: Partial<{
+            label: string,
+            description: string,
+            required: boolean, // Default: true,
+            min: TimeInput,
+            max: TimeInput,
+            initialValue: TimeInput, // Default: null
+            validate: (value: TimeOutput) => string | void,
+            onEnter: (value: TimeOutput) => void,
+            style: Style | null
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    TimeInputType = datetime.time | datetime.datetime | None
+    TimeOutputType = datetime.time | None
+
+    ui.time_input(
+        id: str,
+        *,
+        label: str = None,
+        description: str = None,
+        required: bool = True,
+        min: TimeInputType = None,
+        max: TimeInputType = None,
+        initial_value: TimeInputType = None,
+        validate: Callable[[TimeOutputType], str | None] = None,
+        on_enter: Callable[[TimeOutputType], None] = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Label componentName="time input" />
+
+<ParameterTemplate.Description componentName="time input box" />
+
+<ParameterTemplate.Required
+    parameter="required"
+    componentName="time input"
+    hookName={lang => lang === "js" ? "onEnter" : "on_enter"}
+/>
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.min</span> <span className="optional-pill">Optional</span> <span className="type-pill">TimeInput</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">min</span> <span className="optional-pill">Optional</span> <span className="type-pill">TimeInputType</span>
+    </TabItem>
+</Tabs>
+
+The earliest time that can be selected. If not provided, there is no minimum time.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The parameter expects either a JS Date in UTC or a human readable object with hour (0-23) and minute (0-59).
+
+    ```js
+    type TimeInput = 
+        | {
+            hour: number; // 0-23
+            minute: number; // 0-59
+        }
+        | Date // Assumes UTC for the given date
+        | null // Use default value (i.e. no minimum time)
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The parameter expects either a `datetime.time` or `datetime.datetime` object or `None` to ignore the parameter and use the default value.
+
+    ```python
+    TimeInputType = datetime.time | datetime.datetime | None
+    ```
+    </TabItem>
+</Tabs>
+
+---
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.max</span> <span className="optional-pill">Optional</span> <span className="type-pill">TimeInput</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">max</span> <span className="optional-pill">Optional</span> <span className="type-pill">TimeInputType</span>
+    </TabItem>
+</Tabs>
+
+The latest time that can be selected. If not provided, there is no maximum time.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The parameter expects either a JS Date in UTC or a human readable object with hour (0-23) and minute (0-59).
+
+    ```js
+    type TimeInput = 
+        | {
+            hour: number; // 0-23
+            minute: number; // 0-59
+        }
+        | Date // Assumes UTC for the given date
+        | null // Use default value (i.e. no maximum time)
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The parameter expects either a `datetime.time` or `datetime.datetime` object or `None` to ignore the parameter and use the default value.
+
+    ```python
+    TimeInputType = datetime.time | datetime.datetime | None
+    ```
+    </TabItem>
+</Tabs>
+
+---
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.initialValue</span> <span className="optional-pill">Optional</span> <span className="type-pill">TimeInput</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">initial_value</span> <span className="optional-pill">Optional</span> <span className="type-pill">TimeInputType</span>
+    </TabItem>
+</Tabs>
+
+The initial value to set for the date input. If not provided, the date input will be empty initially.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The parameter expects either a JS Date in UTC or a human readable object with hour (0-23) and minute (0-59).
+
+    ```js
+    type TimeInput = 
+        | {
+            hour: number; // 0-23
+            minute: number; // 0-59
+        }
+        | Date // Assumes UTC for the given date
+        | null // Use default value (i.e. no initial value)
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The parameter expects either a `datetime.time` or `datetime.datetime` object or `None` to ignore the parameter and use the default value.
+
+    ```python
+    TimeInputType = datetime.time | datetime.datetime | None
+    ```
+    </TabItem>
+</Tabs>
+
+---
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.validate</span> <span className="optional-pill">Optional</span> <span className="type-pill">(value: TimeOutput) => string | void</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">validate</span> <span className="optional-pill">Optional</span> <span className="type-pill">Callable[[TimeOutputType], str | None]</span>
+    </TabItem>
+</Tabs>
+
+Supply a custom function to validate the time input.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The validator will be passed an object with the following properties:
+
+    ```js
+    type TimeOutput = 
+        | {
+            hour: number; // 0-23
+            minute: number; // 0-59
+        }
+        | null // Passes `null` if no time was selected
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The validator will be passed a `datetime.time` variable with the selected time or `None` if no time was selected.
+
+    ```python
+    TimeOutputType = datetime.time | None
+    ```
+    </TabItem>
+</Tabs>
+
+---
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    #### <span className="api_parameter">properties.onEnter</span> <span className="optional-pill">Optional</span> <span className="type-pill">(value: TimeOutput) => void</span>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    #### <span className="api_parameter">on_enter</span> <span className="optional-pill">Optional</span> <span className="type-pill">Callable[[TimeOutputType], None]</span>
+    </TabItem>
+</Tabs>
+
+Supply a callback function that is called when the user presses enter while the time input is focused.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The callback will be passed an object with the following properties:
+
+    ```js
+    type TimeOutput = 
+        | {
+            hour: number; // 0-23
+            minute: number; // 0-59
+        }
+        | null // Passes `null` if no time was selected
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The callback will be passed a `datetime.time` variable with the selected time or `None` if no time was selected.
+
+    ```python
+    TimeOutputType = datetime.time | None
+    ```
+    </TabItem>
+</Tabs>
+---
+
+<ParameterTemplate.Style />

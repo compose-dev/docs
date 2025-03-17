@@ -1,0 +1,193 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Add
+description: Add UI components to the page.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+import { Parameter } from "../../src/components";
+
+
+# Page Action | Add
+
+`page.add()` is the foundational method for adding UI components to the page.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+```js
+page.add(() => ui.text("Hello World"));
+
+page.add(() => ui.button('btn', { 
+    label: "Click me!", 
+    onClick: () => console.log("Clicked!")
+}));
+```
+    </TabItem>
+    <TabItem value="python" label="Python">
+```python
+page.add(lambda: ui.text("Hello World"))
+
+page.add(lambda: ui.button('btn', label="Click me!", on_click=lambda: print("Clicked!")))
+```
+    </TabItem>
+</Tabs>
+
+## Multiple Components
+
+Multiple components can be nested into a single `page.add()` call by using [`ui.stack`](/components/layout/stack).
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.add(() => ui.stack([
+        ui.text("Choose an action"),
+        ui.stack(
+            [
+                ui.button("view-btn", { label: "View" }),
+                ui.button("edit-btn", { label: "Edit", appearance: "outline" }),
+                ui.button("delete-btn", { label: "Delete", appearance: "danger" })
+            ],
+            { direction: "horizontal" }
+        )
+    ]))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.add(lambda: ui.stack([
+        ui.text("Choose an action"),
+        ui.stack(
+            [
+                ui.button("view-btn", label="View"),
+                ui.button("edit-btn", label="Edit", appearance="outline"),
+                ui.button("delete-btn", label="Delete", appearance="danger")
+            ],
+            direction="horizontal"
+        )
+    ]))
+    ```
+    </TabItem>
+
+</Tabs>
+
+## Async / Await
+
+Normally, `page.add()` calls are non-blocking. The added components will immediately render without blocking function execution. 
+
+But, it can be useful to sometimes await a user event (e.g. filling out a form) prior to continuing execution of your app.
+
+In this case, `page.add()` calls can be awaited, and then resolved with the included callback.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript"></TabItem>
+  <TabItem value="python" label="Python"></TabItem>
+</Tabs>
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node">
+        ```js
+        import { Compose, Page, UI } from "@composehq/sdk"
+        import db from "../db"
+
+        async function handler({ page, ui }: { page: Page, ui: UI }) {
+            // This will wait until the 'resolve' callback is called before returning,
+            // and return with whatever data is passed into the callback.
+            const formData = await page.add(({ resolve }) => ui.form(
+                [
+                    ui.textInput("firstName"),
+                    ui.textInput("lastName"),
+                ],
+                {
+                    onSubmit: (formData) => resolve(formData)
+                }
+            ))
+
+            db.user.insert(formData.firstName, formData.lastName)
+
+            page.add(() => ui.text("Success!"))
+        }
+
+        const app = new Compose.App({ route: "create-user", handler })
+        ```
+    </TabItem>
+    <TabItem value="python">
+        ```python
+        import compose_sdk as c
+        import db
+
+        async def handler(page: c.Page, ui: c.UI):
+            # This will wait until the 'resolve' callback is called before returning,
+            # and return with whatever data is passed into the callback.
+            form_data = await page.add(lambda resolve: ui.form(
+                [
+                    ui.text_input("first_name"),
+                    ui.text_input("last_name"),
+                ],
+                on_submit=lambda form_data: resolve(form_data),
+            ))
+
+            db.user.create(form_data["first_name"], form_data["last_name"])
+
+            page.add(lambda: ui.text("Success!"))
+
+        app = c.App(route="create-user", handler=handler)
+        ```
+    </TabItem>
+</Tabs>
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type Component = ReturnType<typeof ui.textInput> | ReturnType<typeof ui.button> | /* more components */ | ReturnType<typeof ui.stack>
+    type Resolve = (value: Any) => void
+
+    page.add(
+        argument: (() => Component) | ({ resolve }: { resolve: Resolve }) => Component
+    ): Promise<Any>
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # Return type of all ui components
+    Component = ui.stack | ui.button | ui.text_input | /* more components */ | ui.markdown
+    Resolve = Union[Callable[[], None], Callable[[Any], None]]
+
+    page.add(
+        argument: Callable[[], Component] | Callable[[Resolve], Component]
+    ) -> Awaitable[Any]
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="argument"
+    required={true}
+    type="RenderContent"
+    description={<>
+        A function that returns the component to add to the page. The function passes a <code>resolve</code> callback that can be used to resolve the <code>page.add()</code> method with whatever value is passed into the callback. See the <a href='#async--await'>Async / Await</a> section for more details.
+    </>}
+/>
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>Promise\<Any></span></p>
+
+    A promise that resolves to `undefined` or the value of whatever is passed to the `resolve` callback.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>Awaitable\<Any></span></p>
+
+    An awaitable that resolves to `None` or the value of whatever is passed to the `resolve` callback.
+    </TabItem>
+</Tabs>

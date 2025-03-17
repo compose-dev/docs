@@ -1,0 +1,57 @@
+---
+hide_title: true
+title: Guide | Upgrade SDK
+description: How to upgrade the Compose SDK.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Guide | Upgrade the Compose SDK
+
+Upgrade Compose to the latest stable version with a single command. See the [changelog](https://composehq.com/changelog) to learn what's new.
+
+## Node.js
+
+### npm
+
+```bash
+npm install @composehq/sdk@latest
+```
+
+### yarn
+
+```bash
+yarn up @composehq/sdk
+```
+
+### pnpm
+
+```bash
+pnpm add @composehq/sdk@latest
+```
+
+## Python
+
+### pip
+
+```bash
+pip install --upgrade compose-sdk
+```
+
+### poetry
+
+```bash
+poetry add compose-sdk@
+```
+
+### uv
+
+```bash
+uv remove compose-sdk
+uv add compose-sdk
+```
+
+## Notes
+
+- We recommend pinning to a specific version in production environments

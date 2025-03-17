@@ -1,0 +1,403 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Guide | Build Multipage Apps
+description: How to create multipage apps in Compose.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+
+
+# Guide | Build Multipage Apps
+
+Compose scales easily to support multipage internal tools through two flexible approaches.
+
+1. Add a [navigation pane](#approach-1-navigation-pane). Best for linking between top level pages.
+2. Use [`page.link()`](#approach-2-pagelink) to programatically navigate between apps and pass data using query params. Best for linking from top level to details pages.
+
+Most developers will use a combination of both when building!
+
+## Approach 1: Navigation pane
+
+The simplest approach is to add a [navigation pane](/components/navigation) to your apps, which is possible in just a couple lines of code.
+
+*Navigation panes were introduced in SDK v0.26.0.*
+
+<IFrame type="components-navigation" heightPx={300} />
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Compose } from "@composehq/sdk";
+
+    // Create a navigation pane.
+    const nav = new Compose.Navigation(
+        // list of app routes to include in the navigation pane
+        ["home-page", "settings"],
+        {
+            // optional: a URL to a logo image to display in the navigation pane. 
+            logoUrl: "https://composehq.com/dark-logo-with-text.svg",
+        }
+    );
+
+    const homePage = new Compose.App({
+        route: "home-page",
+        handler: () => page.add(() => ui.header("Home Page"));
+        navigation: nav, // show nav pane on home page
+    });
+
+    const settings = new Compose.App({
+        route: "settings",
+        handler: () => page.add(() => ui.header("Settings Page"));
+        navigation: nav, // show nav pane on settings page
+    });
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+
+    # Create a navigation pane.
+    nav = c.Navigation(
+        # list of app routes to include in the navigation pane
+        ["home-page", "settings"],
+        # optional: a URL to a logo image to display in the navigation pane. 
+        logo_url="https://composehq.com/dark-logo-with-text.svg",
+    )
+
+    home_page = c.App(
+        route="home-page",
+        handler=lambda page, ui: page.add(ui.header("Home Page")),
+        navigation=nav, # show nav pane on home page
+    )
+
+    settings = c.App(
+        route="settings",
+        handler=lambda page, ui: page.add(ui.header("Settings Page")),
+        navigation=nav, # show nav pane on settings page
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+#### Add your logo
+
+For the logo, the easiest approach is to go to your website, right click on your logo, and click "copy link address". Then just paste the link into Compose!
+
+## Approach 2: `page.link()`
+
+Use `page.link()` to navigate between routes programatically, and pass data between pages using the `params` argument.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Compose } from "@composehq/sdk"
+    import { db } from "./database"
+
+    const homePage = new Compose.App({
+        // highlight-start
+        route: "users",
+        // highlight-end
+        handler: async ({ page, ui }) => {
+            const users = await db.selectUsers();
+            page.add(() => ui.table("users", users, {
+                actions: [
+                    {
+                        label: "View details",
+                        // highlight-start
+                        onClick: (user) => page.link("user-details", { params: { id: user.id } })
+                        // highlight-end
+                    }
+                ]
+            })
+        }
+    })
+
+    const settingsPage = new Compose.App({
+        // highlight-start
+        route: "user-details",
+        // highlight-end
+        handler: async ({ page, ui }) => {
+            // highlight-start
+            const userId = page.params.id;
+            // highlight-end
+
+            const user = await db.selectUser(userId);
+            page.add(() => ui.json(user))
+
+            page.add(() =>
+                ui.button("return-btn", { 
+                    // highlight-start
+                    onClick: () => page.link("users") 
+                    // highlight-end
+                })
+            )
+        }
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+    from database import db
+
+    # Show a table of users
+    def users_page_handler(page: c.Page, ui: c.UI):
+        users = db.select_users()
+        page.add(lambda: ui.table(
+            "users", 
+            users,
+            actions=[
+                {
+                    "label": "View details",
+                    # highlight-start
+                    "on_click": lambda user: page.link("user-details", params={"id": user["id"]})
+                    # highlight-end
+                }
+            ]
+        ))
+
+    # Show details for a single user
+    def user_details_page_handler(page: c.Page, ui: c.UI):
+        # highlight-start
+        user_id = page.params.get("id")
+        # highlight-end
+        
+        user = db.select_user(user_id)
+        page.add(lambda: ui.json(user))
+        
+        page.add(lambda: ui.button(
+            "return-btn",
+            # highlight-start
+            on_click=lambda: page.link("users")
+            # highlight-end
+        ))
+
+    users_page = c.App(
+        # highlight-start
+        route="users",
+        # highlight-end
+        handler=users_page_handler
+    )
+
+    user_details_page = c.App(
+        # highlight-start
+        route="user-details",
+        # highlight-end
+        handler=user_details_page_handler
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Pass data between pages
+
+Data is passed between pages using the `params` argument, which is then read from the `page.params` object. 
+
+`params` are turned into query parameters in the URL, which allows them to persist across browser refreshes. This also means that the data will be serialized, so only basic data types should be passed (i.e. no functions or complex objects). A common pattern is to pass ids between pages, which can then be used to fetch data from a database.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Compose } from "@composehq/sdk"
+
+    const homePage = new Compose.App({
+        route: "home-page",
+        handler: async ({ page, ui }) => {
+            page.add(() => ui.header("Home"))
+
+            let email = null;
+
+            page.add(() => ui.textInput("email", { 
+                label: "Enter your email", 
+                onEnter: (value) => email = value 
+            }))
+
+            page.add(() => ui.button(
+                "settings-btn", 
+                { 
+                    label: "Settings", 
+                    onClick: () => page.link("settings-page", {
+                        // highlight-start
+                        params: {
+                            email
+                        }
+                        // highlight-end
+                    }) 
+                }
+            ))
+        }
+    })
+
+    const settingsPage = new Compose.App({
+        route: "settings-page",
+        handler: async ({ page, ui }) => {
+            // highlight-start
+            const email = page.params.email;
+
+            if (email) {
+                const user = await fetchUser(email);
+                page.add(() => ui.header(`Settings for ${user.name}`))
+            } else {
+                page.add(() => ui.header("Settings"))
+            }
+            // highlight-end
+
+            page.add(() => ui.button(
+                "return-btn", 
+                { 
+                    label: "Return to home", 
+                    onClick: () => page.link("home-page") 
+                }
+            ))
+        }
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+
+    def home_page_handler(page: c.Page, ui: c.UI):
+        page.add(lambda: ui.header("Home")),
+
+        email = None;
+
+        page.add(lambda: ui.textInput(
+            "email", 
+            label="Enter your email", 
+            on_enter=lambda value: email = value 
+        ))
+
+        page.add(lambda: ui.button(
+            "settings-btn",
+            label="Settings",
+            # highlight-start
+            on_click=lambda: page.link("settings-page", params={
+                "email": email
+            })
+            # highlight-end
+        ))
+
+    home_page = c.App(
+        route="home-page",
+        handler=home_page_handler
+    )
+
+    def settings_page_handler(page: c.Page, ui: c.UI):
+        # highlight-start
+        email = page.params.get("email", None);
+
+        if email:
+            user = fetch_user(email);
+            page.add(lambda: ui.header(f"Settings for {user.name}"))
+        else:
+            page.add(lambda: ui.header("Settings"))
+        # highlight-end
+
+        page.add(lambda: ui.button( 
+            "return-btn",
+            label="Return to home",
+            on_click=lambda: page.link("home-page")
+        ))
+
+    settings_page = c.App(
+        route="settings-page",
+        handler=settings_page_handler
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Open pages in new tabs
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+You can open pages in new tabs by passing `newTab: true` to `page.link()`:
+    </TabItem>
+    <TabItem value="python" label="Python">
+You can open pages in new tabs by passing `new_tab=True` to `page.link()`:
+    </TabItem>
+</Tabs>
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.link("settings-page", { newTab: true })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.link("settings-page", new_tab=True)
+    ```
+    </TabItem>
+</Tabs>
+
+## Share multipage apps
+
+:::note
+Sharing apps is available on the [Pro plan](https://composehq.com#pricing).
+:::
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    For users with more complex sharing needs, you can add a `parentAppRoute` property to your app to declare it as a sub-page of another app. Now, anyone who has access to the parent app will also have access to the sub-page.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    For users with more complex sharing needs, you can add a `parent_app_route` property to your app to declare it as a sub-page of another app. Now, anyone who has access to the parent app will also have access to the sub-page.
+    </TabItem>
+</Tabs>
+
+By default, all apps are available to all users in your organization. Hence, this feature is useful when (a) sharing certain apps with external users, or (b) more complex setups where users in your organization have access only to certain apps based on their assigned permissions.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Compose } from "@composehq/sdk"
+
+    const homePage = new Compose.App({
+        // highlight-start
+        route: "home-page",
+        // highlight-end
+        handler: async ({ page, ui }) => {
+            // ...
+        }
+    })
+
+    const settingsPage = new Compose.App({
+        // highlight-start
+        route: "settings-page",
+        parentAppRoute: "home-page",
+        // highlight-end
+        handler: async ({ page, ui }) => {
+            // ...
+        }
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+
+    home_page = c.App(
+        # highlight-start
+        route="home-page",
+        # highlight-end
+        handler=lambda page, ui: page.add(lambda: ui.header("Home"))
+    )
+
+    settings_page = c.App(
+        # highlight-start
+        route="settings-page",
+        parent_app_route="home-page",
+        # highlight-end
+        handler=lambda page, ui: page.add(lambda: ui.header("Settings"))
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+Note: adding this property will also hide the sub-app from the Compose homepage to avoid clutter. You can override this by passing `hidden: false` to the constructor for the sub-app.

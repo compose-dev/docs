@@ -1,0 +1,46 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Row
+description: Render a row container component that can be used to group other components.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+
+
+# Component | Row
+
+Row is a generic container component that can be used to group other components. By default, it arranges its children in a horizontal row.
+
+Internally, `ui.row` is a `div` and rendered as a flexbox container. It's primary use is for controlling the layout of its children and applying other styles to control the look of your app.
+
+`ui.row` is a convenience wrapper around `ui.stack` that sets the `direction` property to `"horizontal"`. This means that all the properties available to `ui.stack` are also available to `ui.row`.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.row([
+        ui.button("view-btn", { label: "View" }),
+        ui.button("edit-btn", { label: "Edit", appearance: "outline" }),
+        ui.button("delete-btn", { label: "Delete", appearance: "danger" })
+    ])
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.row([
+        ui.button("view-btn", label="View"),
+        ui.button("edit-btn", label="Edit", appearance="outline"),
+        ui.button("delete-btn", label="Delete", appearance="danger")
+    ])
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-layout-row" heightPx={125} />
+
+## API reference
+
+See the [Stack API reference](/components/layout/stack#api-reference) for more details. The only difference is that `ui.row` sets the `direction` property to `"horizontal"` by default.

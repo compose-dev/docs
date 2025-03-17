@@ -1,0 +1,83 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Reload
+description: Reload the page, which will re-run your app's handler.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+
+
+# Page Action | Reload
+
+Use `page.reload()` to reload your app.
+
+This is useful if you want to refresh the page or reset the data on the page.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Compose, Page, UI } from "@composehq/sdk";
+
+    async function handler({ page, ui }: { page: Page, ui: UI }) {
+        const randomNumber = Math.floor(Math.random() * 100)
+
+        page.add(() => ui.text(`Random number: ${randomNumber}`))
+        page.add(() => ui.button("reload", {
+            // highlight-start
+            onClick: () => page.reload()
+            // highlight-end
+        }))
+    }
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+    import random
+
+    async def handler(page: c.Page, ui: c.UI):
+        random_number = random.randint(0, 100)
+
+        page.add(lambda: ui.text(f"Random number: {random_number}"))
+
+        # highlight-start
+        page.add(lambda: ui.button("reload", on_click=lambda: page.reload()))
+        # highlight-end
+    ```
+    </TabItem>
+</Tabs>
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.reload(): void
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.reload() -> None
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+None.
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>void</span></p>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>None</span></p>
+    </TabItem>
+</Tabs>

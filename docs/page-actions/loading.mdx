@@ -1,0 +1,116 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Loading
+description: Show a loading indicator to the user.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+import { Parameter } from "../../src/components";
+
+# Page Action | Loading
+
+:::info
+Introduced in v0.20.0 of the SDK.
+:::
+
+The `page.loading()` method makes it easy to build flexible loading states into your apps. It also exposes useful parameters for disabling user interaction while loading, showing different loading texts to indicate different stages of loading, and more.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.loading(true, { disableInteraction: true, text: "Step 1..." })
+
+    await expensiveOperation()
+
+    page.loading(true, { text: "Step 2..." })
+
+    await expensiveOperation()
+
+    page.loading(false)
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.loading(True, disable_interaction=True, text="Step 1...")
+
+    expensive_operation()
+
+    page.loading(True, text="Step 2...")
+
+    expensive_operation()
+
+    page.loading(False)
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="page-actions-loading" heightPx={450} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.loading(
+        value: boolean,
+        properties?: Partial<{
+            text: string;
+            disableInteraction: boolean;
+        }>
+    ): void
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.loading(
+        value,
+        *,
+        text: str | None = None,
+        disable_interaction: bool = False
+    ) -> None
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="value"
+    required={true}
+    type="boolean"
+    description="Whether to show the loading indicator or not."
+/>
+
+<Parameter
+    name="text"
+    required={false}
+    type="string"
+    description={<>
+        Specify a custom text for the loading indicator. You can call <code>page.loading()</code> multiple times with different texts to indicate different stages of loading.
+    </>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.disableInteraction" : "disable_interaction"}
+    required={false}
+    type="boolean"
+    description={lang => <>
+        Whether to disable user interaction on the page while the loading indicator is shown. Defaults to <code>{lang === "js" ? "false" : "False"}</code>.
+    </>}
+/>
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>void</span></p>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>None</span></p>
+    </TabItem>
+</Tabs>

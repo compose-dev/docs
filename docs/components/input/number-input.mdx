@@ -1,0 +1,121 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Number Input
+description: Render a number input box.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate } from "../../../src/components";
+
+# Component | Number Input
+
+Render a number input box.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.numberInput("number-input-key", { 
+        label: "Enter your age",
+        onEnter: (value) => console.log(value)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.number_input(
+        "number-input-key",
+        label="Enter your age",
+        on_enter=lambda value: print(value)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-number" heightPx={150} />
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node">
+    This component is a light wrapper on top of `ui.textInput` that is limited to number inputs.
+    </TabItem>
+    <TabItem value="python">
+    This component is a light wrapper on top of `ui.text_input` that is limited to number inputs.
+    </TabItem>
+</Tabs>
+
+Learn more about [working with inputs](/guides/forms).
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.numberInput(
+        id: string,
+        properties?: Partial<{
+            label: string,
+            description: string,
+            required: boolean,
+            initialValue: number | null,
+            validate: (value: number | null) => string | void,
+            onEnter: (value: number | null) => void,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.number_input(
+        id: str,
+        *,
+        label: str | None = None,
+        description: str | None = None,
+        required: bool = True,
+        initial_value: int | float | None = None,
+        validate: Callable[[int | float | None], str | None] | None = None,
+        on_enter: Callable[[int | float | None], None] | None = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Label
+    componentName="number input"
+/>
+
+<ParameterTemplate.Description
+    componentName="number input box"
+/>
+
+<ParameterTemplate.Required
+    parameter="required"
+    componentName="number input"
+    hookName={lang => lang === "js" ? "onEnter" : "on_enter"}
+/>
+
+<ParameterTemplate.InitialValue
+    componentName="number input"
+    type={lang => lang === "js" ? "number | null" : "int | float | None"}
+/>
+
+<ParameterTemplate.ValidateInput
+    componentName="number input"
+    hookInputArgument={lang => lang === "js" ? "value: number | null" : "int | float | None"}
+/>
+
+<ParameterTemplate.OnEnter
+    componentName="number input"
+    hookInputArgument={lang => lang === "js" ? "value: number | null" : "int | float | None"}
+/>
+
+<ParameterTemplate.Style />

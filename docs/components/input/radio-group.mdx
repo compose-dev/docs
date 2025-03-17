@@ -1,0 +1,224 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Radio Group
+description: Render a radio group.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate } from "../../../src/components"
+
+
+# Component | Radio Group
+
+Render a radio group.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.radioGroup("radio-group-key", ["A", "B", "C", "D"], { 
+        label: "Select an option",
+        onChange: (value) => console.log(value)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.radio_group(
+        "radio-group-key",
+        ["A", "B", "C", "D"],
+        label="Select an option",
+        on_change=lambda value: print(value)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-radio-group" heightPx={250} />
+
+Learn more about [working with inputs](/guides/forms).
+
+## Options
+
+Select components support both a "basic" and "detailed" format for options.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript"></TabItem>
+  <TabItem value="python" label="Python"></TabItem>
+</Tabs>
+
+### Basic
+
+Quick and easy. Pass an array of strings, such as `["A", "B", "C", "D"]`.
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.radioGroup("radio-group-key", ["A", "B", "C", "D"], { 
+        label: "Select an option",
+        onChange: (value) => console.log(value)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.radio_group(
+        "radio-group-key",
+        ["A", "B", "C", "D"],
+        label="Select an option",
+        on_change=lambda value: print(value)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Detailed
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    Use separate `label` and `value` fields for each option. The `label` field will be displayed to the user, and the `value` field will be passed to hooks such as `onChange` and `validate`.
+
+    ```js
+    const options = [
+        { label: "Google", value: "GOOG" },
+        { label: "Apple", value: "APPL" },
+        {
+            label: "Microsoft",
+            value: "MSFT",
+            // The detailed format also supports an optional "description" field
+            // to display beneath an option.
+            description: "Current stock price: $423"
+        }
+    ]
+
+    ui.radioGroup("company-select", options, {
+        label: "Select a company",
+        onChange: (value) => console.log(value) // Will be "GOOG", "APPL", or "MSFT"
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    Use separate `label` and `value` fields for each option. The `label` field will be displayed to the user, and the `value` field will be passed to hooks such as `on_change` and `validate`.
+
+    ```python
+    options = [
+        { "label": "Google", "value": "GOOG" },
+        { "label": "Apple", "value": "APPL" },
+        {
+            "label": "Microsoft",
+            "value": "MSFT",
+            # The detailed format also supports an optional "description" field
+            # to display beneath an option.
+            "description": "Current stock price: $423"
+        }
+    ]
+
+    ui.radio_group(
+        "company-select",
+        options,
+        label="Select an option",
+        on_change=lambda value: print(value) # Will be "GOOG", "APPL", or "MSFT"
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+### Detailed option object properties
+
+<ParameterTemplate.SelectOptionsObject />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type OptionValue = string | number | boolean
+
+    type DetailedOption = {
+        label: string,
+        value: OptionValue,
+        description?: string
+    }
+
+    ui.radioGroup(
+        id: string,
+        options: Array<OptionValue | DetailedOption>
+        properties: Partial<{
+            label: string,
+            description: string,
+            required: boolean,
+            initialValue: OptionValue | null,
+            validate: (value: OptionValue | null) => string | void,
+            onChange: (value: OptionValue | null) => void,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    OptionValue = str | float | int | bool
+
+    class DetailedOption(TypedDict):
+        label: str
+        value: OptionValue
+        description: NotRequired[str]
+
+    ui.radio_group(
+        id: str,
+        options: list[OptionValue | DetailedOption],
+        *,
+        label: str | None = None,
+        description: str | None = None,
+        required: bool = True,
+        initial_value: OptionValue | None = None,
+        validate: Callable[[OptionValue | None], str | None] = None,
+        on_change: Callable[[OptionValue | None], None] = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.SelectOptions optionsSectionLink="#options" />
+
+<ParameterTemplate.Label
+    componentName="radio group"
+/>
+
+<ParameterTemplate.Description
+    componentName="radio group"
+/>
+
+<ParameterTemplate.Required
+    parameter="required"
+    componentName="radio group"
+    hookName={lang => lang === "js" ? "onChange" : "on_change"}
+/>
+
+<ParameterTemplate.InitialValue
+    componentName="radio group"
+    type={lang => lang === "js" ? "string | number | boolean | null" : "str | float | int | bool | None"}
+/>
+
+<ParameterTemplate.ValidateInput
+    componentName="radio group"
+    hookInputArgument={lang => lang === "js" ? "value: string | number | boolean | null" : "str | float | int | bool | None"}
+/>
+
+<ParameterTemplate.OnChange
+    componentName="radio group"
+    hookInputArgument={lang => lang === "js" ? "value: string | number | boolean | null" : "str | float | int | bool | None"}
+/>
+
+<ParameterTemplate.Style />

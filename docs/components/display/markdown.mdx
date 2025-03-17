@@ -1,0 +1,100 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Markdown
+description: Render formatted markdown.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components";
+
+# Component | Markdown
+
+Render formatted markdown.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.markdown(`
+        # Welcome to Markdown Example
+
+        ## Features
+
+        1. **Bold text** and *italic text*
+        2. [Hyperlinks](https://example.com)
+        3. Inline \`code\`
+
+        ### Lists
+
+        - Unordered list item 1
+        - Unordered list item 2
+        - Nested item
+
+        > This is a blockquote.
+    `)
+    ```
+
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python 
+    ui.markdown("""
+        # Welcome to Markdown Example
+
+        ## Features
+
+        1. **Bold text** and *italic text*
+        2. [Hyperlinks](https://example.com)
+        3. Inline \`code\`
+
+        ### Lists
+
+        - Unordered list item 1
+        - Unordered list item 2
+        - Nested item
+
+        > This is a blockquote.
+    """)
+    ```
+  </TabItem>
+</Tabs>
+
+<IFrame type="components-display-markdown" heightPx={525} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.markdown(
+        markdown: string,
+        options: Partial<{
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.markdown(
+        markdown: str,
+        *,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="markdown"
+    required={true}
+    type="string"
+    description="The markdown to be rendered."
+/>
+
+<ParameterTemplate.Style />

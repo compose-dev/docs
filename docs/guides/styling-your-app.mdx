@@ -1,0 +1,351 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Guide | Style Your App
+description: Customize your app's appearance with themes, layouts, and styles.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+
+
+# Guide | Style Your App
+
+Compose allows you to style your apps as much or as little as you want.
+
+## Theming
+
+To start, you can control the entire color palette of your apps by passing a `theme` argument to the `Compose.Client` constructor.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Compose } from "@composehq/sdk"
+
+    client = new Compose.Client({
+        apiKey: "your-api-key",
+        apps: [<your-apps-here>],
+        theme: {
+            primaryColor: "#03045e",
+            backgroundColor: "#ffffff",
+            textColor: "#000000",
+        }
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+
+    client = c.Client(
+        api_key = "your-api-key",
+        apps = [<your-apps-here>],
+        theme={
+            "primary_color": "#03045e",
+            "background_color": "#ffffff",
+            "text_color": "#000000",
+        }
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+The theme will be applied to all the apps registered to that `Client`.
+
+## Layout
+
+Compose offers a collection of layout components for grouping and arranging components on the page. Components can be nested to quickly build complex layouts.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        page.add(() => ui.card(
+            ui.distributedRow([
+                ui.header("Users"),
+                ui.row([
+                    ui.button("btn-id", { label: "Add" }),
+                    ui.button("btn-id", { label: "Edit", appearance: "outline" }),
+                    ui.button("btn-id", { label: "Delete", appearance: "danger" })
+                ])
+            ])
+        ))
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        page.add(lambda: ui.card(
+            ui.distributed_row([
+                ui.header("Users"),
+                ui.row([
+                    ui.button("btn-id", label="Add"),
+                    ui.button("btn-id", label="Edit", appearance="outline"),
+                    ui.button("btn-id", label="Delete", appearance="danger")
+                ])
+            ])
+        ))
+        ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="guides-styling-layout" heightPx={150} />
+
+Internally, layout components use a familiar flexbox model for arranging child components and expose positioning parameters to let you fine-tune the layout. You can find out more in the [API reference](/components/layout/stack#api-reference).
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        page.add(() => ui.row(ui.text("I am centered"), { justify: "center" }))
+        page.add(() => ui.stack(
+            [
+                ui.text("I am on the right"),
+                ui.text("I am also on the right")
+            ],
+            { align: "end" }
+        ))
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        page.add(lambda: ui.row(ui.text("I am centered"), justify="center"))
+        page.add(lambda: ui.stack(
+            [
+                ui.text("I am on the right"),
+                ui.text("I am also on the right")
+            ],
+            align="end"
+        ))
+        ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="guides-styling-positioning" heightPx={200} />
+
+## App defaults
+
+You can edit a variety of the page level defaults such as the content width, spacing between components, and more.
+
+See [page config](/page-actions/set-config) for more information.
+
+## Styles
+
+If needed, every Compose component can be granularly edited using the `style` property, which allows you to directly style components using CSS.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Page, UI } from "@composehq/sdk"
+
+    async function handler({ page, ui }: { page: Page, ui: UI }) {
+        page.add(() => 
+            ui.textInput("email", { style: { "width": "20rem", "fontSize": "24px" } })
+        )
+    }
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+
+    def handler(page: c.Page, ui: c.UI):
+        page.add(lambda: ui.text_input("email", style={"width": "20rem", "fontSize": "24px"}))
+    ```
+    </TabItem>
+</Tabs>
+
+Full list of styles:
+
+```js
+{
+    // size
+    width: string;
+    height: string;
+    minWidth: string;
+    maxWidth: string;
+    minHeight: string;
+    maxHeight: string;
+
+    // margin
+    margin: string;
+    marginTop: string;
+    marginBottom: string;
+    marginLeft: string;
+    marginRight: string;
+
+    // padding
+    padding: string;
+    paddingTop: string;
+    paddingBottom: string;
+    paddingLeft: string;
+    paddingRight: string;
+
+    // overflow
+    overflow: "visible" | "hidden" | "scroll" | "auto" | "clip";
+    overflowX: "visible" | "hidden" | "scroll" | "auto" | "clip";
+    overflowY: "visible" | "hidden" | "scroll" | "auto" | "clip";
+
+    // color
+    color: string;
+    backgroundColor: string;
+
+    // borderRadius
+    borderRadius: string;
+    borderTopLeftRadius: string;
+    borderTopRightRadius: string;
+    borderBottomLeftRadius: string;
+    borderBottomRightRadius: string;
+
+    // border
+    border: string;
+    borderTop: string;
+    borderBottom: string;
+    borderLeft: string;
+    borderRight: string;
+
+    // text align
+    textAlign: "left" | "right" | "center" | "justify" | "start" | "end";
+
+    // font
+    fontSize: string;
+    fontWeight: string;
+
+    // gap
+    gap: string;
+
+    // display
+    display: string;
+
+    // position
+    position: "static" | "relative" | "absolute" | "fixed" | "sticky";
+    top: string;
+    right: string;
+    bottom: string;
+    left: string;
+    zIndex: number;
+
+    // flex
+    flex: string;
+    flexGrow: number;
+    flexShrink: number;
+    flexBasis: string;
+    flexDirection: "row" | "row-reverse" | "column" | "column-reverse";
+    flexWrap: "nowrap" | "wrap" | "wrap-reverse";
+    justifyContent:
+      | "flex-start"
+      | "flex-end"
+      | "center"
+      | "space-between"
+      | "space-around"
+      | "space-evenly";
+    alignItems: "stretch" | "flex-start" | "flex-end" | "center" | "baseline";
+    alignSelf:
+      | "auto"
+      | "flex-start"
+      | "flex-end"
+      | "center"
+      | "baseline"
+      | "stretch";
+    alignContent:
+      | "flex-start"
+      | "flex-end"
+      | "center"
+      | "space-between"
+      | "space-around"
+      | "stretch";
+    order: number;
+
+    // grid
+    gridTemplateColumns: string;
+    gridTemplateRows: string;
+    gridTemplateAreas: string;
+    gridAutoColumns: string;
+    gridAutoRows: string;
+    gridAutoFlow: "row" | "column" | "dense" | "row dense" | "column dense";
+    gridColumn: string;
+    gridRow: string;
+    gridArea: string;
+    columnGap: string;
+    rowGap: string;
+
+    // transform
+    transform: string;
+    transformOrigin: string;
+
+    // transition
+    transition: string;
+
+    // opacity
+    opacity: number;
+
+    // cursor
+    cursor: string;
+
+    // box-shadow
+    boxShadow: string;
+
+    // outline
+    outline: string;
+    outlineOffset: string;
+
+    // visibility
+    visibility: "visible" | "hidden" | "collapse";
+
+    // white-space
+    whiteSpace:
+      | "normal"
+      | "nowrap"
+      | "pre"
+      | "pre-wrap"
+      | "pre-line"
+      | "break-spaces";
+
+    // word-break
+    wordBreak: "normal" | "break-all" | "keep-all" | "break-word";
+
+    // text-overflow
+    textOverflow: "clip" | "ellipsis";
+
+    // line-height
+    lineHeight: string;
+
+    // letter-spacing
+    letterSpacing: string;
+
+    // text-decoration
+    textDecoration: string;
+
+    // text-transform
+    textTransform: "none" | "capitalize" | "uppercase" | "lowercase";
+
+    // vertical-align
+    verticalAlign: string;
+
+    // list-style
+    listStyle: string;
+
+    // background
+    backgroundImage: string;
+    backgroundSize: string;
+    backgroundPosition: string;
+    backgroundRepeat: string;
+    backgroundAttachment: string;
+
+    // filter
+    filter: string;
+
+    // backdrop-filter
+    backdropFilter: string;
+
+    // resize
+    resize: "none" | "both" | "horizontal" | "vertical";
+
+    // user-select
+    userSelect: "none" | "auto" | "text" | "contain" | "all";
+
+    // pointer-events
+    pointerEvents: "auto" | "none";
+
+    // content
+    content: string;
+}
+```

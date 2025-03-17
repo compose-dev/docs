@@ -1,0 +1,121 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | URL Input
+description: Render a url input box.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate } from "../../../src/components";
+
+# Component | URL Input
+
+Render a url input box.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.urlInput("url-input-key", { 
+        label: "Enter a url",
+        onEnter: (value) => console.log(value)
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.url_input(
+        "url-input-key",
+        label="Enter a url",
+        on_enter=lambda value: print(value)
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-input-url" heightPx={150} />
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node">
+    This component is a light wrapper on top of `ui.textInput` with url validation built in.
+    </TabItem>
+    <TabItem value="python">
+    This component is a light wrapper on top of `ui.text_input` with url validation built in.
+    </TabItem>
+</Tabs>
+
+Learn more about [working with inputs](/guides/forms).
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.urlInput(
+        id: string,
+        properties?: Partial<{
+            label: string,
+            description: string,
+            required: boolean,
+            initialValue: string | null,
+            validate: (value: string | null) => string | void,
+            onEnter: (value: string | null) => void,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.url_input(
+        id: str,
+        *,
+        label: str | None = None,
+        description: str | None = None,
+        required: bool = True,
+        initial_value: str | None = None,
+        validate: Callable[[str | None], str | None] | None = None,
+        on_enter: Callable[[str | None], None] | None = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Label
+    componentName="url input"
+/>
+
+<ParameterTemplate.Description
+    componentName="url input box"
+/>
+
+<ParameterTemplate.Required
+    parameter="required"
+    componentName="url input"
+    hookName={lang => lang === "js" ? "onEnter" : "on_enter"}
+/>
+
+<ParameterTemplate.InitialValue
+    componentName="url input"
+    type={lang => lang === "js" ? "string | null" : "str | None"}
+/>
+
+<ParameterTemplate.ValidateInput
+    componentName="url input"
+    hookInputArgument={lang => lang === "js" ? "value: string | null" : "str | None"}
+/>
+
+<ParameterTemplate.OnEnter
+    componentName="url input"
+    hookInputArgument={lang => lang === "js" ? "value: string | null" : "str | None"}
+/>
+
+<ParameterTemplate.Style />

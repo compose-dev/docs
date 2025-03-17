@@ -1,0 +1,185 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Guide | File Upload and Download
+description: A guide to uploading files from the browser to your app and downloading files from your app to the user's computer.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+
+# Guide | File Upload and Download
+
+Many internal apps involve working with files. For example: downloading a CSV to the user's browser, uploading images to your server, or displaying PDF previews inline on the page.
+
+Compose is built to support all of these use cases.
+
+## File upload
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    You can upload files from the browser to your app using the built in `ui.fileDrop` component, which supports files up to 10 megabtyes each.
+
+    Files are returned to your app as an array of objects. Each object has the following shape:
+
+    ```js
+    // File object in Compose
+    {
+        buffer: Buffer;
+        name: string;
+        type: string;
+    }
+    ```
+
+    Learn more about Buffers [here](https://nodejs.org/api/buffer.html).
+
+    See the following example:
+
+    ```js
+    import { Compose, Page, UI } from "@composehq/sdk"
+    import path from 'path';
+    import { fileURLToPath } from 'url';
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    function handler({ page, ui }: { page: Page, ui: UI }) {
+        let files: { buffer: Buffer, name: string, type: string }[] = [];
+
+        function onFiles(newFiles: { buffer: Buffer, name: string, type: string }[]) {
+            newFiles.forEach(file => {
+                const filePath = path.join(__dirname, file.name);
+                fs.writeFileSync(filePath, file.buffer);
+            });
+
+            files = [...files, ...newFiles];
+            page.update();
+        }
+
+        page.add(() => ui.fileDrop("pdf-file-drop", {
+            label: "Drop files here",
+            acceptedFileTypes: ["application/pdf"],
+            onChange: onFiles
+        }))
+
+        page.add(() => ui.cond(files.length > 0, {
+            true: ui.text(`Received ${files.length} files.`),
+            false: ui.text("No files received yet.")
+        }))
+    }
+
+    const app = new Compose.App({
+        route: "file-upload",
+        handler
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    You can upload files from the browser to your app using the built in `ui.file_drop` component, which supports files up to 10 megabtyes each.
+
+    Files are returned to your app as an array of `File` objects. A `File` is a subclass of [`BytesIO`](https://docs.python.org/3/library/io.html#io.BytesIO) that additionally has a `name` (file name) and `type` (file type) field.
+
+    ```python
+    # File object in Compose
+    class File(BytesIO):
+        def __init__(self, content: bytes, file_name: str, file_type: str):
+            super().__init__(content)
+            self.name = file_name
+            self.type = file_type
+    ```
+
+    See the following example:
+
+    ```python
+    import compose_sdk as c
+
+    def handler(page: c.Page, ui: c.UI):
+        files: list[c.File] = []
+
+        def on_files(new_files: list[c.File]):
+            nonlocal files
+            
+            files.extend(new_files)
+            page.update()
+        
+        page.add(lambda: ui.file_drop(
+            "pdf-file-drop",
+            label="Drop files here",
+            accepted_file_types=["application/pdf"],
+            on_change=on_files
+        ))
+
+        page.add(lambda: ui.cond(
+            len(files) > 0, 
+            true=ui.text(f"Received {len(files)} files."),
+            false=ui.text("No files received yet.")
+        ))
+
+    const app = new c.App(route="file-upload", handler=handler)
+    ```
+    </TabItem>
+</Tabs>
+
+## File download
+
+Compose allows you to seamlessly download files from your app to a user's computer using the `page.download()` method.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    The `page.download()` method accepts a [`Buffer`](https://nodejs.org/api/buffer.html) and filename string, which is sent to the browser and downloaded to the user's device.
+
+    ```js
+    import { Compose, Page, UI } from "@composehq/sdk";
+    import fs from 'fs';
+
+    function handler({ page, ui }: { page: Page, ui: UI }) {
+        function onDownload() {
+            const fileName = "image.png";
+
+            // Read the file into a Buffer
+            const buffer =  fs.readFileSync(pathToFile);
+
+            // Download to user's computer
+            page.download(buffer, fileName)
+        }
+
+        page.add(() => ui.button("download-btn", {
+            label: "Download PDF",
+            onClick: onDownload
+        }))
+    }
+
+    const app = new Compose.App({
+        route: "file-download",
+        handler
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    The `page.download()` method accepts (1) either bytes or a [`bytes-like object`](https://docs.python.org/3/library/io.html#io.BufferedIOBase) and (2) a file name string to send to the browser.
+
+    ```python
+    import compose_sdk as c
+    import io
+    import os
+
+    def handler(page: c.Page, ui: c.UI):
+        def on_download():
+            # Read the file into a bytes object
+            with open(path_to_file, "rb") as file:
+                file_name = "image.png"
+                
+                # Download to user's computer
+                page.download(file.read(), file_name)
+        
+        page.add(lambda: ui.button(
+            "download-btn",
+            label="Download PDF",
+            on_click=on_download
+        ))
+
+    const app = new c.App("file-upload", handler)
+    ```
+    </TabItem>
+</Tabs>

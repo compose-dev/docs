@@ -1,0 +1,336 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | PDF
+description: Render a PDF Preview.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components";
+
+# Component | PDF
+
+Render a PDF Preview. This component supports annotations, multi-page documents, and advanced sizing and scrolling options.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const buffer = fs.readFileSync("path/to/file.pdf");
+    ui.pdf(buffer, { style: { width: "500px" }})
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    with open("path/to/file.pdf", "rb") as f:
+        bytes = f.read()
+
+    ui.pdf(bytes, style={"width": "500px"})
+    ```
+  </TabItem>
+</Tabs>
+
+<IFrame type="components-display-pdf" heightPx={750} />
+
+## Sizing and scrolling
+
+By default, the PDF component will take up the full width of the page.
+
+The simplest way to size the PDF is to pass the `width` property within the `style` parameter (see first example above). The height will be scaled automatically.
+
+Many PDFs are quite large, so you may want to have the PDF scroll within its container. You can do this by also passing a value for the cross-axis (`height`). In this case,
+the container will be sized based on the `height` parameter, while the PDF will still be responsive to the `width` parameter, and scroll vertically within the container.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const buffer = fs.readFileSync("path/to/file.pdf");
+    ui.pdf(buffer, { style: { width: "500px", height: "300px" }})
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    with open("path/to/file.pdf", "rb") as f:
+        bytes = f.read()
+
+    ui.pdf(bytes, style={"width": "500px", "height": "300px"})
+    ```
+  </TabItem>
+</Tabs>
+
+<IFrame type="components-display-pdf-default-scroll" heightPx={750} />
+
+You can flip the default scrolling direction by passing `scroll="horizontal"` to the component. This will size the container based on the `width` parameter, while the PDF size will be responsive to the `height` parameter.
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const buffer = fs.readFileSync("path/to/file.pdf");
+    ui.pdf(buffer, { 
+      style: { width: "200px", height: "500px" }, 
+      scroll: "horizontal" 
+    })
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    with open("path/to/file.pdf", "rb") as f:
+        bytes = f.read()
+
+    ui.pdf(
+      bytes, 
+      style={"width": "200px", "height": "500px"}, 
+      scroll="horizontal"
+    )
+    ```
+  </TabItem>
+</Tabs>
+
+<IFrame type="components-display-pdf-horizontal-scroll" heightPx={750} />
+
+## Annotations
+
+You can add annotations on top of the PDF by passing an array of `annotation` objects.
+
+Each annotation object must have an `x1`, `y1`, `x2`, and `y2` property. These fields are numbers that represent the coordinates of the annotation on the page. In order to align the coordinates correctly, you should also [size the PDF directly](#sizing-and-scrolling).
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    const buffer = fs.readFileSync("path/to/file.pdf");
+    ui.pdf(buffer, { 
+      style: { width: "500px" }, 
+      annotations: [
+        {
+          x1: 50,
+          y1: 50,
+          x2: 100,
+          y2: 100,
+          label: "Hello World"
+        },
+        {
+          x1: 220,
+          y1: 405,
+          x2: 255,
+          y2: 455,
+          appearance: "box",
+          color: "red",
+          label: "Red Box"
+        }
+      ]
+    })
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    with open("path/to/file.pdf", "rb") as f:
+        bytes = f.read()
+
+    ui.pdf(
+      bytes, 
+      style={"width": "500px"}, 
+      annotations=[
+        {
+          "x1": 50,
+          "y1": 50,
+          "x2": 100,
+          "y2": 100,
+          "label": "Hello World"
+        },
+        {
+          "x1": 220,
+          "y1": 405,
+          "x2": 255,
+          "y2": 455,
+          "appearance": "box",
+          "color": "red",
+          "label": "Red Box"
+        }
+      ]
+    )
+    ```
+  </TabItem>
+</Tabs>
+
+<IFrame type="components-display-pdf-annotation" heightPx={750} />
+
+### Annotation object properties
+
+<Parameter
+    name="x1"
+    required={true}
+    type="int"
+    description="The x-coordinate of the top-left corner of the annotation."
+/>
+
+<Parameter
+    name="y1"
+    required={true}
+    type="int"
+    description="The y-coordinate of the top-left corner of the annotation."
+/>
+
+<Parameter
+    name="x2"
+    required={true}
+    type="int"
+    description="The x-coordinate of the bottom-right corner of the annotation."
+/>
+
+<Parameter
+    name="y2"
+    required={true}
+    type="int"
+    description="The y-coordinate of the bottom-right corner of the annotation."
+/>
+
+<Parameter
+    name={() => "appearance"}
+    required={false}
+    type="literal"
+    description={
+        <>
+            <p>Specify a custom appearance for the annotation. Defaults to <code>"highlight"</code>.</p>
+            <p>Options include:</p>
+            <ul>
+                <li><code>"highlight"</code>: highlight the annotation.</li>
+                <li><code>"box"</code>: Draw a box around the annotation.</li>
+            </ul>
+        </>
+    }
+/>
+
+<Parameter
+    name={() => "color"}
+    required={false}
+    type="literal"
+    description={
+        <>
+            <p>Specify a color for the annotation. Defaults to <code>"blue"</code>.</p>
+            <p>Options include:</p>
+            <ul>
+                <li><code>"blue"</code></li>
+                <li><code>"yellow"</code></li>
+                <li><code>"green"</code></li>
+                <li><code>"red"</code></li>
+                <li><code>"purple"</code></li>
+                <li><code>"orange"</code></li>
+                <li><code>"gray"</code></li>
+            </ul>
+        </>
+    }
+/>
+
+<Parameter
+    name={() => "label"}
+    required={false}
+    type="string"
+    description="Specify a label to display alongside the annotation."
+/>
+
+<Parameter
+    name={() => "page"}
+    required={false}
+    type="int"
+    description={
+        <>
+            Specify the page number of the annotation. This should be an integer where 1 is the first page. Defaults to <code>1</code>.
+        </>
+    }
+/>
+
+## Multi-page documents
+
+There's no special syntax for multi-page documents. Compose will automatically detect when a PDF has multiple pages and render a page navigation widget below the PDF preview.
+
+Annotations default to the first page of the PDF. You can control which page an annotation is on by passing a `page` property to the annotation object, which should be an integer where 1 is the first page.
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    ui.pdf(
+        file: Buffer,
+        properties?: Partial<{
+            label: string,
+            description: string,
+            annotations: Annotation[],
+            scroll: "vertical" | "horizontal",
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.pdf(
+        file: bytes | io.BufferedIOBase,
+        *,
+        label: str | None = None,
+        description: str | None = None,
+        annotations: list[Annotation] | None = None,
+        scroll: Literal["vertical", "horizontal"] | None = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="file"
+    required={true}
+    type={lang => lang === "js" ? "Buffer" : "bytes | io.BufferedIOBase"}
+    description={lang => lang === "js" ? 
+        <p>The PDF file to display. This should be a <code>Buffer</code>.</p> :
+        <p>The PDF file to display. This should be <code>bytes</code> or a <code>bytes</code>-like object that supports the <code>read()</code> method (e.g. <code>BytesIO</code>).</p>
+    }
+/>
+
+<Parameter
+    name="label"
+    required={false}
+    type="string"
+    description="Display a label above the PDF viewer. If not provided, the label will be left blank."
+/>
+
+<Parameter
+    name="description"
+    required={false}
+    type="string"
+    description="Display a small description between the label and the PDF viewer. If not provided, the description will be left blank."
+/>
+
+<Parameter
+    name="annotations"
+    required={false}
+    type={lang => lang === "js" ? "Annotation[]" : "list[Annotation]"}
+    description={
+        <>
+            An array of annotation objects to display on the PDF. Each annotation object should follow the <a href='#annotation-object-properties'>Annotation type</a>.
+        </>
+    }
+/>
+
+<Parameter
+    name="scroll"
+    required={false}
+    type="literal"
+    description={<>
+        <p>Specifies the scroll direction for the PDF viewer. Defaults to <code>"vertical"</code>.</p>
+        <p>Options:</p>
+        <ul>
+            <li><code>"vertical"</code></li>
+            <li><code>"horizontal"</code></li>
+        </ul>
+
+        <p>See the <a href='#sizing-and-scrolling'>sizing and scrolling</a> section for more details.</p>
+    </>}
+/>
+
+<ParameterTemplate.Style />

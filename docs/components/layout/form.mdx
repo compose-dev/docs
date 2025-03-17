@@ -1,0 +1,136 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Form
+description: Render a form component
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { ParameterTemplate, Parameter } from "../../../src/components"
+
+
+# Component | Form
+
+:::tip
+
+Looking to build forms in your app? Read our [forms guide](/guides/forms) for a comprehensive overview with examples and best practices on how to build forms. This page serves as an API reference for the `ui.form` component.
+
+:::
+
+Form is a generic container component that can be used to group other input components.
+
+It includes all the functionality of a [stack](/components/layout/stack), while also providing additional utilities for building forms.
+
+This page serves as an API reference for the `ui.form` component. If you're looking for a guide on how to build forms, check out the [forms guide](/guides/forms).
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type Component = ReturnType<typeof ui.textInput> | ReturnType<typeof ui.button> | /* more components */ | ReturnType<typeof ui.stack>
+
+    ui.form(
+        id: string,
+        children: Component | Component[],
+        properties?: Partial<{
+            direction: "vertical" | "horizontal" | "vertical-reverse" | "horizontal-reverse",
+            justify: "start" | "end" | "center" | "between" | "around" | "evenly",
+            align: "start" | "end" | "center" | "baseline" | "stretch",
+            spacing: string,
+            clearOnSubmit: boolean,
+            hideSubmitButton: boolean,
+            validate: (values: Record<string, any>) => string | void,
+            onSubmit: (values: Record<string, any>) => void,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # Return type of all ui components
+    Component = ui.stack | ui.button | ui.text_input | /* more components */ | ui.markdown
+
+    ui.form(
+        id: str,
+        children: Component | list[Component],
+        *,
+        direction: Literal["vertical", "horizontal", "vertical-reverse", "horizontal-reverse"] = "vertical",
+        justify: Literal["start", "end", "center", "between", "around", "evenly"] = "start",
+        align: Literal["start", "end", "center", "baseline", "stretch"] = "start",
+        spacing: str = "16px",
+        clear_on_submit: bool = False,
+        hide_submit_button: bool = False,
+        validate: Callable[[dict[str, Any]], str | None] | None = None,
+        on_submit: Callable[[dict[str, Any]], None] | None = None,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Id />
+
+<ParameterTemplate.Children
+    componentName="form"
+    description="The child component(s) to be arranged within the form. This can be a single component or a list of components. Children can be any component, including non-input components."
+/>
+
+<ParameterTemplate.LayoutDirection />
+
+<ParameterTemplate.LayoutJustify
+    componentName="form"
+/>
+
+<ParameterTemplate.LayoutAlign
+    componentName="form"
+/>
+
+<ParameterTemplate.LayoutSpacing />
+
+<Parameter
+    name={lang => lang === "js" ? "properties.clearOnSubmit" : "clear_on_submit"}
+    required={false}
+    type="boolean"
+    description={(lang) => <p>Clear the form back to its initial state after submission. Defaults to <code>{lang === "js" ? "false" : "False"}</code>. Form values can also be manually set at any time using the <a href="/page-actions/set-inputs"><code>{lang === "js" ? "page.setInputs()" : "page.set_inputs()"}</code></a> method.</p>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.hideSubmitButton" : "hide_submit_button"}
+    required={false}
+    type="boolean"
+    description={(lang) => <p>Hide the form submit button. Defaults to <code>{lang === "js" ? "false" : "False"}</code>.</p>}
+/>
+
+<ParameterTemplate.ValidateInput
+    hookInputArgument={lang => lang === "js" ? "values: Record<string, any>" : "dict[str, Any]"}
+    componentName="form"
+    description={
+        <>
+            <p>Validate the form before submitting it. If the function returns a string, it will be displayed as an error message.</p>
+            <p>The function is passed an object containing the values of all inputs in the form, keyed by the input component's <code>id</code>.</p>
+        </>
+    }
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.onSubmit" : "on_submit"}
+    required={false}
+    type={lang => lang === "js" ? "(values: Record<string, any>) => void" : "Callable[[dict[str, Any]], None]"}
+    description={
+        <>
+            <p>Function that is called when the form is submitted.</p>
+            <p>The function is passed an object containing the values of all inputs in the form, keyed by the input component's <code>id</code>.</p>
+        </>
+    }
+/>
+
+<ParameterTemplate.Style
+    elementName="form"
+/>

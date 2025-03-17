@@ -1,0 +1,137 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Toast
+description: Display a toast notification to the user.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+import { Parameter } from "../../src/components";
+
+# Page Action | Toast
+
+Use `page.toast()` to display a temporary toast notification to the user. This is particularly useful for displaying messages to the user that are not critical and do not require user interaction.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    async function onClickDeleteCompany(companyId) {
+        const companyName = companies[companyId].name;
+        await db.company.deleteById(companyId);
+
+        // highlight-start
+        page.toast(`${companyName} was successfully deleted`);
+        // highlight-end
+    }
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    async def on_click_delete_company(company_id: str):
+        company_name = companies[company_id]["name"]
+        await db.company.delete_by_id(company_id)
+
+        # highlight-start
+        page.toast(f"{company_name} was successfully deleted")
+        # highlight-end
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="page-actions-toast" heightPx={450} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.toast(
+        message: string,
+        properties?: Partial<{
+            title: string,
+            appearance: "success" | "info" | "warning" | "error",
+            duration: "shortest" | "short" | "medium" | "long" | "longest" | "infinite"
+    }>): void
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.toast(
+        message: str,
+        *,
+        title: str | None = None,
+        appearance: Literal["success", "info", "warning", "error"] = "info",
+        duration: Literal["shortest", "short", "medium", "long", "longest", "infinite"] = "medium",
+    ) -> None
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="message"
+    required={true}
+    type="string"
+    description="The message to display in the toast notification."
+/>
+
+<Parameter
+    name="title"
+    required={false}
+    type="string"
+    description="An optional title for the toast notification. If provided, it will be displayed above the message."
+/>
+
+<Parameter
+    name="appearance"
+    required={false}
+    type="literal"
+    description={
+        <>
+            <p>Sets the visual style of the toast. Defaults to <code>"info"</code>.</p>
+            <p>Options:</p>
+            <ul>
+                <li><code>"success"</code>: Use for successful operations</li>
+                <li><code>"info"</code>: Use for general information</li>
+                <li><code>"warning"</code>: Use for warnings</li>
+                <li><code>"error"</code>: Use for errors or destructive actions</li>
+            </ul>
+        </>
+    }
+/>
+
+<Parameter
+    name="duration"
+    required={false}
+    type="literal"
+    description={
+        <>
+            <p>Determines how long the toast will be displayed before disappearing. Defaults to <code>"medium"</code>.</p>
+            <p>Options:</p>
+            <ul>
+                <li><code>"shortest"</code>: 1.5 seconds</li>
+                <li><code>"short"</code>: 3 seconds</li>
+                <li><code>"medium"</code>: 5 seconds</li>
+                <li><code>"long"</code>: 10 seconds</li>
+                <li><code>"longest"</code>: 20 seconds</li>
+                <li><code>"infinite"</code>: 1000 seconds</li>
+            </ul>
+        </>
+    }
+/>
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>void</span></p>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>None</span></p>
+    </TabItem>
+</Tabs>

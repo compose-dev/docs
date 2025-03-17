@@ -1,0 +1,256 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Update
+description: Update UI components on the page with new data.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+
+# Page Action | Update
+
+Easily create reactive apps by updating the UI with `page.update()`. Compose will diff the previous UI against the new one and intelligently update any components that have changed.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        import { Compose, Page, UI } from "@composehq/sdk"
+
+        function handler({ page, ui }: { page: Page, ui: UI }) {
+            let count = 0;
+
+            page.add(() => ui.stack([
+                ui.header(`Count: ${count}`),
+                ui.button("increment-btn", {
+                    label: "Increment",
+                    onClick: () => {
+                        count += 1
+                        // highlight-next-line
+                        page.update()
+                    }
+                }),
+            ]))
+        }
+
+        const app = new Compose.App({ route: "counter", handler })
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        import compose_sdk as c
+
+        def handler(page: c.Page, ui: c.UI):
+            count = 0
+
+            def on_click():
+                nonlocal count
+                count += 1
+                # highlight-next-line
+                page.update()
+
+            page.add(lambda: ui.stack([
+                ui.header(f"Count: {count}"),
+                ui.button("increment-btn", label="Increment", on_click=on_click),
+            ]))
+
+        counter_app = c.App(route="counter", handler=handler)
+        ```
+    </TabItem>
+
+</Tabs>
+
+<IFrame type="get-started-fundamentals-state" heightPx={200} />
+
+*Note: `page.update()` was introduced in version `0.21.0` of the SDK.*
+
+## How it works
+
+You may have noticed that `page.add()` and `page.modal()` both accept callback functions that return UI components, instead of accepting the UI components directly.
+
+When you call `page.update()`, Compose will execute the callback functions again and diff the result against the previously cached one. Any changes are then sent to the browser.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        let text = "Hello, world!"
+        page.add(() => ui.text(text))
+
+        text = "Hello, world! (updated)"
+        page.update() // Will re-run the callback function inside `page.add()`
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        text = "Hello, world!"
+        page.add(lambda: ui.text(text))
+
+        text = "Hello, world! (updated)"
+        page.update() # Will re-run the callback function inside `page.add()`
+        ```
+    </TabItem>
+
+</Tabs>
+
+Two key takeaways:
+- Update data immutably. For example, instead of mutating a single field in a table row, you should create a copy of the table data, mutate the copy, and reassign the original table data to the copy.
+- Avoid putting business logic (e.g. db queries, data transformations, etc.) inside `page.add()` or `page.modal()`. The business logic will re-run everytime `page.update()` is called. Instead, do this work outside of the callback function and simply pass the result into the page method.
+
+## Common pitfalls
+
+### Mutate data immutably
+
+In order for `page.update()` to detect changes, all variable updates should be done immutably. For example, instead of mutating a single field in a table row, you should create a copy of the table data, mutate the copy, and reassign the original table data to the copy.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        import { Compose, Page, UI } from "@composehq/sdk"
+
+        function handler({ page, ui }: { page: Page, ui: UI }) {
+            let tableData = [
+                { id: 1, name: "John" },
+                { id: 2, name: "Jane" },
+            ];
+
+            // highlight-start
+            function onClick() {
+                // This won't work
+                tableData[1].name = "Jim"
+
+                // Do this instead
+                const copy = [...tableData]
+                copy[1].name = "Jim"
+                tableData = copy
+
+                page.update()
+            }
+            // highlight-end
+
+            page.add(() => ui.stack([
+                ui.table("users", tableData),
+                ui.button("edit-table", {
+                    onClick
+                }),
+            ]))
+        }
+
+        const app = new Compose.App({ route: "table-update", handler })
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        import compose_sdk as c
+
+        def handler(page: c.Page, ui: c.UI):
+            table_data = [
+                {"id": 1, "name": "John"},
+                {"id": 2, "name": "Jane"},
+            ]
+
+            # highlight-start
+            def on_click():
+                nonlocal table_data
+
+                # This won't work
+                table_data[1]["name"] = "Jim"
+
+                # Do this instead
+                copy = [*table_data]
+                copy[1]["name"] = "Jim"
+                table_data = copy
+
+                page.update()
+            # highlight-end
+
+            page.add(lambda: ui.stack([
+                ui.table("users", table_data),
+                ui.button("edit-table", label="Edit", on_click=on_click),
+            ]))
+
+        table_app = c.App(route="table-update", handler=handler)
+        ```
+    </TabItem>
+</Tabs>
+
+### Put business logic outside of `page.add()`
+
+Putting business logic (e.g. db queries, data transformations, etc.) inside `page.add()` or `page.modal()` will cause the business logic to re-run everytime `page.update()` is called.
+
+Instead, do this work outside of the callback function and simply pass the result into the page method.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        import { Compose, Page, UI } from "@composehq/sdk"
+        import { fetchFromS3 } from "./utils"
+
+        function handler({ page, ui }: { page: Page, ui: UI }) {
+            // ❌ Since the S3 fetch is inside the callback function,
+            // it will be rerun everytime `page.update()` is called!
+            page.add(() => ui.pdf(fetchFromS3()))
+
+            // ✅ Instead, do this work outside of the callback function
+            const pdf = fetchFromS3()
+            page.add(() => ui.pdf(pdf))
+
+            // ... rest of the code
+        }
+
+        const app = new Compose.App({ route: "/pdf-app", handler })
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        import compose_sdk as c
+        from utils import fetch_from_s3
+
+        def handler(page: c.Page, ui: c.UI):
+            # ❌ Since the S3 fetch is inside the callback function,
+            # it will be rerun everytime `page.update()` is called!
+            page.add(lambda: ui.pdf(fetch_from_s3()))
+
+            # ✅ Instead, do this work outside of the callback function
+            pdf = fetch_from_s3()
+            page.add(lambda: ui.pdf(pdf))
+
+            # ... rest of the code
+
+        pdf_app = c.App(route="/pdf-app", handler=handler)
+        ```
+    </TabItem>
+</Tabs>
+
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.update(): void
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.update() -> None
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+None.
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>void</span></p>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>None</span></p>
+    </TabItem>
+</Tabs>

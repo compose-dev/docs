@@ -1,0 +1,457 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Guide | Migrate from Interval
+description: How to migrate from Interval to Compose.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Guide | Migrate from Interval
+
+Welcome to Compose - we're glad you're here! This guide will help you understand the key differences between the two platforms and guide you in smoothly migrating your tools from Interval to Compose.
+
+## History
+
+Compose and Interval are both platforms made to help developers build internal tools with simple backend code.
+
+### Similarities
+
+- **Development Approach**: Both platforms offer an SDK for building internal tools with backend code, and a dashboard for running and sharing those tools.
+
+### Key differences
+
+- **Hosting and Maintenance**: Compose is actively developed and hosts the dashboard for you. Following it's acquisition in late 2023, Interval requires self-hosting and is no longer actively maintained.
+- **Extensibility**: Compose provides a polished set of UI primitives for building interactive, reactive applications. While Interval offers a structured approach well-suited for CLI-style tools, Compose enables development of more sophisticated internal applications.
+
+## Basics
+
+### Setup
+
+Both Interval and Compose follow a similar setup process with defining `apps` (`actions` in Interval) and a `client` to serve those apps.
+
+The key difference is that Compose `routes` are defined programmatically, instead of being file-based.
+
+<Tabs groupId="competitorName">
+    <TabItem value="Compose">
+    ```ts
+    import { Compose } from "@composehq/sdk";
+
+    const app = new Compose.App({
+        route: "my-app", // Define the route programmatically
+        handler: async ({ page, ui }) => {
+            page.add(() => ui.text(`Hello World`));
+        }
+    })
+
+    const client = new Compose.Client({
+        apiKey: "YOUR_API_KEY",
+        apps: [app] // Pass the list of apps to serve to the client
+    })
+
+    client.connect()
+    ```
+    </TabItem>
+    <TabItem value="Interval">
+    ```ts
+    // src/routes/my-app.ts
+    import { Action, io } from "@interval/sdk";
+
+    export default new Action(async () => {
+        return "Hello World"
+    })
+
+    // src/tools.ts
+    import path from "path";
+    import { Interval } from "@interval/sdk";
+
+    const interval = new Interval({
+        apiKey: "YOUR_API_KEY",
+        routesDirectory: path.resolve(__dirname, "routes"),
+    });
+
+    interval.listen();
+    ```
+    </TabItem>
+</Tabs>
+
+### Tables
+
+[Tables](/components/input/table) are the core building block of many internal tools. Compose apps support tables by default, while Interval supports them via their `Pages` feature.
+
+<Tabs groupId="competitorName">
+    <TabItem value="Compose">
+    ```ts
+    import { Compose, Page, UI } from "@composehq/sdk";
+    import { fetchUsers } from "../db";
+
+    // Separate the handler function for better readability
+    function handler({ page, ui }: { page: Page, ui: UI }) {
+        page.add(() => ui.header("Users"))
+        page.add(() => ui.text("Manage your users here"))
+
+        let users = await fetchUsers()
+        page.add(() => ui.table("users", users))
+    }
+
+    const app = new Compose.App({
+        route: "users-dashboard",
+        handler
+    })
+    ```
+    </TabItem>
+    <TabItem value="Interval">
+    ```ts
+    import { Page, Layout, io } from "@interval/sdk";
+    import { fetchUsers } from "../db";
+
+    export default new Page({
+        name: "Users",
+        handler: async () => {
+            const users = await fetchUsers()
+
+            return new Layout({
+                title: "Users",
+                description: "Manage your users here",
+                children: [
+                    io.display.table("Users", {
+                        data: users,
+                    }),
+                ],
+            });
+        },
+    });
+    ```
+    </TabItem>
+</Tabs>
+
+### Forms
+
+Both platforms have a similar approach to [forms](/guides/forms). The key difference is that Compose exposes form submissions via callbacks, which enables forms to be submitted multiple times without reloading the app.
+
+<Tabs groupId="competitorName">
+    <TabItem value="Compose">
+    ```ts
+    import { Compose, Page, UI } from "@composehq/sdk";
+
+    function handler({ page, ui }: { page: Page, ui: UI }) {
+        page.add(() => ui.form(
+            "new-user",
+            [
+                ui.textInput("name"),
+                ui.emailInput("email")
+            ],
+            {
+                onSubmit: async (formData) => {
+                    await createUser(formData.name, formData.email)
+                    page.toast("User created")
+                },
+            }
+        ))
+    }
+
+    const app = new Compose.App({
+        route: "my-app",
+        handler
+    })
+    ```
+    </TabItem>
+    <TabItem value="Interval">
+    ```ts
+    import { Action, io } from "@interval/sdk";
+
+    export default new Action(async () => {
+        const [name, email] = await io.group([
+            io.input.text("name"),
+            io.input.email("email")
+        ])
+
+        await createUser(name, email)
+    })
+    ```
+    </TabItem>
+</Tabs>
+
+### Connecting tables to forms
+
+Both platforms support adding row level buttons to tables. In Interval, these buttons link to other actions, while in Compose, they trigger callbacks that can be used to run custom logic.
+
+While it is definitely possible to link to other apps from these buttons, we recommend connecting them to modals within the same app.
+
+<Tabs groupId="competitorName">
+    <TabItem value="Compose">
+    ```ts
+    import { Compose, Page, UI } from "@composehq/sdk";
+    import { fetchUsers, updateUser } from "../db";
+
+    function handler({ page, ui }: { page: Page, ui: UI }) {
+        page.add(() => ui.header("Users"))
+        page.add(() => ui.text("Manage your users here"))
+
+        let users = await fetchUsers()
+
+        function editUser(name: string, email: string, idx: number) {
+            page.modal(({ resolve }) => ui.form(
+                "edit-user",
+                [
+                    ui.textInput("name", { initialValue: name }),
+                    ui.emailInput("email", { initialValue: email }),
+                ],
+                {
+                    onSubmit: async (formData) => {
+                        await updateUser(idx, formData.name, formData.email)
+                        
+                        users[idx] = { name: formData.name, email: formData.email }
+                        page.update() // Refresh the UI
+
+                        page.toast("User updated!", { appearance: "success" })
+                        resolve() // Close the modal
+                    }
+                }
+            ), { title: `Edit ${name}` })
+        }
+
+        page.add(() => ui.table("users", users, {
+            actions: [{
+                label: "Edit",
+                onClick: (row, idx) => editUser(row.name, row.email, idx)
+            }]
+        }))
+    }
+
+    const app = new Compose.App({
+        route: "users-dashboard",
+        handler
+    })
+    ```
+    </TabItem>
+    <TabItem value="Interval">
+    ```ts
+    import { Page, Layout, io, Action, redirect } from "@interval/sdk";
+    import { fetchUsers } from "../db";
+
+    export default new Page({
+        name: "Users",
+        routes: {
+            edit: new Action({
+                name: "Edit User",
+                handler: async () => {
+                    const [name, email] = await io.group([
+                        io.input.text("name", { defaultValue: ctx.params.name }),
+                        io.input.email("email", { defaultValue: ctx.params.email })
+                    ])
+
+                    await updateUser(ctx.params.idx, name, email)
+                    await redirect("/users")
+                }
+            })
+        }
+        handler: async () => {
+            const users = await fetchUsers()
+
+            // Need index so we can access it as a param
+            const withIdx = users.map((user, idx) => ({ ...user, idx }))
+
+            return new Layout({
+                title: "Users",
+                description: "Manage your users here",
+                children: [
+                    io.display.table("Users", {
+                        data: withIdx,
+                        columns: [
+                            "name",
+                            "email",
+                            {
+                                label: "edit",
+                                renderCell: (row) => ({
+                                    label: "Edit",
+                                    route: "users/edit",
+                                    params: {
+                                        name: row.name,
+                                        email: row.email,
+                                        idx: row.idx
+                                    }
+                                })
+                            }
+                        ]
+                    }),
+                ],
+            });
+        },
+    });
+    ```
+    </TabItem>
+</Tabs>
+
+## Additional
+
+### Multipage apps
+
+Instead of `ctx.redirect`, use [`page.link`](/page-actions/link) to navigate between apps in Compose.
+
+```js
+import { Compose } from "@composehq/sdk"
+
+const settingsPage = new Compose.App({
+    route: "settings-page",
+    parentAppRoute: "home-page",
+    handler: /* ...*/
+})
+
+const homePage = new Compose.App({
+    route: "home-page",
+    handler: async ({ page, ui }) => {
+        page.add(() => ui.button("settings", {
+            // highlight-start
+            onClick: () => page.link("settings-page", {
+                params: {
+                    param1: "value1"
+                }
+            })
+            // highlight-end
+        }))
+    }
+})
+
+```
+
+### Loading
+
+Instead of `ctx.loading`, use [`page.loading`](/page-actions/loading) to show a loading indicator on the page.
+
+```js
+import { Compose } from "@composehq/sdk"
+
+async function handler({ page, ui }: { page: Page, ui: UI }) {
+    ui.button("expensive-computation", {
+        onClick: async () => {
+            page.loading(true, { disableInteraction: true, text: "Step 1..." })
+            await expensiveComputation()
+            page.loading(true, { text: "Step 2..." })
+            await expensiveComputation()
+            page.loading(false)
+        }
+    })
+}
+```
+
+### Error handling
+
+Similar to Interval, you can safely throw errors in your Compose app handlers. Compose will catch and surface them to the user.
+
+```js
+import { Compose } from "@composehq/sdk"
+
+async function handler({ page, ui }: { page: Page, ui: UI }) {
+    throw new Error("Something went wrong")
+}
+```
+
+### Confirmation Dialogs
+
+Instead of `io.confirm`, use [`page.confirm`](/page-actions/confirm-modal) to show a confirmation dialog to the user.
+
+```js
+import { Compose } from "@composehq/sdk"
+
+async function handler({ page, ui }: { page: Page, ui: UI }) {
+    const confirmed = await page.confirm({
+        message: "Are you sure you want to delete Retool?",
+        typeToConfirmText: "Retool",
+        appearance: "danger",
+    });
+
+    if (confirmed) {
+        await doSomething()
+    }
+}
+```
+
+## Advanced
+
+### Multistep Forms
+
+Normally, form submissions are handled via callbacks. It's possible to call additional `page.add()` methods within those callbacks in order to create multistep forms, but this can quickly become cumbersome.
+
+Instead, you can use the included `resolve` callback to resolve the `page.add()` method with the form data.
+
+```js
+import { Compose } from "@composehq/sdk"
+
+async function handler({ page, ui }: { page: Page, ui: UI }) {
+    const { companyLocation } = await page.add(({ resolve }) => ui.form(
+        "step-one",
+        [ ui.selectBox("companyLocation", ["USA", "International"]) ],
+        {
+            onSubmit: formData => resolve(formData)
+        }
+    ))
+
+    const { companyName, taxId } = await page.add(({ resolve }) => ui.form(
+        "step-two",
+        [
+            ui.textInput("companyName"),
+            ui.cond(companyLocation === "USA", {
+                true: ui.textInput("taxId")
+            })
+        ],
+        { onSubmit: formData => resolve(formData) }
+    ))
+}
+```
+
+### Dynamic Forms
+
+We can make the previous form dynamic by using the `page.update()` method to refresh the UI. Users will be able to edit their `companyLocation` selection and re-render the form based on what they choose.
+
+
+```js
+import { Compose } from "@composehq/sdk"
+
+async function handler({ page, ui }: { page: Page, ui: UI }) {
+    let companyLocation = null;
+
+    page.add(() => ui.form(
+        "step-one",
+        [ ui.selectBox("companyLocation", ["USA", "International"]) ],
+        {
+            onSubmit: formData => {
+                companyLocation = formData.companyLocation
+                page.update() // re-render the UI
+            }
+        }
+    ))
+
+    page.add(() => 
+        ui.cond(companyLocation !== null, // Conditionally show step two
+            true: ui.form(
+                "step-two",
+                [
+                    ui.textInput("companyName"),
+                    ui.cond(companyLocation === "USA", { // Conditionally show the tax input
+                        true: ui.textInput("taxId")
+                    })
+                ],
+                { 
+                    onSubmit: formData => {
+                        // do something
+                    } 
+                }
+            ),
+        )
+    )
+}
+```
+
+### Custom Styling
+
+Compose exposes numerous methods for customizing the color palette for your apps, arranging components around the page, and editing default margins and padding.
+
+For more information, check out the [Styling guide](/guides/styling-your-app).
+
+## Missing something?
+
+While Compose includes the majority of features from Interval - along with many more - there may be some features missing.
+
+If there's a feature you use often that you'd like to see added to Compose, please don't hesitate to reach out by emailing us: atul@composehq.com

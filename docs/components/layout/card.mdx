@@ -1,0 +1,46 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Card
+description: Render a card component that can be used to group other components.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+
+
+# Component | Card
+
+:::info
+Introduced in v0.19.0 of the SDK.
+:::
+
+Card is an opinionated container component that can be used to group other components. By default, it wraps its children in a card-like UI.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.card([
+        ui.header("Users", { size: "sm" }),
+        ui.text("10 users found in database.")
+    ])
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.card([
+        ui.header("Users", size="sm"),
+        ui.text("10 users found in database.")
+    ])
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-layout-card" heightPx={250} />
+
+Internally, `ui.card` is a convenience wrapper around `ui.stack` with default properties set accordingly. This means that all the properties available to `ui.stack` are also available to `ui.card`.
+
+## API reference
+
+See the [Stack API reference](/components/layout/stack#api-reference) for more details. The only difference is that `ui.card` applies some default styles to the stack.

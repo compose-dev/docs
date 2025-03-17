@@ -1,0 +1,51 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Guide | AI Integration
+description: How to create forms in Compose.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../src/iframe";
+
+
+# Guide | AI Assistant Integration
+
+Compose abstracts the complexity of building internal software into a small set of composable, clearly defined methods that are far simpler for LLMs to write and maintain. 
+
+Many users already use AI assistants like Cursor and Claude to build Compose Apps for them within their own IDEs. This guide will show you how to do the same.
+
+## Integrate with Cursor
+
+You can index Compose's documentation, then refer to it using the `@Compose` symbol. Cursor documentation: [link](https://docs.cursor.com/context/@-symbols/@-docs#add-custom-docs).
+
+#### Step 1: Open Cursor Settings
+
+<img src="/img/cursor/open-settings.png" className="rounded" />
+
+#### Step 2: Go to the Docs section
+
+Then click "+ Add new doc".
+
+<img src="/img/cursor/docs-section.png" className="rounded" />
+
+#### Step 3: Add the Compose docs
+
+<img src="/img/cursor/type-compose-url.png" className="rounded" />
+
+#### Step 4: Confirm information
+
+<img src="/img/cursor/add-compose.png" className="rounded" />
+
+#### Step 5: Use with `@Compose` symbol
+
+<img src="/img/cursor/example.png" className="rounded" />
+
+## Integrate with Github Copilot
+
+Compose does not yet support a native Github Copilot integration. If you'd like to see this feature, please reach out by emailing us: atul@composehq.com.
+
+## Other AI assistants
+
+Due to how new Compose is, most AI assistants are not yet trained on it. We have thought about creating a v0/bolt.new style prompt window for generating Compose apps, but have not yet implemented it. If you'd like to see this feature, please reach out by emailing us: atul@composehq.com.

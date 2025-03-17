@@ -1,0 +1,76 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Image
+description: Render an image.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components";
+
+# Component | Image
+
+Render an image.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.image("https://example.com/image.png", { style: { width: "600px" } })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.image("https://example.com/image.png", style={"width": "600px"})
+    ```
+    </TabItem>
+</Tabs>
+
+<IFrame type="components-display-image" heightPx={550} />
+
+At this time, the image component does not support local images. You must pass a URL to an image hosted on the internet.
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.image(
+        src: string,
+        options: Partial<{
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.image(
+        src: str,
+        *,
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="src"
+    required={true}
+    type="string"
+    description="The URL of the image to be rendered."
+/>
+
+<ParameterTemplate.Style
+    descriptionAdditional={
+        <p>
+            For example, you can use the <code>height</code> and <code>width</code> properties to set the
+            height and width of the image.
+        </p>
+    }
+/>

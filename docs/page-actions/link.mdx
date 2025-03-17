@@ -1,0 +1,218 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Link
+description: Link to other Compose apps or external URLs.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { Parameter } from "../../src/components";
+
+# Page Action | Link
+
+Use `page.link()` to link to other Compose apps or external URLs. Often used to build [multipage apps](/guides/multipage-apps).
+
+## Link to other Compose apps
+
+All that's necessary is use `page.link()` to navigate between routes.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Compose } from "@composehq/sdk"
+
+    const homePage = new Compose.App({
+        // highlight-start
+        route: "home-page",
+        // highlight-end
+        handler: async ({ page, ui }) => {
+            page.add(() => ui.header("Home"))
+            page.add(() => ui.button(
+                "settings-btn", 
+                { 
+                    label: "Settings", 
+                    // highlight-start
+                    onClick: () => page.link("settings-page") 
+                    // highlight-end
+                }
+            ))
+        }
+    })
+
+    const settingsPage = new Compose.App({
+        // highlight-start
+        route: "settings-page",
+        // highlight-end
+        handler: async ({ page, ui }) => {
+            page.add(() => ui.header("Settings"))
+            page.add(() => ui.button(
+                "return-btn", 
+                { 
+                    label: "Return to home", 
+                    // highlight-start
+                    onClick: () => page.link("home-page") 
+                    // highlight-end
+                }
+            ))
+        }
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+
+    home_page = c.App(
+        # highlight-start
+        route="home-page",
+        # highlight-end
+        handler=lambda page, ui: (
+            page.add(lambda: ui.header("Home")),
+            page.add(lambda: ui.button(
+                "settings-btn",
+                label="Settings",
+                # highlight-start
+                on_click=lambda: page.link("settings-page")
+                # highlight-end
+            ))
+        )
+    )
+
+    settings_page = c.App(
+        # highlight-start
+        route="settings-page",
+        # highlight-end
+        handler=lambda page, ui: (
+            page.add(lambda: ui.header("Settings")),
+            page.add(lambda: ui.button(
+                "return-btn",
+                label="Return to home",
+                # highlight-start
+                on_click=lambda: page.link("home-page")
+                # highlight-end
+            ))
+        )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+The `route` argument is used to identify your app, and must be unique for every app in your project.
+
+It's also possible to pass params to the linked app. Learn more in the guide on [multipage apps](/guides/multipage-apps).
+
+## Link to external URLs
+
+To link to an external URL, simply pass a complete URL to the `link()` function.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    import { Compose } from "@composehq/sdk"
+
+    const homePage = new Compose.App({
+        route: "home-page",
+        handler: async ({ page, ui }) => {
+            page.add(() => ui.header("Home"))
+            page.add(() => ui.button(
+                "docs-btn", 
+                { 
+                    label: "Go to Compose docs", 
+                    // highlight-start
+                    onClick: () => page.link("https://docs.composehq.com", { newTab: true }) 
+                    // highlight-end
+                }
+            ))
+        }
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    import compose_sdk as c
+
+    home_page = c.App(
+        route="home-page",
+        handler=lambda page, ui: (
+            page.add(lambda: ui.header("Home")),
+            page.add(lambda: ui.button(
+                "docs-btn",
+                label="Go to Compose docs",
+                # highlight-start
+                on_click=lambda: page.link("https://docs.composehq.com", new_tab=True)
+                # highlight-end
+            ))
+        )
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.link(
+        url: appRouteString || externalUrlString,
+        properties: Partial<{
+            newTab: boolean,
+            params: Record<string, string | number | boolean>
+        }>
+    ): void
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.link(
+        url: appRouteStr | externalUrlStr,
+        *,
+        new_tab: bool = False,
+        params: Dict[str, str | int | bool] = {}
+    ) -> None
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="url"
+    required={true}
+    type="string"
+    description={<>
+        The URL to link to. Either an app route (e.g. <code>"home-page"</code>) or an external URL (e.g. <code>"https://docs.composehq.com"</code>).
+    </>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.newTab" : "new_tab"}
+    required={false}
+    type="boolean"
+    description={lang => <>
+        Whether to open the link in a new tab. Defaults to <code>{lang === "js" ? "false" : "False"}</code>.
+    </>}
+/>
+
+<Parameter
+    name="params"
+    required={false}
+    type={lang => lang === "js" ? "Record\<string, string | number | boolean>" : "Dict[str, str | int | bool]"}
+    description={<>
+        Optional parameters object to pass to the linked Compose app, which will be made available to that app via the <code>page.params</code> object.
+    </>}
+/>
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>void</span></p>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>None</span></p>
+    </TabItem>
+</Tabs>

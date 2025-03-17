@@ -1,0 +1,120 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Stack
+description: Render a stack container component that can be used to group other components.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate } from "../../../src/components";
+
+# Component | Stack
+
+Stack is a generic container component that can be used to group other components. By default, it arranges its children in a vertical stack.
+
+Internally, `ui.stack` is a `div` and rendered as a flexbox container. It's primary use is for controlling the layout of its children and applying other styles to control the look of your app.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.stack(
+        [
+            ui.text("Choose an action"),
+            ui.row([
+                ui.button("view-btn", { label: "View" }),
+                ui.button("edit-btn", { label: "Edit", appearance: "outline" }),
+                ui.button("delete-btn", { label: "Delete", appearance: "danger" })
+            ])
+        ],
+        { align: "center" }
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.stack(
+        [
+            ui.text("Choose an action"),
+            ui.row([
+                ui.button("view-btn", label="View"),
+                ui.button("edit-btn", label="Edit", appearance="outline"),
+                ui.button("delete-btn", label="Delete", appearance="danger")
+            ])
+        ],
+        align="center"
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+<IFrame type="components-layout-stack" heightPx={175} />
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    type Component = ReturnType<typeof ui.textInput> | ReturnType<typeof ui.button> | /* more components */ | ReturnType<typeof ui.stack>
+
+    ui.stack(
+        children: Component | Component[],
+        properties?: Partial<{
+            direction: "vertical" | "horizontal" | "vertical-reverse" | "horizontal-reverse",
+            justify: "start" | "end" | "center" | "between" | "around" | "evenly",
+            align: "start" | "end" | "center" | "baseline" | "stretch",
+            spacing: string,
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # Return type of all ui components
+    Component = ui.stack | ui.button | ui.text_input | # ...
+
+    ui.stack(
+        children: Component | list[Component],
+        *,
+        direction: Literal["vertical", "horizontal", "vertical-reverse", "horizontal-reverse"] = "vertical",
+        justify: Literal["start", "end", "center", "between", "around", "evenly"] = "start",
+        align: Literal["start", "end", "center", "baseline", "stretch"] = "start",
+        spacing: str = "16px",
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+
+</Tabs>
+
+### Parameters
+
+<ParameterTemplate.Children
+    componentName="stack"
+/>
+
+<ParameterTemplate.LayoutDirection />
+
+<ParameterTemplate.LayoutJustify
+    componentName="stack"
+/>
+
+<ParameterTemplate.LayoutAlign
+    componentName="stack"
+/>
+
+<ParameterTemplate.LayoutSpacing />
+
+<ParameterTemplate.Style
+    description={(
+        <>
+            <p>Directly style the underlying <code>div</code> element using CSS. See the <a href="/guides/styling-your-app#styles">styling guide</a> for more details on available style properties.</p>
+            <p>For example, you could set a border around the stack to create a card component.</p>
+        </>
+    )}
+/>
