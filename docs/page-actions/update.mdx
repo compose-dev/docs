@@ -222,6 +222,71 @@ Instead, do this work outside of the callback function and simply pass the resul
     </TabItem>
 </Tabs>
 
+### Use stable component IDs
+
+The SDK needs to be smart enough to not reset all your form and input values everytime you call `page.update()`. It accomplishes this by requiring all interactive components to have a stable, unique ID as their first argument. The unique ID is crucial for Compose to properly track the component and its state across updates.
+
+Many bugs occur because of unstable component IDs such as list indices. For example:
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        ```js
+        let players = ["John", "Jane", "Jim"]
+        
+        page.add(() => ui.form(
+            "player-names",
+            ui.forEach(players, (player, index) => 
+                ui.textInput(
+                    // highlight-next-line
+                    `player-${index}`, // ❌ using unstable list index as component ID
+                    { 
+                        initialValue: player,
+                        label: "Player Name"
+                    }
+                )
+            )
+        ))
+        
+        // highlight-start
+        players.shift() // Remove the first player
+        page.update() // Update the form to remove the first player
+        // highlight-end
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        ```python
+        players = ["John", "Jane", "Jim"]
+        
+        page.add(lambda: ui.form(
+            "player-names",
+            ui.for_each(players, lambda player, index:
+                ui.text_input(
+                    # highlight-next-line
+                    f"player-{index}", # ❌ using unstable list index as component ID
+                    initial_value=player,
+                    label="Player Name"
+                )
+            )
+        ))
+
+        # highlight-start
+        players.pop(0) # Remove the first player
+        page.update() # Update the form to remove the first player
+        # highlight-end
+        ```
+    </TabItem>
+</Tabs>
+
+The above code has a bug. In the first render, the form has the following input IDs:
+- `player-0`
+- `player-1`
+- `player-2`
+
+After we remove the first player, the form will have the following input IDs:
+- `player-0`
+- `player-1`
+
+From Compose's perspective, we've actually removed the last input component. To fix this, always use a stable, unique ID for components!
 
 ## API reference
 

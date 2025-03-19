@@ -102,7 +102,7 @@ Each action's callback will receive the row as an argument.
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
     ui.table("table-key",
-    <list-of-users>,
+    [ /* list of users */ ],
     { 
         actions: [
             { label: "Edit", onClick: (row) => doSomething(row) },
@@ -118,7 +118,7 @@ Each action's callback will receive the row as an argument.
     ```python
     ui.table(
         "table-key",
-        <list-of-users>,
+        [<list-of-users>],
         actions=[
             { "label": "Edit", "on_click": lambda row: do_something(row) },
             { "label": "Delete", "on_click": lambda row: do_something(row) },
