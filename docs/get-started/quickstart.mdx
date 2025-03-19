@@ -125,6 +125,7 @@ If you're just exploring for now or prefer to start from scratch, you can also [
             route: "view-users",
             navigation: nav,
             handler: async ({ page, ui }) => {
+                page.add(() => ui.header("View Users", { size: "lg" }))
                 const users = [...dbUsers] // fake database call
                 page.add(() => ui.table("users-table", users));
             }
@@ -134,6 +135,7 @@ If you're just exploring for now or prefer to start from scratch, you can also [
             route: "create-user",
             navigation: nav,
             handler: async ({ page, ui }) => {
+                page.add(() => ui.header("Create User", { size: "lg" }))
                 page.add(() => ui.form(
                     "create-user-form",
                     [
@@ -177,6 +179,7 @@ If you're just exploring for now or prefer to start from scratch, you can also [
         ]
 
         def view_users_handler(page: c.Page, ui: c.UI):
+            page.add(lambda: ui.header("View Users", size="lg"))
             users = [*db_users] # fake database call
             page.add(lambda: ui.table("users-table", users))
 
@@ -186,6 +189,7 @@ If you're just exploring for now or prefer to start from scratch, you can also [
                 page.toast("User created successfully", appearance="success")
                 page.link("view-users")
 
+            page.add(lambda: ui.header("Create User", size="lg"))
             page.add(lambda: ui.form(
                 "create-user-form",
                 [
@@ -346,6 +350,7 @@ Setup a new project with Compose using a single `npx` command in your terminal.
             route: "view-users",
             navigation: nav,
             handler: async ({ page, ui }) => {
+                page.add(() => ui.header("View Users", { size: "lg" }))
                 const users = [...dbUsers] // fake database call
                 page.add(() => ui.table("users-table", users));
             }
@@ -355,6 +360,7 @@ Setup a new project with Compose using a single `npx` command in your terminal.
             route: "create-user",
             navigation: nav,
             handler: async ({ page, ui }) => {
+                page.add(() => ui.header("Create User", { size: "lg" }))
                 page.add(() => ui.form(
                     "create-user-form",
                     [
@@ -442,6 +448,7 @@ Setup a new project with Compose using a single `npx` command in your terminal.
         ]
 
         def view_users_handler(page: c.Page, ui: c.UI):
+            page.add(lambda: ui.header("View Users", size="lg"))
             users = [*db_users] # fake database call
             page.add(lambda: ui.table("users-table", users))
 
@@ -451,6 +458,7 @@ Setup a new project with Compose using a single `npx` command in your terminal.
                 page.toast("User created successfully", appearance="success")
                 page.link("view-users")
 
+            page.add(lambda: ui.header("Create User", size="lg"))
             page.add(lambda: ui.form(
                 "create-user-form",
                 [
