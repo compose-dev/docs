@@ -275,6 +275,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "components/input/json-input",
+          label: "JSON Input",
+        },
+        {
+          type: "doc",
           id: "components/input/multi-select-box",
           label: "Multi Select",
         },

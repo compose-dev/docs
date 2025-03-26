@@ -1,8 +1,8 @@
 ---
 sidebar_position: 1
 hide_title: true
-title: Component | Text Area
-description: Render a text area input box.
+title: Component | JSON Input
+description: Render a JSON input box.
 ---
 
 import Tabs from "@theme/Tabs";
@@ -11,31 +11,39 @@ import IFrame from "../../../src/iframe";
 import { ParameterTemplate } from "../../../src/components"
 
 
-# Component | Text Area
+# Component | JSON Input
 
-Render a text area input box.
+:::note
+Introduced in SDK version 0.26.3
+:::
+
+Render a JSON input with:
+
+- **Syntax highlighting and formatting** for the input data
+- **Error checking** to ensure well-formed JSON
+- **Line numbers** for better readability
+
+<IFrame type="components-input-json" heightPx={450} />
 
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
-    ui.textArea("text-area-key", { 
-        label: "Write your story...",
-        onEnter: (value) => console.log(value)
+    ui.jsonInput("user-data", {
+        initialValue: { users: [ /* ... */ ] }, // Replace with actual JSON data.
+        onEnter: (value) => db.updateUserMetadata(value)
     })
     ```
     </TabItem>
     <TabItem value="python" label="Python">
     ```python
-    ui.text_area(
-        "text-area-key",
-        label="Write your story...",
-        on_enter=lambda value: print(value)
+    ui.json_input(
+        "user-data",
+        initial_value={ "users": [] }  # Replace with actual JSON data.
+        on_enter=lambda value: db.update_user_metadata(value)
     )
     ```
     </TabItem>
 </Tabs>
-
-<IFrame type="components-input-textarea" heightPx={250} />
 
 Learn more about [working with inputs](/guides/forms).
 
@@ -46,15 +54,15 @@ You can change the height of the input element via the `style` property. For exa
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
-    ui.textArea("text-area-key", {
+    ui.jsonInput("user-data", {
         style: { height: "800px" }
     })
     ```
     </TabItem>
     <TabItem value="python" label="Python">
     ```python
-    ui.text_area(
-        "text-area-key",
+    ui.json_input(
+        "user-data",
         style={"height": "800px"}
     )
     ```
@@ -68,15 +76,23 @@ You can change the height of the input element via the `style` property. For exa
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
-    ui.textArea(
+    type ValidJson =
+    | string
+    | number
+    | boolean
+    | null
+    | ValidJson[]
+    | { [key: string]: ValidJson };
+
+    ui.jsonInput(
         id: string,
         properties?: Partial<{
             label: string,
             description: string,
             required: boolean,
-            initialValue: string | null,
-            validate: (value: string | null) => string | void,
-            onEnter: (value: string | null) => void,
+            initialValue: ValidJson,
+            validate: (value: ValidJson) => string | void,
+            onEnter: (value: ValidJson) => void,
             style: Style
         }>
     )
@@ -84,15 +100,18 @@ You can change the height of the input element via the `style` property. For exa
     </TabItem>
     <TabItem value="python" label="Python">
     ```python
-    ui.text_area(
+    JsonPrimitive = Union[str, int, float, bool, None, Mapping[str, Any], List[Any]]
+    ValidJson = Union[Mapping[str, JsonPrimitive], List[JsonPrimitive], JsonPrimitive]
+
+    ui.json_input(
         id: str,
         *,
         label: str | None = None,
         description: str | None = None,
         required: bool = True,
-        initial_value: str | None = None,
-        validate: Callable[[str | None], str | None] | None = None,
-        on_enter: Callable[[str | None], None] | None = None,
+        initial_value: ValidJson = None,
+        validate: Callable[[ValidJson], str | None] | None = None,
+        on_enter: Callable[[ValidJson], None] | None = None,
         style: Style | None = None
     )
     ```
@@ -104,31 +123,31 @@ You can change the height of the input element via the `style` property. For exa
 <ParameterTemplate.Id />
 
 <ParameterTemplate.Label
-    componentName="text area"
+    componentName="JSON input"
 />
 
 <ParameterTemplate.Description
-    componentName="text area box"
+    componentName="JSON input"
 />
 
 <ParameterTemplate.Required
-    componentName="text area"
+    componentName="JSON input"
     hookName={lang => lang === "js" ? "onEnter" : "on_enter"}
 />
 
 <ParameterTemplate.InitialValue
-    componentName="text area"
-    type={lang => lang === "js" ? "string | null" : "str | None"}
+    componentName="JSON input"
+    type={lang => lang === "js" ? "ValidJson" : "ValidJson"}
 />
 
 <ParameterTemplate.ValidateInput
-    componentName="text area"
-    hookInputArgument={lang => lang === "js" ? "value: string | null" : "str | None"}
+    componentName="JSON input"
+    hookInputArgument={lang => lang === "js" ? "value: ValidJson" : "ValidJson"}
 />
 
 <ParameterTemplate.OnEnter
-    componentName="text area"
-    hookInputArgument={lang => lang === "js" ? "value: string | null" : "str | None"}
+    componentName="JSON input"
+    hookInputArgument={lang => lang === "js" ? "value: ValidJson" : "ValidJson"}
 />
 
 <ParameterTemplate.Style />
