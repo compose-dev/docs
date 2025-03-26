@@ -142,6 +142,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "page-actions/log",
+          label: "Log",
+        },
+        {
+          type: "doc",
           id: "page-actions/loading",
           label: "Loading",
         },

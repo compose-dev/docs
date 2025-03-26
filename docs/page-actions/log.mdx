@@ -1,0 +1,124 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Page Action | Log
+description: Log information to audit logs.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { Parameter } from "../../src/components";
+
+# Page Action | Log
+
+Use `page.log()` to log information to audit logs. Only available on Pro plans.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.log("Deleted database record in user's table", {
+        severity: "info",
+        data: {
+            userId: 123,
+            recordId: 456,
+        },
+    });
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.log(
+        "Deleted database record in user's table",
+        severity="info",
+        data={
+            "user_id": 123,
+            "record_id": 456,
+        },
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+## Audit Logs
+
+### Collecting logs
+
+By default, Compose will log everytime a user runs an app. But, due to Compose's tight security model, it's not possible for us to see what a user does within an app.
+
+For all other logs you may want, it's simple to use `page.log()` to record additional information. All logs are automatically enriched with the user's session, timestamp, the app route, and more. Note that Compose may enforce rate limits to prevent abuse. We'll work with you to increase this limit if needed.
+
+### Viewing logs
+
+Logs can be viewed, filtered, and searched via the Compose dashboard.
+
+### Exporting logs
+
+Logs can be exported to a CSV format. You can also contact us to set up a custom export to a separate service such as S3, Datadog, etc.
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    page.log(
+        message: string,
+        properties?: Partial<{
+            severity: "trace" | "debug" | "info" | "warn" | "error" | "fatal",
+            data: Record<string, any>
+        }>
+    ): void
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    page.log(
+        message: str,
+        *,
+        severity: Literal["trace", "debug", "info", "warn", "error", "fatal"] = "info",
+        data: Dict[str, Any] = {}
+    ) -> None
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="message"
+    required={true}
+    type="string"
+    description={<>
+        The message to log.
+    </>}
+/>
+
+<Parameter
+    name="severity"
+    required={false}
+    type="literal"
+    description={<>
+        The severity of the log message. Options are <code>trace</code>, <code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code>, and <code>fatal</code>. Defaults to <code>info</code>.
+    </>}
+/>
+
+<Parameter
+    name="data"
+    required={false}
+    type="object"
+    description={<>
+        Optional metadata to log for the message.
+    </>}
+/>
+
+### Returns
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>void</span></p>
+    </TabItem>
+    <TabItem value="python" label="Python">
+    <p><span className="type-pill" style={{ marginLeft: 0}}>None</span></p>
+    </TabItem>
+</Tabs>
