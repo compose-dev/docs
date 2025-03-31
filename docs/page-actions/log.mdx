@@ -41,15 +41,19 @@ Use `page.log()` to log information to audit logs. Only available on Pro plans.
 
 ## Audit Logs
 
+<video width="100%" muted autoPlay loop>
+    <source src="/vid/audit-log-2.mp4" type="video/mp4" />
+</video>
+
 ### Collecting logs
 
-By default, Compose will log everytime a user runs an app. But, due to Compose's tight security model, it's not possible for us to see what a user does within an app.
+Compose will automatically collect basic `system` logs, which includes everytime a user runs an app. Due to Compose's tight security model, it's not possible for us to see what a user does within an app.
 
-For all other logs you may want, it's simple to use `page.log()` to record additional information. All logs are automatically enriched with the user's session, timestamp, the app route, and more. Note that Compose may enforce rate limits to prevent abuse. We'll work with you to increase this limit if needed.
+Hence, for any other logs you want, you can use `page.log()` to record events to your team's audit logs (e.g. when a resource is edited, a file is downloaded, etc.). All logs are automatically enriched with the user's session, timestamp, the app that was running, and more. Note that Compose may enforce rate limits to prevent abuse. We'll work with you to increase this limit if needed.
 
 ### Viewing logs
 
-Logs can be viewed, filtered, and searched via the [Compose dashboard](https://app.compose.com/home/audit-log).
+Logs can be viewed, filtered, and searched via the [Compose dashboard](https://app.composehq.com/home/audit-log).
 
 ### Exporting logs
 
