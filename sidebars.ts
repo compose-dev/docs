@@ -19,7 +19,7 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "doc",
-          id: "get-started/quickstart",
+          id: "quickstart",
           label: "Quickstart",
         },
         {
