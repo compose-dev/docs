@@ -63,11 +63,14 @@ Compose offers a collection of layout components for grouping and arranging comp
         page.add(() => ui.card(
             ui.distributedRow([
                 ui.header("Users"),
-                ui.row([
-                    ui.button("btn-id", { label: "Add" }),
-                    ui.button("btn-id", { label: "Edit", appearance: "outline" }),
-                    ui.button("btn-id", { label: "Delete", appearance: "danger" })
-                ])
+                ui.row(
+                    [
+                        ui.button("btn-id", { label: "Add" }),
+                        ui.button("btn-id", { label: "Edit", appearance: "outline" }),
+                        ui.button("btn-id", { label: "Delete", appearance: "danger" })
+                    ],
+                    { justify: "end" }
+                )
             ])
         ))
         ```
@@ -77,11 +80,14 @@ Compose offers a collection of layout components for grouping and arranging comp
         page.add(lambda: ui.card(
             ui.distributed_row([
                 ui.header("Users"),
-                ui.row([
-                    ui.button("btn-id", label="Add"),
-                    ui.button("btn-id", label="Edit", appearance="outline"),
-                    ui.button("btn-id", label="Delete", appearance="danger")
-                ])
+                ui.row(
+                    [
+                        ui.button("btn-id", label="Add"),
+                        ui.button("btn-id", label="Edit", appearance="outline"),
+                        ui.button("btn-id", label="Delete", appearance="danger")
+                    ],
+                    justify="end"
+                )
             ])
         ))
         ```
