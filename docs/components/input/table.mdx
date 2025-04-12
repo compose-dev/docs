@@ -332,7 +332,7 @@ Introduced in SDK v0.24.0.
 
 ### Automatic Pagination
 
-Tables with more than 5000 rows are automatically paginated without any additional configuration on your end, enabling Compose to remain performant at scale.
+Tables with more than 2500 rows are automatically paginated without any additional configuration on your end, enabling Compose to remain performant at scale.
 
 An important caveat is that auto-pagination disables client-side search since the browser only has a paginated subset of the data. You can re-enable search by manually paginating the table.
 
@@ -537,6 +537,7 @@ If you're not yet ready to handle search, you can disable it by passing the `sea
             maxSelections: number,
             selectionReturnType: "full" | "index",
             searchable: boolean,
+            paginate: boolean,
             style: Style,
         }>
     )
@@ -564,6 +565,7 @@ If you're not yet ready to handle search, you can disable it by passing the `sea
         max_selections: int = 1000000000,
         selection_return_type: Literal["full", "index"] = "full",
         searchable: bool = True,
+        paginate: bool = False,
         style: Style | None = None,
     )
     ```
@@ -679,7 +681,18 @@ If you're not yet ready to handle search, you can disable it by passing the `sea
     version="0.24.0"
     description={(lang) => <>
         <p>Whether to show the search input. Defaults to <code>{lang === "js" ? "true" : "True"}</code>.</p>
-        <p>The exception is auto-paginated tables (i.e. tables with more than 5000 rows). Client-side search is not possible for these tables, and you'll need to manage search yourself using <a href="#manual-pagination">manual pagination</a>.</p>
+        <p>The exception is auto-paginated tables (i.e. tables with more than 2500 rows). Client-side search is not possible for these tables, and you'll need to manage search yourself using <a href="#manual-pagination">manual pagination</a>.</p>
+    </>}
+/>
+
+<Parameter
+    name="paginate"
+    required={false}
+    type="boolean"
+    version="0.26.7"
+    description={(lang) => <>
+        <p>Whether to paginate the table server-side. Defaults to <code>{lang === "js" ? "false" : "False"}</code>.</p>
+        <p>Tables with more than 2500 rows will be paginated by default.</p>
     </>}
 />
 
