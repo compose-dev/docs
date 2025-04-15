@@ -41,6 +41,7 @@ This page serves as an API reference for the `ui.form` component. If you're look
             justify: "start" | "end" | "center" | "between" | "around" | "evenly",
             align: "start" | "end" | "center" | "baseline" | "stretch",
             spacing: string,
+            responsive: boolean,
             clearOnSubmit: boolean,
             hideSubmitButton: boolean,
             validate: (values: Record<string, any>) => string | void,
@@ -63,6 +64,7 @@ This page serves as an API reference for the `ui.form` component. If you're look
         justify: Literal["start", "end", "center", "between", "around", "evenly"] = "start",
         align: Literal["start", "end", "center", "baseline", "stretch"] = "start",
         spacing: str = "16px",
+        responsive: bool = True,
         clear_on_submit: bool = False,
         hide_submit_button: bool = False,
         validate: Callable[[dict[str, Any]], str | None] | None = None,
@@ -93,6 +95,8 @@ This page serves as an API reference for the `ui.form` component. If you're look
 />
 
 <ParameterTemplate.LayoutSpacing />
+
+<ParameterTemplate.LayoutResponsive />
 
 <Parameter
     name={lang => lang === "js" ? "properties.clearOnSubmit" : "clear_on_submit"}

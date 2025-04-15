@@ -54,6 +54,7 @@ Map a list of items to a list of components.
             justify: "start" | "end" | "center" | "between" | "around" | "evenly",
             align: "start" | "end" | "center" | "baseline" | "stretch",
             spacing: string,
+            responsive: boolean,
             style: Style
         }>
     )
@@ -69,6 +70,13 @@ Map a list of items to a list of components.
     ui.for_each(
         items: Iterable[T],
         generator: Callable[[T], Component] | Callable[[T, int], Component]
+        *,
+        direction: Literal["vertical", "horizontal", "vertical-reverse", "horizontal-reverse"] = "vertical",
+        justify: Literal["start", "end", "center", "between", "around", "evenly"] = "start",
+        align: Literal["start", "end", "center", "baseline", "stretch"] = "start",
+        spacing: str = "16px",
+        responsive: bool = True,
+        style: Style | None = None
     )
     ```
     </TabItem>
@@ -101,6 +109,8 @@ Map a list of items to a list of components.
 />
 
 <ParameterTemplate.LayoutSpacing />
+
+<ParameterTemplate.LayoutResponsive />
 
 <ParameterTemplate.Style
     description={(

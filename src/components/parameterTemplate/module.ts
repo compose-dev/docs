@@ -6,6 +6,7 @@ import LabelParameter from "./LabelParameter";
 import LayoutAlignParameter from "./LayoutAlignParameter";
 import LayoutDirectionParameter from "./LayoutDirectionParameter";
 import LayoutJustifyParameter from "./LayoutJustifyParameter";
+import LayoutResponsiveParameter from "./LayoutResponsiveParameter";
 import LayoutSpacingParameter from "./LayoutSpacingParameter";
 import RequiredParameter from "./RequiredParameter";
 import StyleParameter from "./StyleParameter";
@@ -24,6 +25,7 @@ export {
   LayoutAlignParameter as LayoutAlign,
   LayoutDirectionParameter as LayoutDirection,
   LayoutJustifyParameter as LayoutJustify,
+  LayoutResponsiveParameter as LayoutResponsive,
   LayoutSpacingParameter as LayoutSpacing,
   RequiredParameter as Required,
   StyleParameter as Style,

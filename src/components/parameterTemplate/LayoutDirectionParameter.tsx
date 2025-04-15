@@ -11,7 +11,7 @@ export default function LayoutDirectionParameter({
       name="direction"
       required={false}
       type="literal"
-      description={
+      description={(lang) =>
         description || (
           <>
             <p>
@@ -37,6 +37,12 @@ export default function LayoutDirectionParameter({
                 in reverse order (right to left)
               </li>
             </ul>
+            <p>
+              The direction will automatically adjust to a vertical layout on
+              mobile devices, which can be disabled by setting the{" "}
+              <code>responsive</code> property to{" "}
+              <code>{lang === "js" ? "false" : "False"}</code>.
+            </p>
           </>
         )
       }
