@@ -365,6 +365,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "components/display/statistic",
+          label: "Statistic",
+        },
+        {
+          type: "doc",
           id: "components/display/text",
           label: "Text",
         },

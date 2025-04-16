@@ -1,0 +1,293 @@
+---
+sidebar_position: 1
+hide_title: true
+title: Component | Statistic
+description: Display a well-formatted, customizable statistic.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components";
+
+# Component | Statistic
+
+:::note
+Introduced in SDK v0.26.9
+:::
+
+Display a well-formatted, customizable statistic.
+
+<IFrame type="components-display-statistic" heightPx={500} />
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.row([
+      ui.statistic(
+        "Total Users",
+        135,
+        {
+          delta: 14,
+          description: "Since last month",
+          format: "currency",
+        },
+      ),
+      ui.statistic(
+        "Total Revenue",
+        39211,
+        {
+          format: "currency",
+          delta: .06,
+          deltaFormat: "percent",
+          description: "Since last month",
+        },
+      ),
+      ui.statistic(
+        "At Risk Accounts",
+        12,
+        {
+          delta: -1,
+          isPositiveDelta: true,
+          description: "Since last month",
+          labelColor: "danger",
+        },
+      ),
+    ])
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    ui.row([
+      ui.statistic(
+        "Total Users",
+        135,
+        delta=14,
+        description="Since last month",
+        format="currency"
+      ),
+      ui.statistic(
+        "Total Revenue",
+        39211,
+        format="currency",
+        delta=0.06,
+        delta_format="percent",
+        description="Since last month"
+      ),
+      ui.statistic(
+        "At Risk Accounts",
+        12,
+        delta=-1,
+        is_positive_delta=True,
+        description="Since last month",
+        label_color="danger"
+      )
+    ])
+    ```
+  </TabItem>
+</Tabs>
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    ui.statistic(
+        label: string,
+        value: number,
+        options?: Partial<{
+            format: "standard" | "percent" | "currency",
+            description: string,
+            decimals: number,
+            delta: number,
+            deltaFormat: "standard" | "percent" | "currency",
+            deltaDecimals: number,
+            suffix: string,
+            prefix: string,
+            isPositiveDelta: boolean | ((delta: number) => boolean),
+            labelColor: "text" | "text-secondary" | "danger" | "warning" | "success" | "primary",
+            valueColor: "text" | "text-secondary" | "danger" | "warning" | "success" | "primary",
+            descriptionColor: "text" | "text-secondary" | "danger" | "warning" | "success" | "primary",
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.statistic(
+        label: str,
+        value: int | float,
+        *,
+        format: Literal["standard", "percent", "currency"] = "standard",
+        description: str | None = None,
+        decimals: int | None = None,
+        delta: int | float | None = None,
+        delta_format: Literal["standard", "percent", "currency"] = "standard",
+        delta_decimals: int | None = None,
+        is_positive_delta: bool | None = None,
+        suffix: str | None = None,
+        prefix: str | None = None,
+        label_color: Literal["text", "text-secondary", "danger", "warning", "success", "primary"] = "text",
+        value_color: Literal["text", "text-secondary", "danger", "warning", "success", "primary"] = "text",
+        description_color: Literal["text", "text-secondary", "danger", "warning", "success", "primary"] = "text-secondary",
+        style: Style | None = None,
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="label"
+    required={true}
+    type="string"
+    description="The title of the statistic."
+/>
+
+<Parameter
+    name="value"
+    required={true}
+    type="int_or_float"
+    description="The value of the statistic."
+/>
+
+<Parameter
+    name="format"
+    required={false}
+    type="literal"
+    description={() =>
+        (
+          <>
+            <p>
+              The format to display the value in. Defaults
+              to <code>"standard"</code>.
+            </p>
+            <p>Options:</p>
+            <ul>
+              <li>
+                <code>"standard"</code>: Display the value as a standard number.
+              </li>
+              <li>
+                <code>"percent"</code>: Display the value as a percentage.
+              </li>
+              <li>
+                <code>"currency"</code>: Display the value as a currency.
+              </li>
+            </ul>
+          </>
+        )
+      }
+/>
+
+<Parameter
+    name="description"
+    required={false}
+    type="string"
+    description="Display an optional description below the value."
+/>
+
+<Parameter
+    name="decimals"
+    required={false}
+    type="int"
+    description="Round the value to the specified number of decimal places. By default, the value is not rounded."
+/>
+
+<Parameter
+    name="delta"
+    required={false}
+    type="int_or_float"
+    description="Display a delta value to represent the change in the value."
+/>
+
+<Parameter
+    name={(lang) => lang === "js" ? "properties.deltaFormat" : "delta_format"}
+    required={false}
+    type="literal"
+    description={() =>
+        (
+          <>
+            <p>
+              The format to display the delta in. Defaults
+              to <code>"standard"</code>.
+            </p>
+            <p>Options:</p>
+            <ul>
+              <li>
+                <code>"standard"</code>: Display the delta as a standard number.
+              </li>
+              <li>
+                <code>"percent"</code>: Display the delta as a percentage.
+              </li>
+              <li>
+                <code>"currency"</code>: Display the delta as a currency.
+              </li>
+            </ul>
+          </>
+        )
+      }
+/>
+
+<Parameter
+    name={(lang) => lang === "js" ? "properties.deltaDecimals" : "delta_decimals"}
+    required={false}
+    type="int"
+    description="Round the delta to the specified number of decimal places. By default, the delta is not rounded."
+/>
+
+<Parameter
+    name={(lang) => lang === "js" ? "properties.isPositiveDelta" : "is_positive_delta"}
+    required={false}
+    type={lang => lang === "js" ? "boolean | ((delta: number) => boolean)" : "bool | Callable[[int, float], bool]"}
+    description="Override the default determination of whether the delta is positive or negative with custom logic. By default, the delta is positive if it is greater than 0, and negative if it is less than 0."
+/>
+
+<Parameter
+    name="suffix"
+    required={false}
+    type="string"
+    description={
+        <>
+            <p>
+              Display an optional suffix to the value. This will override any default suffix that would otherwise be applied based on the <code>format</code> option.
+            </p>
+        </>
+    }
+/>
+<Parameter
+    name="prefix"
+    required={false}
+    type="string"
+    description={
+        <>
+            <p>
+              Display an optional prefix to the value. This will override any default prefix that would otherwise be applied based on the <code>format</code> option.
+            </p>
+        </>
+    }
+/>
+
+<ParameterTemplate.TextColor
+    parameterName={(lang) => lang === "js" ? "properties.labelColor" : "label_color"}
+    componentName="label"
+    defaultValue='"text"'
+/>
+
+<ParameterTemplate.TextColor
+    parameterName={(lang) => lang === "js" ? "properties.valueColor" : "value_color"}
+    componentName="value"
+    defaultValue='"text"'
+/>
+
+<ParameterTemplate.TextColor
+    parameterName={(lang) => lang === "js" ? "properties.descriptionColor" : "description_color"}
+    componentName="description"
+    defaultValue='"text-secondary"'
+/>
+
+<ParameterTemplate.Style />
+

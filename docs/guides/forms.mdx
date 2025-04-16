@@ -261,10 +261,6 @@ You can specify the initial value of an input by setting the `initialValue` para
         )
     )
     ```
-
-    :::warning
-    Notice that `ui.selectBox` is not part of the form. This is intentional since inputs inside of forms will ignore their own callbacks such as `onChange`.
-    :::
     </TabItem>
     <TabItem value="python" label="Python">
     ```python
@@ -299,10 +295,6 @@ You can specify the initial value of an input by setting the `initialValue` para
         )
     )
     ```
-
-    :::warning
-    Notice that `ui.select_box` is not part of the form. This is intentional since inputs inside of forms will ignore individual callbacks such as `on_change`.
-    :::
     </TabItem>
 </Tabs>
 
@@ -469,18 +461,5 @@ That's completely possible, and quite straightforward. Simple use the input comp
 
     page.add(lambda: ui.table("users", users))
     ```
-    </TabItem>
-</Tabs>
-
-## Notes and best practices
-
-<Tabs groupId="sdkLanguage" className="hide_tabs">
-    <TabItem value="node" label="TypeScript / JavaScript">
-    - Inputs nested inside a form component will ignore their own direct callback functions such as `onEnter` and `onChange`.
-    - Forms cannot be nested inside other forms.
-    </TabItem>
-    <TabItem value="python">
-    - Inputs nested inside a form component will ignore their own direct callback functions such as `on_enter` and `on_change`.
-    - Forms cannot be nested inside other forms.
     </TabItem>
 </Tabs>

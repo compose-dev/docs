@@ -15,6 +15,7 @@ import OnEnterParameter from "./OnEnterParameter";
 import OnChangeParameter from "./OnChangeParameter";
 import SelectOptionsObjectParameters from "./SelectOptionsObjectParameters";
 import SelectOptionsParameter from "./SelectOptionsParameter";
+import TextColorParameter from "./TextColorParameter";
 
 export {
   ChildrenParameter as Children,
@@ -34,4 +35,5 @@ export {
   OnChangeParameter as OnChange,
   SelectOptionsObjectParameters as SelectOptionsObject,
   SelectOptionsParameter as SelectOptions,
+  TextColorParameter as TextColor,
 };

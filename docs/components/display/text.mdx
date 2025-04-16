@@ -15,6 +15,8 @@ import { Parameter, ParameterTemplate } from "../../../src/components"
 
 Render text
 
+<IFrame type="components-display-text" heightPx={150} />
+
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
@@ -28,7 +30,6 @@ Render text
     </TabItem>
 </Tabs>
 
-<IFrame type="components-display-text" heightPx={150} />
 
 ## Color & Size
 
@@ -127,42 +128,10 @@ You can nest text components to create more complex text structures.
     description="The text to be displayed."
 />
 
-<Parameter
-    name="color"
-    required={false}
-    type="literal"
-    description={
-        <>
-            <p>
-              Specifies the color of the text. Defaults to <code>"text"</code>
-            </p>
-            <p>Options:</p>
-            <ul>
-              <li>
-                <code>"text"</code>: Default text color
-              </li>
-              <li>
-                <code>"text-secondary"</code>: Secondary text color, uses a lighter shade of the default text color
-              </li>
-              <li>
-                <code>"primary"</code>: Primary color. Defaults to a shade of blue. Can be set via the <a href="/guides/styling-your-app#theming">theme</a>.
-              </li>
-              <li>
-                <code>"success"</code>: Success color, green.
-              </li>
-              <li>
-                <code>"warning"</code>: Warning color, orange.
-              </li>
-              <li>
-                <code>"danger"</code>: Danger color, red.
-              </li>
-              <li>
-                <code>"background"</code>: Background color. Can be used over inverted backgrounds.
-              </li>
-            </ul>
-        </>
-    }
-    version="0.19.1"
+<ParameterTemplate.TextColor
+    parameterName="color"
+    componentName="text"
+    defaultValue='"text"'
 />
 
 <Parameter
@@ -194,7 +163,6 @@ You can nest text components to create more complex text structures.
             </ul>
         </>
     }
-    version="0.19.1"
 />
 
 <ParameterTemplate.Style />

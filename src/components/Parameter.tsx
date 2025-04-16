@@ -10,6 +10,7 @@ interface ParameterProps {
     | "literal"
     | "style"
     | "int"
+    | "int_or_float"
     | "no-arguments-void-fn"
     | "any"
     | (string & {})
@@ -54,7 +55,7 @@ export default function Parameter({
       return "Style";
     }
 
-    if (type && type === "int") {
+    if (type && (type === "int" || type === "int_or_float")) {
       return "number";
     }
 
@@ -92,6 +93,10 @@ export default function Parameter({
 
     if (type && type === "int") {
       return "int";
+    }
+
+    if (type && type === "int_or_float") {
+      return "int | float";
     }
 
     if (type && type === "any") {
