@@ -15,7 +15,7 @@ import { ParameterTemplate, Parameter, CustomCodeBlock } from "../../../src/comp
 Render a table. Tables offer:
 
 - **Actions** to add interactivity to each row.
-- **Customizable columns** to format data in a variety of ways.
+- **Customizable columns** to format, sort, and filter data.
 - **Built-in search** to filter rows.
 - **Pagination and virtualization** to efficiently scale to millions of rows.
 
@@ -150,13 +150,30 @@ Each action's callback will receive the row as an argument.
 />
 
 <Parameter
+    name="appearance"
+    required={false}
+    type="literal"
+    description={
+        <>
+            <p>The appearance of the action. Defaults to <code>outline</code>. Options:</p>
+            <ul>
+                <li><code>"primary"</code></li>
+                <li><code>"outline"</code></li>
+                <li><code>"warning"</code></li>
+                <li><code>"danger"</code></li>
+            </ul>
+        </>
+    }
+/>
+
+<Parameter
     name={() => "surface"}
     required={false}
     type="boolean"
     description={lang =>
         <>
         <p>
-            Set to <code>{lang === "js" ? "true" : "True"}</code> render the action as a button. Set to <code>{lang === "js" ? "false" : "False"}</code> to render the action inside a dropdown.
+            Set to <code>{lang === "js" ? "true" : "True"}</code> to render the action as a button. Set to <code>{lang === "js" ? "false" : "False"}</code> to render the action inside a dropdown.
         </p>
         <p>
             By default, if the table has only one action, it will render as a button. If there are multiple actions, they'll render inside a dropdown.
@@ -167,11 +184,11 @@ Each action's callback will receive the row as an argument.
 
 ## Columns
 
-By default, Compose infers the table columns and how to render them. This can be overriden by passing the `columns` property.
+By default, Compose infers which columns to show (and how to render them) from your data. To take control, pass a columns array: either simple key strings or full column-definition objects.
 
-### Basic Usage
+### Selecting & ordering
 
-You can pass a list of `key` strings, which Compose uses to map to the data. This allows you to control which columns are rendered, and in what order, while still leveraging Compose to infer the label and data type.
+Choose which fields to show, and in what order, by listing their property keys.
 
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
@@ -181,6 +198,7 @@ You can pass a list of `key` strings, which Compose uses to map to the data. Thi
         { name: "Jane", age: 25, createdAt: new Date("2021-01-02"), isActive: false },
     ]
 
+    // Show only name -> age -> isActive
     ui.table("table-key", users, { columns: ["name", "age", "isActive"] })
     ```
     </TabItem>
@@ -191,32 +209,46 @@ You can pass a list of `key` strings, which Compose uses to map to the data. Thi
         {"name": "Jane", "age": 25, "created_at": datetime(2021, 1, 2), "is_active": False},
     ]
 
+    # Show only name -> age -> isActive
     ui.table("table-key", users, columns=["name", "age", "is_active"])
     ```
     </TabItem>
 
 </Tabs>
 
-### Advanced Usage
+### Formatting
 
-Instead of strings, you can also pass objects that allows you to more granularly control each column. Each column object must have a `key` field to map to the data.
+Compose will infer column labels and data types from your data. Override this behavior by passing objects that allows you to more granularly control each column:
 
-You can also include optional fields like `label`, `width`, and `format` to override Compose's attempt to infer them.
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    - `label`: specify the header text.
+    - `width`: specify a custom width for the column.
+    - `format`: choose from a variety of built-in types like `date`, `currency`, `tag`, `json`, etc.
+    - `tagColors`: map values to pill colors when using the `tag` format. 
+    </TabItem>
+    <TabItem value="python" label="Python">
+    - `label`: specify the header text.
+    - `width`: specify a custom width for the column.
+    - `format`: choose from a variety of built-in types like `date`, `currency`, `tag`, `json`, etc.
+    - `tag_colors`: map values to pill colors when using the `tag` format. 
+    </TabItem>
+</Tabs>
 
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
     const users = [
-        { name: "John", age: 30, createdAt: new Date("2021-01-01"), isActive: true },
-        { name: "Jane", age: 25, createdAt: new Date("2021-01-02"), isActive: false },
+        { name: "John", createdAt: new Date("2021-01-01"), isActive: true, tier: "Enterprise" },
+        { name: "Jane", createdAt: new Date("2021-01-02"), isActive: false, tier: "Basic" },
     ]
 
     ui.table("table-key", users, {
         columns: [
-            { key: "name", width: "150px" },
-            "age",
-            { key: "createdAt", format: "date" },
-            { key: "isActive", label: "Status", format: "boolean" }
+            "name",
+            { key: "createdAt", format: "date", width: "150px" },
+            { key: "isActive", label: "Status", format: "boolean" },
+            { key: "tier", format: "tag", tagColors: { "blue": ["Enterprise", "Pro"], "green": "Basic" } }
         ]
     })
     ```
@@ -224,23 +256,58 @@ You can also include optional fields like `label`, `width`, and `format` to over
     <TabItem value="python" label="Python">
     ```python
     users = [
-        {"name": "John", "age": 30, "created_at": datetime(2021, 1, 1), "is_active": True},
-        {"name": "Jane", "age": 25, "created_at": datetime(2021, 1, 2), "is_active": False},
+        {"name": "John", "created_at": datetime(2021, 1, 1), "is_active": True, "tier": "Enterprise"},
+        {"name": "Jane", "created_at": datetime(2021, 1, 2), "is_active": False, "tier": "Basic"},
     ]
 
     ui.table(
         "table-key",
         users,
         columns=[
-            {"key": "name", "width": "150px"},
-            "age",
-            {"key": "created_at", "format": "date"},
-            {"key": "is_active", "label": "Status", "format": "boolean"}
+            "name",
+            {"key": "created_at", "format": "date", "width": "150px"},
+            {"key": "is_active", "label": "Status", "format": "boolean"},
+            {"key": "tier", "format": "tag", "tagColors": { "blue": ["Enterprise", "Pro"], "green": "Basic" }}
         ]
     )
     ```
     </TabItem>
+</Tabs>
 
+### Visibility & pinning
+
+While end-users can toggle column visibility and pinning via the table's toolbar, you can also control the initial settings:
+
+- `hidden`: hide a column.
+- `pinned`: pin a column to the left or right of the table.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.table("table-key", users, {
+        columns: [
+            { key: "name", pinned: "left" },
+            { key: "createdAt", hidden: true },
+            "isActive",
+            "tier"
+        ]
+    })
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.table(
+        "table-key",
+        users,
+        columns=[
+            { "key": "name", "pinned": "left" },
+            { "key": "created_at", "hidden": True },
+            "isActive",
+            "tier"
+        ]
+    )
+    ```
+    </TabItem>
 </Tabs>
 
 ### Column object properties
@@ -296,6 +363,9 @@ You can also include optional fields like `label`, `width`, and `format` to over
                     <code>"tag"</code>: Render values (or lists of values) as <span className="colored-pill colored-pill-purple">colored</span> <span className="colored-pill colored-pill-green">pills</span>. Useful for enum-type data. You can pass a <code>{lang === "js" ? "tagColors" : "tag_colors"}</code> property to specify the colors of the tags. If not provided, Compose will randomly assign colors to each value.
                 </li>
                 <li>
+                    <code>"json"</code>: Render JSON objects and arrays as formatted code blocks.
+                </li>
+                <li>
                     <code>"string"</code>: Stringify the value and render as is. Use when you don't want any special formatting.
                 </li>
             </ul>
@@ -324,6 +394,61 @@ You can also include optional fields like `label`, `width`, and `format` to over
         </>
     }
     version="0.23.0"
+/>
+
+<Parameter
+    name={() => "hidden"}
+    required={false}
+    type="boolean"
+    description="Whether to initially hide the column from the table. This can always be toggled by the user via the table's toolbar. By default, all columns are visible."
+/>
+
+<Parameter
+    name={() => "pinned"}
+    required={false}
+    type="literal"
+    description={lang =>
+        <>
+            <p>Whether to pin the column to the left or right of the table. Options:</p>
+            <ul>
+                <li>
+                    <code>"left"</code>: Pin the column to the left of the table.
+                </li>
+                <li>
+                    <code>"right"</code>: Pin the column to the right of the table.
+                </li>
+            </ul>
+            <p>
+                By default, columns are not pinned.
+            </p>
+        </>
+    }
+/>
+
+<Parameter
+    name={() => "overflow"}
+    required={false}
+    type="literal"
+    description={lang =>
+        <>
+            <p>Whether to truncate the column content if it overflows the column width. In most cases, you should use the table's <code>overflow</code> property instead. This property will override the table-wide setting for this column. Options:</p>
+            <p>Options:</p>
+            <ul>
+                <li>
+                    <code>"clip"</code>: Clip the column content if it overflows.
+                </li>
+                <li>
+                    <code>"dynamic"</code>: Wrap the column content to the next line when it overflows.
+                </li>
+                <li>
+                    <code>"ellipsis"</code>: Show an ellipsis (<code>...</code>) when the column content overflows.
+                </li>
+            </ul>
+            <p>
+                The default behavior is to use the table-wide overflow setting, which itself defaults to <code>"ellipsis"</code>.
+            </p>
+        </>
+    }
 />
 
 ## Pagination
