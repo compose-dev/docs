@@ -12,11 +12,11 @@ import { ParameterTemplate, Parameter, CustomCodeBlock } from "../../../src/comp
 
 # Component | Table
 
-Render a table. Tables offer:
+Compose offers an enterprise-grade table component for efficiently working with tabular datasets. Some highlights:
 
 - **Actions** to add interactivity to each row.
-- **Customizable columns** to format, sort, and filter data.
-- **Built-in search** to filter rows.
+- **Customizable columns** with support for pinning, hiding, and formatting data.
+- **Built-in data controls** to search, sort, and filter data, along with views to save configurations of these controls.
 - **Pagination and virtualization** to efficiently scale to millions of rows.
 
 <IFrame type="components-input-table" heightPx={685} />
@@ -79,17 +79,6 @@ Render a table. Tables offer:
 
 </Tabs>
 
-<Tabs groupId="sdkLanguage" className="hide_tabs">
-    <TabItem value="node">
-    By default, each row in the table will render with a checkbox. This can be disabled by passing the `allowSelect` property as `false`, which will render the table as a display only component.
-    </TabItem>
-    <TabItem value="python">
-    By default, each row in the table will render with a checkbox. This can be disabled by passing the `allow_select` parameter as `False`, which will render the table as a display only component.
-    </TabItem>
-</Tabs>
-
-Learn more about [working with inputs](/guides/forms).
-
 ## Row Actions
 
 Actions are a powerful construct that allows you to add row-level interactivity to your table. Tables can have an unlimited number of actions, rendered either as buttons or nested inside a dropdown menu.
@@ -110,7 +99,6 @@ Each action's callback will receive the row as an argument.
             // The optional surface field will render the action as a button instead of inside a dropdown (or vice-versa if false).
             { label: "View", onClick: (row, idx) => doSomething(row, idx), surface: true }
         ]
-        allowSelect: false
     })
     ```
     </TabItem>
@@ -125,7 +113,6 @@ Each action's callback will receive the row as an argument.
             # The optional surface field will render the action as a button instead of inside a dropdown (or vice-versa if false).
             { "label": "View", "on_click": lambda row, idx: do_something(row, idx), "surface": True }
         ]
-        allow_select=False
     )
     ```
     </TabItem>
@@ -209,7 +196,7 @@ Choose which fields to show, and in what order, by listing their property keys.
         {"name": "Jane", "age": 25, "created_at": datetime(2021, 1, 2), "is_active": False},
     ]
 
-    # Show only name -> age -> isActive
+    # Show only name -> age -> is_active
     ui.table("table-key", users, columns=["name", "age", "is_active"])
     ```
     </TabItem>
@@ -267,7 +254,7 @@ Compose will infer column labels and data types from your data. Override this be
             "name",
             {"key": "created_at", "format": "date", "width": "150px"},
             {"key": "is_active", "label": "Status", "format": "boolean"},
-            {"key": "tier", "format": "tag", "tagColors": { "blue": ["Enterprise", "Pro"], "green": "Basic" }}
+            {"key": "tier", "format": "tag", "tag_colors": { "blue": ["Enterprise", "Pro"], "green": "Basic" }}
         ]
     )
     ```
@@ -432,7 +419,6 @@ While end-users can toggle column visibility and pinning via the table's toolbar
     description={lang =>
         <>
             <p>Whether to truncate the column content if it overflows the column width. In most cases, you should use the table's <code>overflow</code> property instead. This property will override the table-wide setting for this column. Options:</p>
-            <p>Options:</p>
             <ul>
                 <li>
                     <code>"clip"</code>: Clip the column content if it overflows.
@@ -453,19 +439,17 @@ While end-users can toggle column visibility and pinning via the table's toolbar
 
 ## Pagination
 
-Introduced in SDK v0.24.0.
-
 ### Automatic Pagination
 
 Tables with more than 2500 rows are automatically paginated without any additional configuration on your end, enabling Compose to remain performant at scale.
 
-An important caveat is that auto-pagination disables client-side search since the browser only has a paginated subset of the data. You can re-enable search by manually paginating the table.
+Auto-pagination disables searching, filtering, and sorting since the browser only has a paginated subset of the data. You can re-enable these features by manually paginating the table, which enables you to manage these features on your own server-side via a simple callback function.
 
 ### Manual Pagination
 
-For very large datasets, you can manually paginate tables by passing a getter function to the `data` parameter. Manual pagination enables you to:
+For very large datasets, you should manually paginate tables by passing a getter function to the `data` parameter. Manual pagination enables you to:
 - fetch data from your data store as needed, instead of having to load everything into memory at once.
-- manage search using your own custom logic.
+- manage search, filtering, and sorting using your own custom logic.
 - scale endlessly (millions of rows) without performance degradation.
 
 <Tabs groupId="sdkLanguage">
@@ -633,6 +617,26 @@ If you're not yet ready to handle search, you can disable it by passing the `sea
     ```
     </TabItem>
 </Tabs>
+
+## Data Controls
+
+Writeup coming soon.
+
+### Filtering
+
+Writeup coming soon.
+
+### Searching
+
+Writeup coming soon.
+
+### Sorting
+
+Writeup coming soon.
+
+### Views
+
+Writeup coming soon.
 
 ## API reference
 
