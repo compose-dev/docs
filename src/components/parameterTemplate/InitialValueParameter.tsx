@@ -21,17 +21,17 @@ export default function InitialValueParameter({
         typeof description === "function"
           ? description(lang)
           : description || (
-              <p>
-                The initial value of the {componentName}. Defaults to{" "}
-                <code>{lang === "js" ? "null" : "None"}</code>. You can also
-                update the value of the {componentName} at any time using the{" "}
-                <a href="/page-actions/set-inputs">
-                  <code>
-                    {lang === "js" ? "page.setInputs()" : "page.set_inputs()"}
-                  </code>
-                </a>{" "}
-                method.
-              </p>
+              <>
+                <p>
+                  The initial value of the {componentName}. Defaults to{" "}
+                  <code>{lang === "js" ? "null" : "None"}</code>.
+                </p>
+                <p>
+                  You can programatically update the value of the{" "}
+                  {componentName} at any time by updating the initial value and
+                  calling <code>page.update()</code>.
+                </p>
+              </>
             )
       }
     />

@@ -215,42 +215,32 @@ You can specify the initial value of an input by setting the `initialValue` para
 
 ## Change input values programmatically
 
-<Tabs groupId="sdkLanguage" className="hide_tabs">
-    <TabItem value="node" label="TypeScript / JavaScript">
-    You can change the current value of an input programmatically at any time using the `page.setInputs` method.
-    </TabItem>
-    <TabItem value="python">
-    You can change the current value of an input programmatically at any time using the `page.set_inputs` method.
-    </TabItem>
-</Tabs>
+Change the value of an input programmatically at any time by updating it's initial value and calling `page.update()`.
 
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
-    page.add(() =>
-        ui.selectBox(
-            "email-template",
-            ["Invoice", "Welcome", "Order Confirmation"],
-            {
-                // highlight-start
-                onChange: (value) => {
-                    // Pass an object that maps input IDs to the new values.
-                    page.setInputs({
-                        "emailBody": emailTemplates[value]
-                    })
-                }
-                // highlight-end
-            }
-        )
-    )
+    let emailBody: string | null = null;
 
     page.add(() =>
         ui.form(
             "email-form",
             [
+                ui.selectBox(
+                    "emailTemplate",
+                    ["Invoice", "Welcome", "Order Confirmation"],
+                    {
+                        // highlight-start
+                        onChange: (value) => {
+                            emailBody = emailTemplates[value]
+                            page.update()
+                        }
+                        // highlight-end
+                    }
+                ),
                 ui.textInput("emailSubject"),
                 // highlight-start
-                ui.textArea("emailBody"),
+                ui.textArea("emailBody", { initialValue: emailBody }),
                 // highlight-end
             ],
             {
@@ -265,30 +255,28 @@ You can specify the initial value of an input by setting the `initialValue` para
     <TabItem value="python" label="Python">
     ```python
     # highlight-start
-    def on_select_email_template(value):
-        # Pass an object that maps input IDs to the new values.
-        page.set_inputs({
-            "email_body": email_templates[value]
-        })
-    # highlight-end
+    email_body: str | None = None
 
-    page.add(lambda:
-        ui.select_box(
-            "email-template",
-            ["Invoice", "Welcome", "Order Confirmation"],
-            # highlight-start
-            on_change=on_select_email_template
-            # highlight-end
-        )
-    )
+    def on_select_email_template(value):
+        nonlocal email_body
+        email_body = email_templates[value]
+        page.update() # refresh the UI
+    # highlight-end
 
     page.add(lambda:
         ui.form(
             "email-form",
             [
+                ui.select_box(
+                    "email_template",
+                    ["Invoice", "Welcome", "Order Confirmation"],
+                    # highlight-start
+                    on_change=on_select_email_template
+                    # highlight-end
+                )
                 ui.text_input("email_subject"),
                 # highlight-start
-                ui.text_area("email_body"),
+                ui.text_area("email_body", initial_value=email_body),
                 # highlight-end
             ],
             on_submit=lambda form: send_email(form["email_subject"], form["email_body"])

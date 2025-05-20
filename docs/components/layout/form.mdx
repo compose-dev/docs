@@ -102,7 +102,7 @@ This page serves as an API reference for the `ui.form` component. If you're look
     name={lang => lang === "js" ? "properties.clearOnSubmit" : "clear_on_submit"}
     required={false}
     type="boolean"
-    description={(lang) => <p>Clear the form back to its initial state after submission. Defaults to <code>{lang === "js" ? "false" : "False"}</code>. Form values can also be manually set at any time using the <a href="/page-actions/set-inputs"><code>{lang === "js" ? "page.setInputs()" : "page.set_inputs()"}</code></a> method.</p>}
+    description={(lang) => <p>Clear the form back to its initial state after submission. Defaults to <code>{lang === "js" ? "false" : "False"}</code>. Form values can also be manually set at any time by updating the initial value of the input components and calling <code>page.update()</code>.</p>}
 />
 
 <Parameter

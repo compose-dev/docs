@@ -9,42 +9,56 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import IFrame from "../../../src/iframe";
 import { ParameterTemplate, Parameter, CustomCodeBlock } from "../../../src/components";
+import CodeBlock from "@theme/CodeBlock";
 
 # Component | Table
 
-Compose offers an enterprise-grade table component for efficiently working with tabular datasets. Some highlights:
+Display and interact with tabular data. Start with a single function call, and scale to an enterprise-grade feature set when you need it. Tables offer:
 
 - **Actions** to add interactivity to each row.
-- **Customizable columns** with support for pinning, hiding, and formatting data.
-- **Built-in data controls** to search, sort, and filter data, along with views to save configurations of these controls.
+- **Customizable columns** that can be pinned, hidden, and formatted for a variety of data types.
+- **Built-in data controls** to search, sort, and filter data, along with [views](#views) to save configurations of these controls.
 - **Pagination and virtualization** to efficiently scale to millions of rows.
 
-<IFrame type="components-input-table" heightPx={685} />
+<IFrame type="components-input-table" heightPx={675} />
 
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
-    const companies = [
-       { name: "Apple", tier: "Enterprise", headquarters: "Cupertino, CA", arr: 150000 },
-        { name: "Asana", tier: "Basic", headquarters: "San Francisco, CA", arr: 12000 },
-        /* ... */
-        { name: "Notion", tier: "Basic", headquarters: "San Francisco, CA", arr: 8000 }, 
-    ]
+    const customers = [{ name: "Apple", tier: "Enterprise", arr: 150000, onboarded: true }, /* ... */]
 
     ui.table(
-        "table-key",
-        companies,
+        "customers-table",
+        customers,
         { 
-            label: "Companies",
-            actions: [{ 
-                label: "View Details", 
-                onClick: (row) => page.modal(() => ui.json(row), { title: "Company Details" }) 
-            }],
+            actions: [
+                { 
+                    label: "Details", 
+                    onClick: (row) => page.modal(() => ui.json(row), { title: "Customer Details" }) 
+                }
+            ],
             columns: [
                 "name",
                 { key: "tier", format: "tag" },
-                "headquarters",
-                { key: "arr", label: "ARR", format: "currency" }
+                { key: "arr", label: "ARR", format: "currency" },
+                "onboarded"
+            ],
+            views: [
+                {
+                    label: "Highest ARR",
+                    description: "Sort by ARR (decreasing)",
+                    sortBy: [{ key: "arr", direction: "desc" }],
+                    isDefault: true,
+                },
+                {
+                    label: "Enterprise Customers",
+                    description: "Filter to show only enterprise customers",
+                    filterBy: {
+                        key: "tier",
+                        operator: "hasAny",
+                        value: ["Enterprise"],
+                    },
+                },
             ]
         }
     )
@@ -52,40 +66,55 @@ Compose offers an enterprise-grade table component for efficiently working with 
     </TabItem>
     <TabItem value="python" label="Python">
     ```python
-    companies = [
-        { "name": "Apple", "tier": "Enterprise", "headquarters": "Cupertino, CA", "arr": 150000 },
-        { "name": "Asana", "tier": "Basic", "headquarters": "San Francisco, CA", "arr": 12000 },
+    customers = [
+        { "name": "Apple", "tier": "Enterprise", "arr": 150000, "onboarded": True }
         # ...
-        { "name": "Notion", "tier": "Basic", "headquarters": "San Francisco, CA", "arr": 8000 },
     ]
 
     ui.table(
-        "table-key",
-        companies,
-        label="Companies",
-        actions=[{ 
-            "label": "View Details", 
-            "on_click": lambda row: page.modal(lambda: ui.json(row), title="Company Details") 
-        }],
+        "customers-table",
+        customers,
+        actions=[
+            { 
+                "label": "Details", 
+                "on_click": lambda row: page.modal(lambda: ui.json(row), title="Customer Details") 
+            }
+        ],
         columns=[
             "name",
             { "key": "tier", "format": "tag" },
-            "headquarters",
-            { "key": "arr", "label": "ARR", "format": "currency" }
+            { "key": "arr", "label": "ARR", "format": "currency" },
+            "onboarded"
+        ],
+        views=[
+            {
+                "label": "Highest ARR",
+                "description": "Sort by ARR (decreasing)",
+                "sort_by": [{"key": "arr", "direction": "desc"}],
+                "is_default": True,
+            },
+            {
+                "label": "Enterprise Customers",
+                "description": "Filter to show only enterprise customers"
+                "filter_by": {
+                    "key": "tier",
+                    "operator": "has_any",
+                    "value": ["Enterprise"],
+                }
+            }
         ]
     )
     ```
     </TabItem>
-
 </Tabs>
 
-## Row Actions
+## Row actions
 
 Actions are a powerful construct that allows you to add row-level interactivity to your table. Tables can have an unlimited number of actions, rendered either as buttons or nested inside a dropdown menu.
 
 Actions are often used as a foundation to create robust [multipage apps](/guides/multipage-apps).
 
-Each action's callback will receive the row as an argument.
+Each action's callback will receive the row and index as arguments.
 
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
@@ -94,10 +123,20 @@ Each action's callback will receive the row as an argument.
     [ /* list of users */ ],
     { 
         actions: [
-            { label: "Edit", onClick: (row) => doSomething(row) },
-            { label: "Delete", onClick: (row) => doSomething(row) },
-            // The optional surface field will render the action as a button instead of inside a dropdown (or vice-versa if false).
-            { label: "View", onClick: (row, idx) => doSomething(row, idx), surface: true }
+            { 
+                label: "Details",
+                onClick: (row) => page.link("user-details", { params: { id: row.id } }) 
+            },
+            { 
+                label: "Delete",
+                onClick: (row) => deleteUser(row.id),
+                appearance: "danger"
+            },
+            {
+                label: "View",
+                onClick: (row, idx) => page.modal(() => ui.json(row)),
+                surface: true // Render as button instead of inside dropdown (or vice-versa if false).
+            }
         ]
     })
     ```
@@ -108,10 +147,20 @@ Each action's callback will receive the row as an argument.
         "table-key",
         [<list-of-users>],
         actions=[
-            { "label": "Edit", "on_click": lambda row: do_something(row) },
-            { "label": "Delete", "on_click": lambda row: do_something(row) },
-            # The optional surface field will render the action as a button instead of inside a dropdown (or vice-versa if false).
-            { "label": "View", "on_click": lambda row, idx: do_something(row, idx), "surface": True }
+            {
+                "label": "Details",
+                "on_click": lambda row: page.link("user-details", params={"id": row["id"]})
+            },
+            {
+                "label": "Delete",
+                "on_click": lambda row: delete_user(row["id"]),
+                "appearance": "danger"
+            },
+            {
+                "label": "View",
+                "on_click": lambda row, idx: page.modal(lambda: ui.json(row)),
+                "surface": True # Render as button instead of inside dropdown (or vice-versa if False).
+            }
         ]
     )
     ```
@@ -137,7 +186,7 @@ Each action's callback will receive the row as an argument.
 />
 
 <Parameter
-    name="appearance"
+    name={() => "appearance"}
     required={false}
     type="literal"
     description={
@@ -185,8 +234,10 @@ Choose which fields to show, and in what order, by listing their property keys.
         { name: "Jane", age: 25, createdAt: new Date("2021-01-02"), isActive: false },
     ]
 
+    // highlight-start
     // Show only name -> age -> isActive
     ui.table("table-key", users, { columns: ["name", "age", "isActive"] })
+    // highlight-end
     ```
     </TabItem>
     <TabItem value="python" label="Python">
@@ -196,8 +247,10 @@ Choose which fields to show, and in what order, by listing their property keys.
         {"name": "Jane", "age": 25, "created_at": datetime(2021, 1, 2), "is_active": False},
     ]
 
+    # highlight-start
     # Show only name -> age -> is_active
     ui.table("table-key", users, columns=["name", "age", "is_active"])
+    # highlight-end
     ```
     </TabItem>
 
@@ -418,20 +471,744 @@ While end-users can toggle column visibility and pinning via the table's toolbar
     type="literal"
     description={lang =>
         <>
-            <p>Whether to truncate the column content if it overflows the column width. In most cases, you should use the table's <code>overflow</code> property instead. This property will override the table-wide setting for this column. Options:</p>
+            <p>Whether to truncate the cell content if it overflows the column width. In most cases, you should use the table's <code>overflow</code> property instead. This property will override the table-wide setting for this column. Options:</p>
             <ul>
                 <li>
-                    <code>"clip"</code>: Clip the column content if it overflows.
+                    <code>"clip"</code>: Clip the cell content if it overflows.
                 </li>
                 <li>
-                    <code>"dynamic"</code>: Wrap the column content to the next line when it overflows.
+                    <code>"dynamic"</code>: Expand the cell's height to fit the content.
                 </li>
                 <li>
-                    <code>"ellipsis"</code>: Show an ellipsis (<code>...</code>) when the column content overflows.
+                    <code>"ellipsis"</code>: Show an ellipsis (<code>...</code>) when the cell content overflows.
                 </li>
             </ul>
             <p>
                 The default behavior is to use the table-wide overflow setting, which itself defaults to <code>"ellipsis"</code>.
+            </p>
+        </>
+    }
+/>
+
+## Data controls
+
+Every table includes built-in data controls that enable users to search, sort, and filter data.
+
+### Views
+
+Views let your users switch between preset configurations of data and presentation controls. They enable complex workflows, while taking just a few minutes to setup.
+
+As an example, the following table includes three views, each of which serves a unique purpose.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    const customers = db.selectCompanies();
+
+    page.add(() => ui.table("customers-table", customers, {
+        columns: [
+            "name",
+            "createdAt",
+            "onboardingComplete",
+            {
+                key: "plan",
+                format: "tag",
+                tagColors: {
+                    "blue": "Enterprise",
+                    "green": "Pro",
+                    "red": "Basic"
+                }
+            },
+            {
+                key: "arr",
+                label: "ARR",
+                format: "currency"
+            },
+            {
+                key: "featureFlags",
+                format: "json",
+                hidden: true
+            }, 
+        ],
+        // highlight-start
+        views: [
+            // View 1: Enterprise customers, sorted by ARR.
+            {
+                label: "Enterprise Customers",
+                description: "Enterprise customers, sorted by ARR.",
+                filterBy: {
+                    key: "plan",
+                    operator: "hasAny",
+                    value: ["Enterprise"]
+                },
+                sortBy: [
+                    {
+                        key: "arr",
+                        direction: "desc"
+                    }
+                ]
+            },
+            // View 2: Feature flags, with table rows expanded to show the flags object.
+            {
+                label: "Feature Flags",
+                description: "View customer feature flags",
+                columns: {
+                    featureFlags: {
+                        hidden: false,
+                        pinned: "right"
+                    },
+                    arr: {
+                        hidden: true
+                    }
+                },
+                overflow: "dynamic"
+            },
+            // View 3: Customers still in onboarding, sorted by oldest to newest.
+            {
+                label: "Onboarding Customers",
+                description: "Customers still in onboarding, sorted by oldest to newest.",
+                filterBy: {
+                    key: "onboarding",
+                    operator: "is",
+                    value: false
+                },
+                sortBy: [
+                    {
+                        key: "createdAt",
+                        direction: "asc"
+                    }
+                ]
+            }
+        ]
+        // highlight-end
+    }))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    customers = db.select_companies();
+
+    page.add(lambda: ui.table(
+        "customers-table",
+        customers,
+        columns=[
+            "name",
+            "created_at",
+            "onboarding_complete",
+            {
+                "key": "plan",
+                "format": "tag",
+                "tag_colors": {
+                    "blue": "Enterprise",
+                    "green": "Pro",
+                    "red": "Basic"
+                }
+            },
+            {
+                "key": "arr",
+                "label": "ARR",
+                "format": "currency"
+            },
+            {
+                "key": "feature_flags",
+                "format": "json",
+                "hidden": True
+            }, 
+        ],
+        # highlight-start
+        views=[
+            # View 1: Enterprise customers, sorted by ARR.
+            {
+                "label": "Enterprise Customers",
+                "description": "Enterprise customers, sorted by ARR.",
+                "filter_by": {
+                    "key": "plan",
+                    "operator": "has_any",
+                    "value": ["Enterprise"]
+                },
+                "sort_by": [
+                    {
+                        "key": "arr",
+                        "direction": "desc"
+                    }
+                ]
+            },
+            # View 2: Feature flags, with table rows expanded to show the flags object.
+            {
+                "label": "Feature Flags",
+                "description": "View customer feature flags",
+                "columns": {
+                    "feature_flags": {
+                        "hidden": False,
+                        "pinned": "right"
+                    },
+                    "arr": {
+                        "hidden": True
+                    }
+                },
+                "overflow": "dynamic"
+            },
+            # View 3: Customers still in onboarding, sorted by oldest to newest.
+            {
+                "label": "Onboarding Customers",
+                "description": "Customers still in onboarding, sorted by oldest to newest.",
+                "filter_by": {
+                    "key": "onboarding",
+                    "operator": "is",
+                    "value": False
+                },
+                "sort_by": [
+                    {
+                        "key": "created_at",
+                        "direction": "asc"
+                    }
+                ]
+            }
+        ]
+        # highlight-end
+    ))
+    ```
+    </TabItem>
+</Tabs>
+
+### Filtering
+
+Compose tables support complex filtering operations via a combination of filter rules and filter groups.
+
+- **Filter rule**: A single filter that's applied to a column. For example, "Revenue column greater than 1000".
+- **Filter group**: A collection of filter rules and groups that are applied together using a logical operator. For example, "Revenue column greater than 1000 AND Country column is United States".
+
+Disable column filtering by setting the table's `filterable` property to `false`.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    const customers = db.selectCompanies();
+
+    page.add(() => ui.table("customers-table", customers, {
+        columns: [
+            "name",
+            "createdAt",
+            "onboardingComplete",
+            { key: "plan", format: "tag" },
+            { key: "arr", format: "currency" },
+        ],
+        views: [
+            {
+                label: "Enterprise Customers",
+                // highlight-start
+                // Example 1: Apply a single filter rule.
+                filterBy: {
+                    key: "plan",
+                    operator: "hasAny",
+                    value: ["Enterprise"]
+                },
+                // highlight-end
+            },
+            {
+                label: "Urgent Customers",
+                // highlight-start
+                // Example 2: A complex nested filter group.
+                filterBy: {
+                    logicalOperator: "and",
+                    filters: [
+                        {
+                            key: "plan",
+                            operator: "hasAny",
+                            value: ["Enterprise"]
+                        },
+                        {
+                            logicalOperator: "or",
+                            filters: [
+                                {
+                                    key: "arr",
+                                    operator: "greaterThan",
+                                    value: 1000
+                                },
+                                {
+                                    key: "onboardingComplete",
+                                    operator: "is",
+                                    value: false
+                                }
+                            ]
+                        }
+                    ]
+                }
+                // highlight-end
+            },
+        ]
+    }))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    customers = db.select_companies();
+
+    page.add(lambda: ui.table(
+        "customers-table",
+        customers,
+        columns=[
+            "name",
+            "created_at",
+            "onboarding_complete",
+            { "key": "plan", "format": "tag" },
+            { "key": "arr", "format": "currency" },
+        ],
+        views=[
+            {
+                "label": "Enterprise Customers",
+                # highlight-start
+                # Example 1: Apply a single filter rule.
+                "filter_by": {
+                    "key": "plan",
+                    "operator": "has_any",
+                    "value": ["Enterprise"]
+                },
+                # highlight-end
+            },
+            {
+                "label": "Urgent Customers",
+                # highlight-start
+                # Example 2: A complex nested filter group.
+                "filter_by": {
+                    "logical_operator": "and",
+                    "filters": [
+                        {
+                            "key": "plan",
+                            "operator": "has_any",
+                            "value": ["Enterprise"]
+                        },
+                        {
+                            "logical_operator": "or",
+                            "filters": [
+                                {
+                                    "key": "arr",
+                                    "operator": "greater_than",
+                                    "value": 1000
+                                },
+                                {
+                                    "key": "onboarding_complete",
+                                    "operator": "is",
+                                    "value": False
+                                }
+                            ]
+                        }
+                    ]
+                },
+                # highlight-end
+            },
+        ]
+    ))
+    ```
+    </TabItem>
+</Tabs>
+
+#### Filtering API reference
+
+A complete type definition of the column filter property is provided below for reference.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    type ColumnFilterLogicOperator = "and" | "or";
+
+    // Note: Each column format supports a subset of these operators. More info below.
+    type ColumnFilterOperator = 
+        | "is"
+        | "isNot"
+        | "includes"
+        | "notIncludes"
+        | "greaterThan"
+        | "greaterThanOrEqual"
+        | "lessThan"
+        | "lessThanOrEqual"
+        | "isEmpty"
+        | "isNotEmpty"
+        | "hasAny"
+        | "notHasAny"
+        | "hasAll"
+        | "notHasAll";
+
+    interface TableColumnFilterRule<TData extends TableDataRow[]> {
+        key: StringOnlyKeys<TData[number]>;
+        operator: ColumnFilterOperator;
+        value: any;
+    }
+
+    interface TableColumnFilterGroup<TData extends TableDataRow[]> {
+        logicOperator: ColumnFilterLogicOperator;
+        filters: NonNullable<TableColumnFilterModel<TData>>[];
+    }
+
+    type TableColumnFilterModel<TData extends TableDataRow[]> =
+        | TableColumnFilterRule<TData>
+        | TableColumnFilterGroup<TData>
+        | null;
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ColumnFilterLogicOperator = Literal["and", "or"]
+
+    # Note: Each column format supports a subset of these operators. More info below.
+    ColumnFilterOperator = Literal[
+        "is",
+        "is_not",
+        "includes",
+        "not_includes",
+        "greater_than",
+        "greater_than_or_equal",
+        "less_than",
+        "less_than_or_equal",
+        "is_empty",
+        "is_not_empty",
+        "has_any",
+        "not_has_any",
+        "has_all",
+        "not_has_all",
+    ]
+
+    class TableColumnFilterGroup(TypedDict):
+        logic_operator: ColumnFilterLogicOperator
+        filters: Sequence[Union[TableColumnFilterRule, TableColumnFilterGroup]]
+
+    class TableColumnFilterRule(TypedDict):
+        operator: ColumnFilterOperator
+        value: Any
+        key: str
+
+    TableColumnFilterModel = Union[TableColumnFilterRule, TableColumnFilterGroup, None]
+    ```
+    </TabItem>
+</Tabs>
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+
+| Column Format | Supported Operators |
+| ------------- | ------------------- |
+| `string`, `json` | `is`, `isNot`, `includes`, `notIncludes`, `isEmpty`, `isNotEmpty` |
+| `number`, `currency`, `date`, `datetime` | `greaterThan`, `greaterThanOrEqual`, `lessThan`, `lessThanOrEqual`, `isEmpty`, `isNotEmpty` |
+| `boolean` | `is`, `isNot`, `isEmpty`, `isNotEmpty` |
+| `tag` | `is`, `isNot`, `hasAny`, `notHasAny`, `hasAll`, `notHasAll`, `isEmpty`, `isNotEmpty` |
+
+    </TabItem>
+    <TabItem value="python" label="Python">
+
+| Column Format | Supported Operators |
+| ------------- | ------------------- |
+| `string`, `json` | `is`, `is_not`, `includes`, `not_includes`, `is_empty`, `is_not_empty` |
+| `number`, `currency`, `date`, `datetime` | `greater_than`, `greater_than_or_equal`, `less_than`, `less_than_or_equal`, `is_empty`, `is_not_empty` |
+| `boolean` | `is`, `is_not`, `is_empty`, `is_not_empty` |
+| `tag` | `is`, `is_not`, `has_any`, `not_has_any`, `has_all`, `not_has_all`, `is_empty`, `is_not_empty` |
+
+    </TabItem>
+</Tabs>
+
+### Searching
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    Compose tables support global search via a search bar at the top of the table. A default query can be specified via the `searchQuery` property.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    Compose tables support global search via a search bar at the top of the table. A default query can be specified via the `search_query` property.
+    </TabItem>
+</Tabs>
+
+Disable global search by setting the table's `searchable` property to `false`.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    const customers = db.selectCompanies();
+
+    page.add(() => ui.table("customers-table", customers, {
+        columns: [
+            "name",
+            "createdAt",
+            "notes"
+        ],
+        // highlight-start
+        views: [
+            {
+                label: "Urgent customers",
+                description: "Search the table for any row containing the word 'urgent'.",
+                searchQuery: "urgent",
+            },
+        ]
+        // highlight-end
+    }))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    customers = db.select_companies();
+
+    page.add(lambda: ui.table(
+        "customers-table",
+        customers,
+        columns=[
+            "name",
+            "created_at",
+            "notes"
+        ],
+        # highlight-start
+        views=[
+            {
+                "label": "Urgent note",
+                "description": "Search the table for any row containing the word 'urgent'.",
+                "search_query": "urgent"
+        ]
+        # highlight-end
+    ))
+    ```
+    </TabItem>
+</Tabs>
+
+#### Searching API reference
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    // Either a string or null if no search is being performed.
+    type TableSearchQuery = string | null;
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    # Either a string or None if no search is being performed.
+    TableSearchQuery = str | None
+    ```
+    </TabItem>
+</Tabs>
+
+### Sorting
+
+Compose tables support multi-column sorting via an ordered list of sort rules.
+
+Disable sorting by setting the table's `sortable` property to `false`, or limit to single-column sorting by setting the property to `"single"`.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    const customers = db.selectCompanies();
+
+    page.add(() => ui.table("customers-table", customers, {
+        columns: [
+            "name",
+            "createdAt",
+            "tier",
+            "seatCount"
+        ],
+        // highlight-start
+        views: [
+            {
+                label: "Largest to smallest customers",
+                description: "Sort the table by seat count, then by name.",
+                sortBy: [
+                    { key: "seatCount", direction: "desc" },
+                    { key: "name", direction: "asc" }
+                ]
+            },
+        ]
+        // highlight-end
+    }))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    customers = db.select_companies();
+
+    page.add(lambda: ui.table(
+        "customers-table",
+        customers,
+        columns=[
+            "name",
+            "created_at",
+            "tier"
+        ],
+        # highlight-start
+        views=[
+            {
+                "label": "Largest to smallest customers",
+                "description": "Sort the table by seat count, then by name.",
+                "sort_by": [
+                    { "key": "seat_count", "direction": "desc" },
+                    { "key": "name", "direction": "asc" }
+                ]
+            },
+        ]
+        # highlight-end
+    ))
+    ```
+    </TabItem>
+</Tabs>
+
+#### Sorting API reference
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    interface TableColumnSortRule<TData extends TableDataRow[]> {
+        key: StringOnlyKeys<TData[number]>; // The column to sort by.
+        direction: "asc" | "desc"; // The direction to sort by.
+    }
+
+    // An ordered list of column sort rules.
+    type TableColumnSortModel<TData extends TableDataRow[]> = TableColumnSortRule<TData>[];
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    class TableColumnSortRule(TypedDict):
+        key: str # The column to sort by.
+        direction: Literal["asc", "desc"] # The direction to sort by.
+
+    # An ordered list of column sort rules.
+    TableColumnSortModel = List[TableColumnSortRule]
+    ```
+    </TabItem>
+</Tabs>
+
+### View object properties
+
+<Parameter
+    name="label"
+    required={true}
+    type="string"
+    description="The user-facing label for the view."
+/>
+
+<Parameter
+    name={() => "description"}
+    required={false}
+    type="string"
+    description={<p>A brief description of what the view does.</p>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "isDefault" : "is_default"}
+    required={false}
+    type="boolean"
+    description={lang => <p>Whether to apply this view by default when the table loads. Defaults to <code>{lang === "js" ? "false" : "False"}</code>. Only one view can be the default.</p>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "filterBy" : "filter_by"}
+    required={false}
+    type={lang => lang === "js" ? "TableColumnFilterModel" : "TableColumnFilterModel"}
+    description={lang =>
+        <>
+            <p>
+                Filter the table according to the provided filter model. Learn more in the <a href="#filtering">filtering</a> section.
+            </p>
+        </>
+    }
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "sortBy" : "sort_by"}
+    required={false}
+    type={lang => lang === "js" ? "TableColumnSortModel" : "TableColumnSortModel"}
+    description={() =>
+        <>
+            <p>
+                Sort the table according to the provided sort model.
+            </p>
+            <p>
+                Should be an ordered list of sort rules. Each rule is an object with a <code>key</code> field that maps to a column key, and a <code>direction</code> field that is either <code>"asc"</code> or <code>"desc"</code>.
+            </p>
+            <p>
+                Learn more in the <a href="#sorting">sorting</a> section.
+            </p>
+        </>
+    }
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "searchQuery" : "search_query"}
+    required={false}
+    type="string"
+    description={() =>
+        <>
+            <p>
+                A global search query to filter the table by. Learn more in the <a href="#searching">searching</a> section.
+            </p>
+        </>
+    }
+/>
+
+<Parameter
+    name={() => "density"}
+    required={false}
+    type="literal"
+    description={() =>
+        <>
+            <p>
+                Override the default density of the table rows for this view. Options:
+            </p>
+            <ul>
+                <li>
+                    <code>"compact"</code>: 32px row height.
+                </li>
+                <li>
+                    <code>"standard"</code>: 40px row height.
+                </li>
+                <li>
+                    <code>"comfortable"</code>: 48px row height.
+                </li>
+            </ul>
+        </>
+    }
+/>
+
+<Parameter
+    name={() => "overflow"}
+    required={false}
+    type="literal"
+    description={() =>
+        <>
+            <p>
+                Override the default overflow behavior of the table cells for this view. Options:
+            </p>
+            <ul>
+                <li>
+                    <code>"clip"</code>: Clip the cell content if it overflows.
+                </li>
+                <li>
+                    <code>"dynamic"</code>: Expand the cell's height to fit the content.
+                </li>
+                <li>
+                    <code>"ellipsis"</code>: Show an ellipsis (<code>...</code>) when the cell content overflows.
+                </li>
+            </ul>
+        </>
+    }
+/>
+
+<Parameter
+    name={() => "columns"}
+    required={false}
+    type="literal"
+    description={(lang) =>
+        <>
+            <p>
+                Override the default <code>pinned</code> and <code>hidden</code> properties of specified table columns for this view. For example:
+            </p>
+            {lang === "js" ? <CodeBlock language="js">
+{`{
+    name: { pinned: "left" },
+    uuid: { hidden: false }
+}`}
+            </CodeBlock> : <CodeBlock language="python">
+{`{
+    "name": { "pinned": "left" },
+    "uuid": { "hidden": False }
+}`}
+            </CodeBlock>}
+            <p>
+                The structure is an object where the keys are the column keys, and the values are an object with the properties to override. Currently, the supported properties are <code>pinned</code> and <code>hidden</code>.
             </p>
         </>
     }
@@ -458,17 +1235,21 @@ For very large datasets, you should manually paginate tables by passing a getter
     import { TablePageChangeParams, TablePageChangeResponse } from "@composehq/sdk"
 
     async function onPageChange(params: TablePageChangeParams): TablePageChangeResponse {
-        const { offset, pageSize, searchQuery, prevTotalRecords, prevSearchQuery } = params;
+        const {
+            offset,
+            pageSize,
+            refreshTotalRecords,
+            prevTotalRecords,
+            searchQuery, // optional to handle search
+            sortBy, // optional to handle sorting
+            filterBy, // optional to handle filtering
+        } = params;
 
-        // Only refetch total records on initial load and when the search query changes.
-        const refetchTotal =
-            prevTotalRecords === null || prevSearchQuery !== searchQuery;
-
-        const totalRecords = refetchTotal
-            ? await postgres.countUsers(searchQuery)
+        const totalRecords = refreshTotalRecords || prevTotalRecords === null
+            ? await postgres.countUsers(searchQuery, filterBy)
             : prevTotalRecords;
 
-        const pageOfUsers = await postgres.getUsers(offset, pageSize, searchQuery);
+        const pageOfUsers = await postgres.getUsers(offset, pageSize, searchQuery, sortBy, filterBy);
 
         return {
             data: pageOfUsers,
@@ -489,18 +1270,20 @@ For very large datasets, you should manually paginate tables by passing a getter
         # Unpack arguments
         offset = args["offset"]
         page_size = args["page_size"]
-        search_query = args["search_query"]
+        refresh_total_records = args["refresh_total_records"]
         prev_total_records = args["prev_total_records"]
-        prev_search_query = args["prev_search_query"]
+        search_query = args["search_query"] # optional to handle search
+        sort_by = args["sort_by"] # optional to handle sorting
+        filter_by = args["filter_by"] # optional to handle filtering
 
-        # Only refetch total records on initial load and when the search query changes
-        refetch_total = prev_total_records is None or prev_search_query != search_query
-
+        # Only recalculate total records when needed
         total_records = (
-            postgres.count_users(search_query) if refetch_total else prev_total_records
+            postgres.count_users(search_query, filter_by, sort_by)
+            if refresh_total_records or prev_total_records is None
+            else prev_total_records
         )
 
-        page_of_users = postgres.get_users(offset, page_size, search_query)
+        page_of_users = postgres.get_users(offset, page_size, search_query, sort_by, filter_by)
 
         return {"data": page_of_users, "total_records": total_records}
 
@@ -509,13 +1292,13 @@ For very large datasets, you should manually paginate tables by passing a getter
     </TabItem>
 </Tabs>
 
-Type definitions:
+#### Pagination type definitions
 
 <Tabs groupId="sdkLanguage" className="hide_tabs">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```ts
     // Passed to the onPageChange callback as a single object.
-    interface TablePageChangeParams {
+    interface TablePageChangeParams<TData extends TableDataRow[]> {
         // The number of rows to skip.
         offset: number;
         // The number of rows to return. You can return less than this if there
@@ -524,13 +1307,20 @@ Type definitions:
         // The search query to filter the rows by. Will be null if no search
         // is being performed.
         searchQuery: string | null;
-        // The previous total number of records. This is provided so that you
+        // The sort model to sort the rows by. Will be an empty list if no sorting
+        // is being performed.
+        sortBy: TableColumnSortModel<TData>;
+        // The filter model to filter the rows by. Will be null if no filtering
+        // is being performed.
+        filterBy: TableColumnFilterModel<TData> | null;
+        // Whether to refresh the total number of records. Provided so that you
         // only recalculate the total record count when needed.
+        refreshTotalRecords: boolean;
+        // The previous total number of records. If refreshTotalRecords is false,
+        // simply return the previous total number of records.
         prevTotalRecords: number | null;
-        // The previous search query. This is provided so that you only
-        // recalculate the total record count when needed.
-        prevSearchQuery: string | null;
     }
+
 
     // Expected return type of the onPageChange callback.
     interface TablePageChangeResponse {
@@ -551,15 +1341,22 @@ Type definitions:
         # The number of rows to return. You can return less than this if there
         # aren't enough rows to fill the page (e.g. the last page).
         page_size: int
-        # The search query to filter the rows by. Will be null if no search
+        # The search query to filter the rows by. Will be None if no search
         # is being performed.
         search_query: str | None
-        # The previous total number of records. This is provided so that you
+        # The sort model to sort the rows by. Will be an empty list if no sorting
+        # is being performed.
+        sort_by: TableColumnSortModel
+        # The filter model to filter the rows by. Will be None if no filtering
+        # is being performed.
+        filter_by: TableColumnFilterModel
+        # Whether to refresh the total number of records. Provided so that you
         # only recalculate the total record count when needed.
+        refresh_total_records: bool
+        # The previous total number of records. If refresh_total_records is false,
+        # simply return the previous total number of records.
         prev_total_records: int | None
-        # The previous search query. This is provided so that you only
-        # recalculate the total record count when needed.
-        prev_search_query: str | None
+
 
     # The expected return type of the on_page_change callback.
     class TablePageChangeResponse(TypedDict):
@@ -572,22 +1369,64 @@ Type definitions:
     </TabItem>
 </Tabs>
 
-:::note
-If you're not yet ready to handle search, you can disable it by passing the `searchable: false` property to the table.
-:::
+Learn more about the format of the data controls:
+- [Filtering API reference](#filtering-api-reference)
+- [Searching API reference](#searching-api-reference)
+- [Sorting API reference](#sorting-api-reference)
 
-### Row Selections
+### Handle data controls
+
+By default, data controls (search, filtering, sorting) are disabled for paginated tables.
+
+It's up to you to whether you want to handle some or all of these controls in your page change callback. If not handling, you can simply ignore those parameters in your page change callback.
+
+For controls you choose to handle, you'll need to explicitly enable the control in the table component.
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    ui.table(
+        "users-table",
+        onPageChange,
+        // highlight-start
+        {
+            searchable: true,
+            sortable: true,
+            filterable: true
+        }
+        // highlight-end
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.table(
+        "users-table",
+        on_page_change,
+        # highlight-start
+        searchable=True,
+        sortable=True,
+        filterable=True
+        # highlight-end
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Handle row selection
+
+While Compose normally passes a list of full table rows to selection callback functions, it's not possible to do this for paginated tables since only a paginated subset of the data is available at any time.
 
 <Tabs groupId="sdkLanguage" className="hide_tabs">
     <TabItem value="node" label="TypeScript / JavaScript">
-    Compose disables row selections by default for paginated tables. Due to constraints introduced by server-side pagination, it's not possible for Compose to pass a list of table rows to callbacks (e.g. `onChange` or `onSubmit`) when the user selects rows.
+    To enable row selections for paginated tables, you'll need to pass a `selectionReturnType: "id"` property to the table. When this is enabled, Compose will pass a list of row IDs to any callbacks instead of the rows themselves.
 
-    You can re-enable row selections by passing a `selectionReturnType: "index"` property to the table. When this is enabled, Compose will pass a list of row indices to any callbacks instead of the rows themselves.
+    The row ID should be a unique, stable identifier for each row (such as a `uuid`). It is specified via the `primaryKey` property. If not provided, Compose will default to using the row index (though this is not recommended since the row index is not stable).
     </TabItem>
     <TabItem value="python" label="Python">
-    Compose disables row selections by default for paginated tables. Due to constraints introduced by server-side pagination, it's not possible for Compose to pass a list of table rows to callbacks (e.g. `on_change` or `on_submit`) when the user selects rows.
+    To enable row selections for paginated tables, you'll need to pass a `selection_return_type: "id"` property to the table. When this is enabled, Compose will pass a list of row IDs to any callbacks instead of the rows themselves.
 
-    You can re-enable row selections by passing a `selection_return_type: "index"` property to the table. When this is enabled, Compose will pass a list of row indices to any callbacks instead of the rows themselves.
+    The row ID should be a unique, stable identifier for each row (such as a `uuid`). It is specified via the `primary_key` property. If not provided, Compose will default to using the row index (though this is not recommended since the row index is not stable).
     </TabItem>
 </Tabs>
 
@@ -597,12 +1436,15 @@ If you're not yet ready to handle search, you can disable it by passing the `sea
     ui.table(
         "users-table",
         onPageChange,
+        // highlight-start
         {
-            selectionReturnType: "index",
+            selectionReturnType: "id",
+            primaryKey: "uuid", // maps to the `uuid` field in the table data
             onChange: (selectedRows) => {
-                console.log(selectedRows) // [0, 1, 2, ...]
+                console.log(selectedRows) // [uuid1, uuid2, uuid3, ...]
             }
         }
+        // highlight-end
     )
     ```
     </TabItem>
@@ -611,32 +1453,178 @@ If you're not yet ready to handle search, you can disable it by passing the `sea
     ui.table(
         "users-table",
         on_page_change,
-        selection_return_type="index",
-        on_change=lambda selected_rows: print(selected_rows) # [0, 1, 2, ...]
+        # highlight-start
+        selection_return_type="id",
+        primary_key="uuid", # maps to the `uuid` field in the table data
+        on_change=lambda selected_rows: print(selected_rows) # [uuid1, uuid2, uuid3, ...]
+        # highlight-end
     )
     ```
     </TabItem>
 </Tabs>
 
-## Data Controls
+## Row selection
 
-Writeup coming soon.
+Compose tables support row selection out of the box. To enable row selection:
 
-### Filtering
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    1. Specify a `primaryKey` that maps to a unique, stable identifier for each row (such as a `uuid`). (If not provided, Compose will default to using the row index, though this is not recommended since the row index is not stable.)
+    2. Pass an `onChange` callback that will be called when the user selects/deselects rows.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    1. Specify a `primary_key` that maps to a unique, stable identifier for each row (such as a `uuid`). (If not provided, Compose will default to using the row index, though this is not recommended since the row index is not stable.)
+    2. Pass an `on_change` callback that will be called when the user selects/deselects rows.
+    </TabItem>
+</Tabs>
 
-Writeup coming soon.
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    ui.table(
+        "users-table",
+        users,
+        // highlight-start
+        {
+            primaryKey: "uuid", // maps to the `uuid` field in the table data
+            onChange: (selectedUsers) => {
+                console.log(selectedUsers) // [user1, user2, user3, ...]
+            }
+        }
+        // highlight-end
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.table(
+        "users-table",
+        users,
+        # highlight-start
+        primary_key="uuid", # maps to the `uuid` field in the table data
+        on_change=lambda selected_users: print(selected_users) # [user1, user2, user3, ...]
+        # highlight-end
+    )
+    ```
+    </TabItem>
+</Tabs>
 
-### Searching
+### Advanced patterns
 
-Writeup coming soon.
+#### Row selection actions
 
-### Sorting
+A common use case is to take action on a set of selected rows. To do this, it's easy to combine row selections with buttons to quickly build out a UI.
 
-Writeup coming soon.
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    let selectedUsers: User[] = [];
 
-### Views
+    page.add(() => ui.table(
+        "users-table",
+        users,
+        {
+            primaryKey: "uuid",
+            onChange: (newSelectedUsers) => {
+                selectedUsers = newSelectedUsers;
+                page.update();
+            }
+            initialSelectedRows: selectedUsers
+        }
+    ))
+    
+    // Show a refund button if there are selected users
+    page.add(() => ui.cond(selectedUsers.length > 0 {
+        true: ui.button("Refund selected users", onClick: () => {
+            selectedUsers.forEach((user) => refundUser(user.uuid));
+            selectedUsers = [];
+            page.update(); // update table to clear row selections
+        })
+    }))
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    selected_users: list[User] = []
 
-Writeup coming soon.
+    def on_change_selections(new_selected_users: list[User]) -> None:
+        selected_users = new_selected_users
+        page.update()
+
+    page.add(lambda: ui.table(
+        "users-table",
+        users,
+        primary_key="uuid",
+        on_change=on_change_selections,
+        initial_selected_rows=selected_users
+    ))
+
+    def on_click_refund_users() -> None:
+        [refund_user(user["uuid"]) for user in selected_users]
+        selected_users = []
+        page.update() # update table to clear row selections
+
+    # Show a refund button if there are selected users
+    page.add(lambda: ui.cond(
+        selected_users.length > 0,
+        true: ui.button(
+            "Refund selected users",
+            on_click=on_click_refund_users
+        )
+    ))
+    ```
+    </TabItem>
+</Tabs>
+
+#### Usage in forms
+
+To use tables in a form, simply:
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    1. Include the table component inside the form.
+    2. Pass `selectable: true` to the table component, which will enable row selections without the need to pass an `onChange` callback.
+    </TabItem>
+    <TabItem value="python" label="Python">
+    1. Include the table component inside the form.
+    2. Pass `selectable=True` to the table component, which will enable row selections without the need to pass an `on_change` callback.
+    </TabItem>
+</Tabs>
+
+Once integrated into a form, row selections will automatically be included as a key in the form's submission payload.
+
+Furthermore, just like other form inputs, table components include the following properties that are useful when used in forms:
+
+- `validate`: Perform field-level validation on the row selections to validate the form.
+- `required`: Whether at least one row must be selected to submit the form.
+
+#### Paginated tables
+
+Paginated tables require a slightly different configuration to enable row selections. Read more in the [paginated row selection guide](#enable-row-selection).
+
+## Look & feel
+
+Tables include two powerful properties that make it easy to customize their look and feel.
+
+### Density
+
+The `density` property can be used to control the overall density of table rows.
+
+| Density | Is Default | Row Height | Font Size | Best For |
+| ------- | ---------- | ---------- | --------- | -------- |
+| `compact` | ❌ | 32px | 12px | Dense data, many columns |
+| `standard` | ✅ | 40px | 14px | General use |
+| `comfortable` | ❌ | 48px | 16px | Sparse data, few columns |
+
+### Overflow
+
+The `overflow` property controls how table cells handle content that exceeds the cell's width.
+
+| Overflow | Is Default | Behavior |
+| -------- | ---------- | -------- |
+| `ellipsis` | ✅ | The content will be truncated with an ellipsis. |
+| `clip` | ❌ | The content will be clipped to the cell. |
+| `dynamic` | ❌ | The cell height will grow to fit the content. |
 
 ## API reference
 
@@ -653,20 +1641,35 @@ Writeup coming soon.
         id: string,
         data: T[] | TablePageChangeCallback<T>,
         properties?: Partial<{
-            allowSelect: boolean,
+            // General
             label: string,
             description: string,
+
+            // Features
+            columns: TableColumn[],
+            actions: TableAction<T>[],
+            views: TableView[],
+
+            // Row selection
+            selectable: boolean,
+            primaryKey: string,
             required: boolean 
             initialSelectedRows: number[],
             validate: (values: T[]) => string | void,
             onChange: (values: T[]) => void,
-            columns: TableColumn[],
-            actions: TableAction<T>[],
+            selectionReturnType: "full" | "id",
             minSelections: number,
             maxSelections: number,
-            selectionReturnType: "full" | "index",
+
+            // Data controls
             searchable: boolean,
+            sortable: boolean,
+            filterable: boolean,
             paginate: boolean,
+
+            // Style
+            density: "compact" | "standard" | "comfortable",
+            overflow: "ellipsis" | "clip" | "dynamic",
             style: Style,
         }>
     )
@@ -681,20 +1684,35 @@ Writeup coming soon.
         id: str,
         data: TableData | TablePageChangeCallback,
         *,
-        allow_select: bool = True,
+        # General
         label: str | None = None,
         description: str | None = None,
+        
+        # Features
+        columns: TableColumns | None = None,
+        actions: list[TableAction] | None = None,
+        views: list[TableView] | None = None,
+
+        # Row selection
+        selectable: bool = False,
+        primary_key: str | None = None,
         required: bool = True,
         initial_selected_rows: list[int] | None = None,
         validate: Callable[[TableData], str | None] | None = None,
         on_change: Callable[[TableData], None] | None = None,
-        columns: TableColumns | None = None,
-        actions: list[TableAction] | None = None,
+        selection_return_type: Literal["full", "id"] = "full",
         min_selections: int = 0,
         max_selections: int = 1000000000,
-        selection_return_type: Literal["full", "index"] = "full",
-        searchable: bool = True,
+
+        # Data controls
+        searchable: bool = True, # defaults false for paginated tables
+        sortable: bool = True, # defaults false for paginated tables
+        filterable: bool = True, # defaults false for paginated tables
         paginate: bool = False,
+
+        # Style
+        density: Literal["compact", "standard", "comfortable"] = "standard",
+        overflow: Literal["ellipsis", "clip", "dynamic"] = "ellipsis",
         style: Style | None = None,
     )
     ```
@@ -718,19 +1736,47 @@ Writeup coming soon.
     }
 />
 
-<Parameter
-    name={(lang) => lang === "js" ? "properties.allowSelect" : "allow_select"}
-    required={false}
-    type="boolean"
-    description={lang => <p>Whether to show the selections column. Defaults to <code>{lang === "js" ? "true" : "True"}</code>.</p>}
-/>
-
 <ParameterTemplate.Label
     componentName="table"
 />
 
 <ParameterTemplate.Description
     componentName="table"
+/>
+
+<Parameter
+    name="columns"
+    required={false}
+    type={(lang) => lang === "js" ? "TableColumn[]" : "list[TableColumn]"}
+    description={lang => <p>Control how columns are rendered in the table. If not provided, Compose will default to using the keys from the first row of data, then do it's best to infer human readable column names, data types, etc. See the <a href="#columns">columns</a> section for more details.</p>}
+/>
+
+<Parameter
+    name="actions"
+    required={false}
+    type={(lang) => lang === "js" ? "TableAction[]" : "list[TableAction]"}
+    description={lang => <p>Add row-level action buttons that execute custom functions when clicked. See the <a href="#row-actions">row actions</a> section for more details.</p>}
+/>
+
+<Parameter
+    name="views"
+    required={false}
+    type={(lang) => lang === "js" ? "TableView[]" : "list[TableView]"}
+    description={lang => <p>Add custom views that allow users to switch between preset configurations of data and presentation controls, such as sorts, filters, pinned columns, etc. See the <a href="#views">views</a> section for more details.</p>}
+/>
+
+<Parameter
+    name="selectable"
+    required={false}
+    type="boolean"
+    description={lang => <p>Whether to show the row selection column. Defaults to <code>{lang === "js" ? "false" : "False"}</code>, or true if an <code>{lang === "js" ? "onChange" : "on_change"}</code> callback is provided.</p>}
+/>
+
+<Parameter
+    name={lang => lang === "js" ? "properties.primaryKey" : "primary_key"}
+    required={false}
+    type="string"
+    description={lang => <p>A key that maps to a field in the table data. The field should be a stable, unique identifier for each row (such as a <code>uuid</code>). Setting this property enables proper row selection tracking. If not provided, the row index will be used (not recommended).</p>}
 />
 
 <ParameterTemplate.Required
@@ -760,17 +1806,19 @@ Writeup coming soon.
 />
 
 <Parameter
-    name="columns"
+    name={lang => lang === "js" ? "properties.selectionReturnType" : "selection_return_type"}
     required={false}
-    type={(lang) => lang === "js" ? "TableColumn[]" : "list[TableColumn]"}
-    description={lang => <p>Control how columns are rendered in the table. If not provided, Compose will default to using the keys from the first row of data, then do it's best to infer human readable column names, data types, etc. See the <a href="#columns">columns</a> section for more details.</p>}
-/>
-
-<Parameter
-    name="actions"
-    required={false}
-    type={(lang) => lang === "js" ? "TableAction[]" : "list[TableAction]"}
-    description={lang => <p>Add row-level action buttons that execute custom functions when clicked. See the <a href="#row-actions">row actions</a> section for more details.</p>}
+    type="literal"
+    version="0.27.0"
+    description={(lang) => <>
+        <p>Options:</p>
+        <ul>
+            <li><code>"full"</code>: Return the full row data to callback functions when the user selects rows.</li>
+            <li><code>"id"</code>: Return the row ids to callback functions when the user selects rows.</li>
+        </ul>
+        <p>By default, this property is set to <code>"full"</code>.</p>
+        <p>Paginated tables only support row selections by id. If you're using a paginated table, you'll need to set this property to <code>"id"</code> to enable row selections. If not, Compose will disable row selections for the paginated table.</p>
+    </>}
 />
 
 <Parameter
@@ -788,31 +1836,41 @@ Writeup coming soon.
 />
 
 <Parameter
-    name={lang => lang === "js" ? "properties.selectionReturnType" : "selection_return_type"}
-    required={false}
-    type="literal"
-    version="0.24.0"
-    description={(lang) => <>
-        <p>Options:</p>
-        <ul>
-            <li><code>"full"</code>: Return the full row data to callback functions when the user selects rows.</li>
-            <li><code>"index"</code>: Return the row indices to callback functions when the user selects rows.</li>
-        </ul>
-        <p>By default, this property is set to <code>"full"</code>.</p>
-        <p>Paginated tables only support row selections by index. If you're using a paginated table, you'll need to set this property to <code>"index"</code> to enable row selections. If not, Compose will disable row selections for the paginated table.</p>
-    </>}
-/>
-
-<Parameter
     name="searchable"
     required={false}
     type="boolean"
     version="0.24.0"
     description={(lang) => <>
-        <p>Whether to show the search input. Defaults to <code>{lang === "js" ? "true" : "True"}</code>.</p>
-        <p>The exception is auto-paginated tables (i.e. tables with more than 2500 rows). Client-side search is not possible for these tables, and you'll need to manage search yourself using <a href="#manual-pagination">manual pagination</a>.</p>
+        <p>Whether to show the search input. Defaults to <code>{lang === "js" ? "true" : "True"}</code> for normal tables, <code>{lang === "js" ? "false" : "False"}</code> for paginated tables.</p>
     </>}
 />
+
+<Parameter
+    name="sortable"
+    required={false}
+    type="boolean"
+    version="0.27.0"
+    description={(lang) => <>
+        <p>Whether to allow sorting. Defaults to <code>{lang === "js" ? "true" : "True"}</code> for normal tables, <code>{lang === "js" ? "false" : "False"}</code> for paginated tables.</p>
+        <p>Options:</p>
+        <ul>
+            <li><code>{lang === "js" ? "true" : "True"}</code>: Allow multi-column sorting.</li>
+            <li><code>"single"</code>: Allow single-column sorting.</li>
+            <li><code>{lang === "js" ? "false" : "False"}</code>: Disable sorting.</li>
+        </ul>
+    </>}
+/>
+
+<Parameter
+    name="filterable"
+    required={false}
+    type="boolean"
+    version="0.27.0"
+    description={(lang) => <>
+        <p>Whether to allow column filtering. Defaults to <code>{lang === "js" ? "true" : "True"}</code> for normal tables, <code>{lang === "js" ? "false" : "False"}</code> for paginated tables.</p>
+    </>}
+/>
+
 
 <Parameter
     name="paginate"
@@ -822,6 +1880,38 @@ Writeup coming soon.
     description={(lang) => <>
         <p>Whether to paginate the table server-side. Defaults to <code>{lang === "js" ? "false" : "False"}</code>.</p>
         <p>Tables with more than 2500 rows will be paginated by default.</p>
+    </>}
+/>
+
+<Parameter
+    name="density"
+    required={false}
+    type="literal"
+    version="0.27.0"
+    description={(lang) => <>
+        <p>The density of the table rows. Defaults to <code>{lang === "js" ? "standard" : "standard"}</code>.</p>
+        <p>Options:</p>
+        <ul>
+            <li><code>"compact"</code>: 32px row height</li>
+            <li><code>"standard"</code>: 40px row height</li>
+            <li><code>"comfortable"</code>: 48px row height</li>
+        </ul>
+    </>}
+/>
+
+<Parameter
+    name="overflow"
+    required={false}
+    type="literal"
+    version="0.27.0"
+    description={(lang) => <>
+        <p>The overflow behavior of the table cells. Defaults to <code>{lang === "js" ? "ellipsis" : "ellipsis"}</code>.</p>
+        <p>Options:</p>
+        <ul>
+            <li><code>"ellipsis"</code>: The content will be truncated with an ellipsis.</li>
+            <li><code>"clip"</code>: The content will be clipped to the cell.</li>
+            <li><code>"dynamic"</code>: The cell height will grow to fit the content.</li>
+        </ul>
     </>}
 />
 

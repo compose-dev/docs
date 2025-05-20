@@ -356,61 +356,56 @@ Tables are a foundational part of most internal tools. Compose's [`ui.table()` c
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
-    const companies = [
-       { name: "Apple", tier: "Enterprise", headquarters: "Cupertino, CA", arr: 150000 },
-        { name: "Asana", tier: "Basic", headquarters: "San Francisco, CA", arr: 12000 },
-        /* ... */
-        { name: "Notion", tier: "Basic", headquarters: "San Francisco, CA", arr: 8000 }, 
-    ]
+    const customers = [{ name: "Apple", tier: "Enterprise", arr: 150000, onboarded: true }, /* ... */]
 
     ui.table(
-        "table-key",
-        companies,
+        "customers-table",
+        customers,
         { 
-            label: "Companies",
-            actions: [{ 
-                label: "View Details", 
-                onClick: (row) => page.modal(() => ui.json(row), { title: "Company Details" }) 
-            }],
+            actions: [
+                { 
+                    label: "Details", 
+                    onClick: (row) => page.modal(() => ui.json(row), { title: "Customer Details" }) 
+                }
+            ],
             columns: [
                 "name",
                 { key: "tier", format: "tag" },
-                "headquarters",
-                { key: "arr", label: "ARR", format: "currency" }
-            ]
+                { key: "arr", label: "ARR", format: "currency" },
+                "onboarded"
+            ],
         }
     )
     ```
     </TabItem>
     <TabItem value="python" label="Python">
     ```python
-    companies = [
-        { "name": "Apple", "tier": "Enterprise", "headquarters": "Cupertino, CA", "arr": 150000 },
-        { "name": "Asana", "tier": "Basic", "headquarters": "San Francisco, CA", "arr": 12000 },
+    customers = [
+        { "name": "Apple", "tier": "Enterprise", "arr": 150000, "onboarded": True }
         # ...
-        { "name": "Notion", "tier": "Basic", "headquarters": "San Francisco, CA", "arr": 8000 },
     ]
 
     ui.table(
-        "table-key",
-        companies,
-        label="Companies",
-        actions=[{ 
-            "label": "View Details", 
-            "on_click": lambda row: page.modal(lambda: ui.json(row), title="Company Details") 
-        }],
+        "customers-table",
+        customers,
+        actions=[
+            { 
+                "label": "Details", 
+                "on_click": lambda row: page.modal(lambda: ui.json(row), title="Customer Details") 
+            }
+        ],
         columns=[
             "name",
             { "key": "tier", "format": "tag" },
-            "headquarters",
-            { "key": "arr", "label": "ARR", "format": "currency" }
-        ]
+            { "key": "arr", "label": "ARR", "format": "currency" },
+            "onboarded"
+        ],
     )
     ```
     </TabItem>
 </Tabs>
 
-<IFrame type="components-input-table" heightPx={685} />
+<IFrame type="components-input-table-core-concepts" heightPx={685} />
 
 It's easy to connect your table to forms that enable you to create, update, and delete rows. See the [CRUD example app](/examples/crud-app) for a complete example.
 
