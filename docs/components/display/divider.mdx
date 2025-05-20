@@ -1,0 +1,121 @@
+---
+sidebar_position: 1 # Assuming it's the first in a potential list
+hide_title: true
+title: Component | Divider
+description: Visually separate content with a horizontal or vertical line.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { ParameterTemplate, Parameter } from "../../../src/components";
+
+# Component | Divider
+
+Visually separate content with a horizontal or vertical line. Dividers are useful for creating logical groupings and improving the scannability of your UI.
+
+<IFrame type="components-display-divider" heightPx={500} />
+
+<Tabs groupId="sdkLanguage">
+  <TabItem value="node" label="TypeScript / JavaScript">
+    ```js
+    ui.stack([
+      ui.statistic("Active Users", 1250),
+      ui.divider(),
+      ui.statistic("Sign Ups", 320),
+      ui.divider(),
+      ui.statistic("Churned Users", 12)
+    ])
+    ```
+  </TabItem>
+  <TabItem value="python" label="Python">
+    ```python
+    ui.stack([
+      ui.statistic("Active Users", 1250),
+      ui.divider(),
+      ui.statistic("Sign Ups", 320),
+      ui.divider(),
+      ui.statistic("Churned Users", 12)
+    ])
+    ```
+  </TabItem>
+</Tabs>
+
+## API reference
+
+### Function signature
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+    ```ts
+    ui.divider(
+        options?: Partial<{
+            orientation: "horizontal" | "vertical",
+            thickness: "thin" | "medium" | "thick",
+            style: Style
+        }>
+    )
+    ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+    ```python
+    ui.divider(
+        *,
+        orientation: Literal["horizontal", "vertical"] = "horizontal",
+        thickness: Literal["thin", "medium", "thick"] = "medium",
+        style: Style | None = None
+    )
+    ```
+    </TabItem>
+</Tabs>
+
+### Parameters
+
+<Parameter
+    name="orientation"
+    required={false}
+    type="literal"
+    description={lang =>
+        <>
+            <p>
+                The orientation of the divider. Defaults to <code>"horizontal"</code>.
+            </p>
+            <p>Options:</p>
+            <ul>
+                <li>
+                    <code>"horizontal"</code>: A horizontal line.
+                </li>
+                <li>
+                    <code>"vertical"</code>: A vertical line. Useful when using the divider is inside a row component.
+                </li>
+            </ul>
+        </>
+    }
+/>
+
+<Parameter
+    name="thickness"
+    required={false}
+    type="literal"
+    description={lang =>
+        <>
+            <p>
+                The thickness of the divider line. Defaults to <code>"thin"</code>.
+            </p>
+            <p>Options:</p>
+            <ul>
+                <li>
+                    <code>"thin"</code>: <code>1px</code>
+                </li>
+                <li>
+                    <code>"medium"</code>: <code>2px</code>
+                </li>
+                <li>
+                    <code>"thick"</code>: <code>4px</code>
+                </li>
+            </ul>
+        </>
+    }
+/>
+
+<ParameterTemplate.Style />

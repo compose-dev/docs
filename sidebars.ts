@@ -340,6 +340,11 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "doc",
+          id: "components/display/divider",
+          label: "Divider",
+        },
+        {
+          type: "doc",
           id: "components/display/header",
           label: "Header",
         },
