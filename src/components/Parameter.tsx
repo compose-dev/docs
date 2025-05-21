@@ -22,6 +22,7 @@ interface ParameterProps {
     | ((lang: "js" | "py") => string | React.Node);
   version?: string;
   divider?: boolean;
+  idSuffix?: string;
 }
 
 export default function Parameter({
@@ -31,6 +32,7 @@ export default function Parameter({
   description,
   version,
   divider = true,
+  idSuffix,
 }: ParameterProps) {
   const requiredText = required ? "required" : "optional";
 
@@ -149,6 +151,10 @@ export default function Parameter({
 
     // Replace snake_case with dashes
     baseName = baseName.replace(/_/g, "-");
+
+    if (idSuffix) {
+      baseName += `-${idSuffix}`;
+    }
 
     return baseName;
   }
