@@ -401,6 +401,10 @@ const sidebars: SidebarsConfig = {
       ],
       collapsed: false,
       collapsible: false,
+      link: {
+        type: "doc",
+        id: "components/index",
+      },
     },
     {
       type: "doc",
