@@ -12,15 +12,15 @@ import IFrame from "../src/iframe";
 
 # Quickstart
 
-Compose is an [open-source platform](https://github.com/compose-dev/compose) that makes it dramatically faster for developers to build and share internal tools with their team - without leaving their codebase.
+Compose is an [open-source platform](https://github.com/compose-dev/compose) that makes it dramatically faster for developers to build and share internal apps with their team. It's an excellent way to build internal support dashboards, ops tools, admin panels, and other user-facing web apps that rely on your backend data and logic.
 
 ## What is Compose?
 
 The platform has two parts:
-- Build internal tools with just backend code using our SDKs for Python and TypeScript.
-- Use and share those tools via your team's Compose web dashboard.
+- Build user-facing internal web apps with just backend code using our SDKs for Python and TypeScript.
+- Use and share those apps via your team's Compose web dashboard.
 
-Here's a simple tool that displays a table of users from your database:
+Here's a simple dashboard that displays a table of users from your database:
 
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
@@ -57,13 +57,11 @@ In your team's Compose web dashboard:
 
 <IFrame type="get-started-quickstart-table" heightPx={390} />
 
-**The Compose SDK** includes tables, forms, charts, file uploads, and 40+ other components to build whatever you need in just a few lines of code. Since the SDK is installed into your backend, connecting these components to your own data and logic is as easy as importing functions and calling them within the Compose Apps that you define.
+**The Compose SDK** includes tables, forms, charts, and 40+ other professional-grade components to quickly build apps. Since the SDK is installed into your backend, connecting these components to your own data and logic is as easy as importing functions and calling them within the Compose Apps that you define.
 
-**The Compose web dashboard** renders beautiful, responsive UIs for your tools and enables you to share them with your entire team. It also includes audit logs, RBAC, and other useful features to manage your tools without any configuration on your end.
+**The Compose web dashboard** renders beautiful, responsive UIs for your apps and enables you to share them with your entire team. It also bundles audit logs, RBAC, and other useful features to manage your tools without any configuration on your end.
 
-Under the hood, the web dashboard maintains a [secure, proxied websocket connection](/get-started/how-it-works) to the Compose SDK to run the tools you build.
-
-Compose's biggest benefit is speed and simplicity, but it's also fully featured and scales to support complex, reactive, multi-page tools when you need it.
+When you're ready, Compose scales to support complex, reactive, multi-page internal apps. Existing users have built internal apps to label thousands of PDFs, manage live events, run AI inference on their data, and more.
 
 ## Installation
 
