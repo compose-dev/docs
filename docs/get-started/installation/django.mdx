@@ -1,0 +1,85 @@
+---
+sidebar_position: 2
+hide_title: true
+title: Installation | Django
+description: Install the Compose SDK into your Django project.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { Introduction, InstallSdkPython, ReplaceApiKey, NextStepsPython, StarterAppsPython, ConnectClientDetailsPython } from "../../../src/components/InstallationSteps";
+
+# Installation | Django
+
+<Introduction framework="Django" />
+
+## 1. Install the SDK
+
+<InstallSdkPython />
+
+## 2. Create a new Django app
+
+Creating a separate Django app for Compose will help organize your code better.
+
+```python
+python manage.py startapp compose
+```
+
+## 3. Add starter apps
+
+In the `compose` folder that you just created, create a new file called `starter_apps.py`, and add the following:
+
+<StarterAppsPython />
+
+## 4. Start the Compose Client
+
+In the `apps.py` file of the Compose app, add the following:
+
+```python
+from django.apps import AppConfig
+# highlight-start
+import os
+import compose_sdk as c
+# highlight-end
+
+
+class ComposeConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'compose'
+
+    # highlight-start
+    def ready(self):
+        # Don't start in the auto-reload process
+        if os.environ.get("RUN_MAIN") != "true":
+            return
+
+        # Do dynamic imports to avoid AppRegistryNotReady errors
+        from .starter_apps import view_users_app, create_user_app
+
+        client = c.Client(
+            api_key="API_KEY_HERE",
+            apps=[view_users_app, create_user_app]
+        )
+
+        client.connect_async()
+    # highlight-end
+```
+
+<ConnectClientDetailsPython framework="Django" />
+
+<ReplaceApiKey />
+
+## 5. Run your app
+
+Start your Django server. Compose will automatically connect in the background.
+
+```bash
+python manage.py runserver
+```
+
+You should see your apps come online in the [Compose web dashboard](https://app.composehq.com/home).
+
+## Next steps
+
+<NextStepsPython />

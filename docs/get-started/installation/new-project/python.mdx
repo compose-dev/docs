@@ -1,0 +1,177 @@
+---
+sidebar_position: 2
+hide_title: true
+title: Installation | New Python Project
+description: Install the Compose SDK into a new Python project.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../../src/iframe";
+import { ReplaceApiKey, NextStepsNode } from "../../../../src/components/InstallationSteps";
+
+# Installation | New Python Project
+
+While Compose is designed to help you build internal apps on top of your existing codebase, you can always create a fresh project if you prefer to start from scratch.
+
+This guide will walk you through creating a new Python project with the Compose SDK installed in ~3 minutes.
+
+## Quick Install
+
+### 1. Clone the starter repo
+
+The [Python starter repo](https://github.com/compose-dev/compose-python-starter) is a barebones Python project that comes with the Compose SDK installed.
+
+```bash
+git clone https://github.com/compose-dev/compose-python-starter.git
+cd compose-python-starter
+```
+
+### 2. Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+### 3. Activate the virtual environment
+
+```bash
+# Mac/Linux
+source .venv/bin/activate
+
+# Windows (Command Prompt)
+.venv\Scripts\Activate.bat
+
+# Windows (PowerShell)
+.venv\Scripts\Activate.ps1
+```
+
+### 4. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Add your API key
+
+Replace `API_KEY_HERE` in `app.py` with your Compose API key. Create a free account on [Compose](https://app.composehq.com/auth/signup) to get an API key.
+
+<img src="/img/copy-api-key.png" className="rounded" />
+
+### 6. Run the app
+
+```bash
+# Use py-mon to enable auto-reload on code changes
+pymon app.py
+
+# Or, use python directly
+python app.py
+```
+
+You should see your apps come online in the [Compose web dashboard](https://app.composehq.com/home).
+
+## Manual Install
+
+<details>
+<summary>Prefer to install manually without the starter repo? Read here.</summary>
+
+Create a project directory
+
+```bash
+mkdir compose && cd compose
+```
+
+Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+Activate the virtual environment
+
+```bash
+# macOS/Linux
+source .venv/bin/activate
+
+# Windows command prompt
+.venv\Scripts\Activate.bat
+
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+```
+
+Install the Compose SDK
+
+```bash
+pip install compose-sdk
+```
+
+Optionally, install py-mon, a lightweight file watcher that will automatically restart your app when you make code changes.
+
+```bash
+pip install py-mon
+```
+
+Create a new file called `app.py` and paste the following starter code:
+
+```python
+import compose_sdk as c
+
+# For demo purposes. In a real app, you'd use your actual database.
+db_users = [
+    { "name": "John Doe", "email": "john@doe.com" },
+    { "name": "Jane Smith", "email": "jane@smith.com" },
+]
+
+def view_users_handler(page: c.Page, ui: c.UI):
+    page.add(lambda: ui.header("View Users", size="lg"))
+    users = [*db_users] # fake database call
+    page.add(lambda: ui.table("users-table", users))
+
+def create_user_handler(page: c.Page, ui: c.UI):
+    def on_submit(form):
+        db_users.append({ "name": form["name"], "email": form["email"] })
+        page.toast("User created successfully", appearance="success")
+        page.link("view-users")
+
+    page.add(lambda: ui.header("Create User", size="lg"))
+    page.add(lambda: ui.form(
+        "create-user-form",
+        [
+            ui.text_input("name"),
+            ui.email_input("email")
+        ],
+        on_submit=on_submit
+    ))
+
+nav = c.Navigation(["view-users", "create-user"])
+
+client = c.Client(
+    api_key="API_KEY_HERE", # replace with your own API key
+    apps=[
+        c.App(route="view-users", navigation=nav, handler=view_users_handler),
+        c.App(route="create-user", navigation=nav, handler=create_user_handler)
+    ]
+)
+
+client.connect()
+```
+
+Replace `API_KEY_HERE` with your Compose API key. Create a free account on [Compose](https://app.composehq.com/auth/signup) to get an API key.
+
+Finally, run your project's dev command, e.g:
+
+```bash
+# Use py-mon to enable auto-reload on code changes
+pymon app.py
+
+# Or, use python directly
+python app.py
+```
+
+You should see your apps come online in the [Compose web dashboard](https://app.composehq.com/home).
+</details>
+
+## Next Steps
+
+<NextStepsNode />

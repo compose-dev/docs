@@ -1,0 +1,55 @@
+---
+sidebar_position: 2
+hide_title: true
+title: Installation | Python
+description: Install the Compose SDK into your Python project.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { Introduction, InstallSdkPython, ReplaceApiKey, NextStepsPython, StarterCodePython, ConnectClientDetailsPython } from "../../../src/components/InstallationSteps";
+
+# Installation | Python
+
+<Introduction framework="Python" />
+
+## 1. Install the SDK
+
+<InstallSdkPython />
+
+## 2. Add starter apps
+
+Create a new file in your project where you'll add your Compose apps, e.g. `compose.py`, and paste the following code:
+
+<StarterCodePython />
+
+## 3. Start the Compose Client
+
+In the main entry point of your project, e.g. `main.py`, add the following:
+
+```python
+from .compose import compose_client
+
+# ... other code ...
+
+# Run the client in a background thread. Use .connect() to run the client
+# as a blocking process in the main thread.
+compose_client.connect_async()
+```
+
+<ConnectClientDetailsPython framework="Django, Flask, etc." />
+
+## 4. Run your app
+
+Run your project's dev server. Compose will automatically connect in the background.
+
+```bash
+python main.py
+```
+
+You should see your apps come online in the [Compose web dashboard](https://app.composehq.com/home).
+
+## Next steps
+
+<NextStepsPython />

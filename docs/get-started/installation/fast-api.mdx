@@ -1,0 +1,65 @@
+---
+sidebar_position: 2
+hide_title: true
+title: Installation | FastAPI
+description: Install the Compose SDK into your FastAPI project.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { Introduction, InstallSdkPython, ReplaceApiKey, NextStepsPython, StarterCodePython, ConnectClientDetailsPython } from "../../../src/components/InstallationSteps";
+
+# Installation | FastAPI
+
+<Introduction framework="FastAPI" />
+
+## 1. Install the SDK
+
+<InstallSdkPython />
+
+## 2. Add starter apps
+
+Create a new file in your project where you'll add your Compose apps, e.g. `compose.py`, and paste the following code:
+
+<StarterCodePython />
+
+<ReplaceApiKey />
+
+
+## 3. Start the Compose Client
+
+In the main entry point of your project, e.g. `main.py`, add the following:
+
+```python
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
+
+from .compose import compose_client
+
+# Use the `lifespan` context manager to connect the Compose dashboard once
+# when the app starts up, and disconnect when the app shuts down.
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    compose_client.connect_async()
+    yield
+    compose_client.shutdown()
+
+app = FastAPI(lifespan=lifespan)
+```
+
+<ConnectClientDetailsPython framework="FastAPI" />
+
+## 4. Run your app
+
+Start your FastAPI server. Compose will automatically connect in the background.
+
+```bash
+fastapi dev main.py
+```
+
+You should see your apps come online in the [Compose web dashboard](https://app.composehq.com/home).
+
+## Next steps
+
+<NextStepsPython />

@@ -1,0 +1,21 @@
+---
+sidebar_position: 2
+hide_title: true
+title: Installation | Hono
+description: Install the Compose SDK into your Hono project.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { Introduction, InstallSdkNode } from "../../../src/components/InstallationSteps";
+
+# Installation | Hono
+
+Compose is not yet supported for Hono.
+
+The Compose SDK requires a long-running server process to maintain a websocket connection to the Compose web dashboard. This is not compatible with Hono, which is designed for a new server process to spin up for each request (i.e. serverless).
+
+We recommend deploying a dedicated Node.js project for your Compose apps. Many existing users already do exactly this.
+
+Read the guide for creating a new project for Compose [here](/get-started/installation/new-project/node-js).

@@ -1,0 +1,150 @@
+---
+sidebar_position: 2
+hide_title: true
+title: Installation | New Node.js Project
+description: Install the Compose SDK into a new Node.js project.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../../src/iframe";
+import { ReplaceApiKey, NextStepsNode } from "../../../../src/components/InstallationSteps";
+
+# Installation | New Node.js Project
+
+While Compose is designed to help you build internal apps on top of your existing codebase, you can always create a fresh project if you prefer to start from scratch.
+
+This guide will walk you through creating a new Node.js project with the Compose SDK installed in ~3 minutes.
+
+## Quick Install
+
+### 1. Clone the starter repo
+
+The [Node.js starter repo](https://github.com/compose-dev/compose-node-starter) is a barebones Node.js project that comes with TypeScript and the Compose SDK installed.
+
+```bash
+git clone https://github.com/compose-dev/compose-node-starter.git
+cd compose-node-starter
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Add your API key
+
+Replace `API_KEY_HERE` in `src/index.ts` with your Compose API key. Create a free account on [Compose](https://app.composehq.com/auth/signup) to get an API key.
+
+<img src="/img/copy-api-key.png" className="rounded" />
+
+### 4. Run the app
+
+```bash
+npm run dev
+```
+
+You should see your apps come online in the [Compose web dashboard](https://app.composehq.com/home).
+
+## Manual Install
+
+<details>
+<summary>Prefer to install manually without the starter repo? Read here.</summary>
+
+Create a project directory
+
+```bash
+mkdir compose && cd compose
+```
+
+Initialize the project, and set the project type to `module` to enable modern JavaScript import/export syntax.
+
+```bash
+npm init -y && npm pkg set type=module
+```
+
+Install the Compose SDK
+
+```bash
+npm install @composehq/sdk
+```
+
+If you're using TypeScript, install the TypeScript compiler and `tsx`, which we'll use to run our app during development.
+
+```bash
+npm install --save-dev typescript tsx
+```
+
+Create a new file called `app.ts` (or `app.js`) and paste the following starter code:
+
+
+```typescript
+import { Compose } from "@composehq/sdk";
+
+const nav = new Compose.Navigation(["view-users", "create-user"])
+
+// For demo purposes. In a real app, you'd use your actual database.
+const dbUsers = [
+    { name: "John Doe", email: "john@doe.com" },
+    { name: "Jane Smith", email: "jane@smith.com" },
+]
+
+const viewUsersApp = new Compose.App({
+    route: "view-users",
+    navigation: nav,
+    handler: async ({ page, ui }) => {
+        page.add(() => ui.header("View Users", { size: "lg" }))
+        const users = [...dbUsers] // fake database call
+        page.add(() => ui.table("users-table", users));
+    }
+})
+
+const createUserApp = new Compose.App({
+    route: "create-user",
+    navigation: nav,
+    handler: async ({ page, ui }) => {
+        page.add(() => ui.header("Create User", { size: "lg" }))
+        page.add(() => ui.form(
+            "create-user-form",
+            [
+                ui.textInput("name"),
+                ui.emailInput("email")
+            ],
+            {
+                onSubmit: async (form) => {
+                    dbUsers.push({ name: form.name, email: form.email });
+                    page.toast("User created successfully", { appearance: "success" });
+                    page.link("view-users");
+                }
+            }
+        ))
+    }
+})
+
+const client = new Compose.Client({
+    apiKey: "API_KEY_HERE", // replace with your own API key
+    apps: [viewUsersApp, createUserApp]
+});
+
+client.connect();
+```
+
+Replace `API_KEY_HERE` with your Compose API key. Create a free account on [Compose](https://app.composehq.com/auth/signup) to get an API key.
+
+Finally, run your project's dev command, e.g:
+
+```bash
+# TypeScript
+npx tsx --watch src/index.ts
+
+# JavaScript
+node --watch src/index.js
+```
+
+You should see your apps come online in the [Compose web dashboard](https://app.composehq.com/home).
+</details>
+
+## Next Steps
+
+<NextStepsNode />

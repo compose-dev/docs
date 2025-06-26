@@ -1,5 +1,14 @@
 import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 
+const divider = (label: string) =>
+  `<div class='sidebar-component-divider sidebar-component-divider-level-1'><span>${label}</span><div class='sidebar-component-divider-line' /></div>`;
+
+const dividerLevel2 = (label: string) =>
+  `<div class='sidebar-component-divider sidebar-component-divider-level-2'><span>${label}</span><div class='sidebar-component-divider-line' /></div>`;
+
+const dividerLevel2LessTopMargin = (label: string) =>
+  `<div class='sidebar-component-divider sidebar-component-divider-level-2-less-top-margin'><span>${label}</span><div class='sidebar-component-divider-line' /></div>`;
+
 /**
  * Creating a sidebar enables you to:
  - create an ordered group of docs
@@ -19,8 +28,79 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "doc",
-          id: "quickstart",
-          label: "Quickstart",
+          id: "introduction",
+          label: "Introduction",
+        },
+        {
+          type: "category",
+          label: "Installation",
+          items: [
+            {
+              type: "html",
+              value: dividerLevel2LessTopMargin("TS / JS"),
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/node-js",
+              label: "Node.js",
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/express",
+              label: "Express",
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/fastify",
+              label: "Fastify",
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/hono",
+              label: "Hono",
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/koa",
+              label: "Koa",
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/new-project/node-js",
+              label: "New Node.js Project",
+              className: "hidden-sidebar-item",
+            },
+            {
+              type: "html",
+              value: dividerLevel2("Python"),
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/python",
+              label: "Python",
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/django",
+              label: "Django",
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/fast-api",
+              label: "FastAPI",
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/flask",
+              label: "Flask",
+            },
+            {
+              type: "doc",
+              id: "get-started/installation/new-project/python",
+              label: "New Python Project",
+              className: "hidden-sidebar-item",
+            },
+          ],
         },
         {
           type: "doc",
@@ -185,8 +265,7 @@ const sidebars: SidebarsConfig = {
       items: [
         {
           type: "html",
-          value:
-            "<div class='sidebar-component-divider'><span>Core</span><div class='sidebar-component-divider-line' /></div>",
+          value: divider("Core"),
         },
         {
           type: "doc",
@@ -205,8 +284,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "html",
-          value:
-            "<div class='sidebar-component-divider'><span>Layout</span><div class='sidebar-component-divider-line'></div></div>",
+          value: divider("Layout"),
         },
         {
           type: "doc",
@@ -235,8 +313,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "html",
-          value:
-            "<div class='sidebar-component-divider'><span>Charts</span><div class='sidebar-component-divider-line' /></div>",
+          value: divider("Charts"),
         },
         {
           type: "doc",
@@ -245,8 +322,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "html",
-          value:
-            "<div class='sidebar-component-divider'><span>Forms</span><div class='sidebar-component-divider-line' /></div>",
+          value: divider("Forms"),
         },
         {
           type: "doc",
@@ -330,8 +406,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "html",
-          value:
-            "<div class='sidebar-component-divider'><span>Display</span><div class='sidebar-component-divider-line' /></div>",
+          value: divider("Display"),
         },
         {
           type: "doc",
@@ -385,8 +460,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: "html",
-          value:
-            "<div class='sidebar-component-divider'><span>Extras</span><div class='sidebar-component-divider-line' /></div>",
+          value: divider("Extras"),
         },
         {
           type: "doc",

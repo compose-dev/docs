@@ -1,0 +1,43 @@
+---
+sidebar_position: 2
+hide_title: true
+title: Installation | Node.js
+description: Install the Compose SDK into your Node.js project.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../../../src/iframe";
+import { Introduction, InstallSdkNode, AddStarterAppsNode, RunAppNode, NextStepsNode } from "../../../src/components/InstallationSteps";
+
+# Installation | Node.js
+
+<Introduction framework="Node.js" />
+
+## 1. Install the SDK
+
+<InstallSdkNode />
+
+## 2. Add starter apps
+
+<AddStarterAppsNode />
+
+## 3. Start the Compose Client
+
+In the main entry point of your project, e.g. `index.ts`, import the Compose Client that you exported in the previous step and initialize it:
+
+```ts
+import { composeClient } from "./compose";
+
+// ...
+
+composeClient.connect();
+```
+
+## 4. Run your app
+
+<RunAppNode />
+
+## Next steps
+
+<NextStepsNode />

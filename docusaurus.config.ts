@@ -88,6 +88,11 @@ const config: Config = {
             component: "@site/src/components/Redirect",
             exact: true,
           });
+          actions.addRoute({
+            path: "/quickstart",
+            component: "@site/src/components/Redirect",
+            exact: true,
+          });
         },
       };
     },

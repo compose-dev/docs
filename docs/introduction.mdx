@@ -1,0 +1,104 @@
+---
+# This file appears in llm.txt! Update there too.
+sidebar_position: 1
+hide_title: true
+title: Get Started | Introduction
+description: Download Compose and build your first app in less than 5 minutes.
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import IFrame from "../src/iframe";
+import { PythonInstallationGrid, NodeInstallationGrid, NewProjectGrid } from "../src/components/InstallationGrid";
+
+# Quickstart
+
+Compose is an [open-source platform](https://github.com/compose-dev/compose) that makes it dramatically faster for developers to build and share internal apps with their team. It's an excellent way to build internal support dashboards, ops tools, admin panels, and other user-facing web apps that rely on your backend data and logic.
+
+## What is Compose?
+
+The platform has two parts:
+- Build user-facing internal web apps with just backend code using our SDKs for Python and TypeScript.
+- Use and share those apps via your team's Compose web dashboard.
+
+Here's a simple dashboard that displays a table of users from your database:
+
+<Tabs groupId="sdkLanguage">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        In your codebase:
+        ```ts
+        import { Compose } from "@composehq/sdk";
+        import { database } from "../database";
+
+        const viewUsersApp = new Compose.App({
+            route: "view-users",
+            handler: async ({ page, ui }) => {
+                const users = await database.selectUsers() // query your database
+                page.add(() => ui.table("users-table", users)); // display results in a table
+            }
+        })
+        ```
+    </TabItem>
+    <TabItem value="python" label="Python">
+        In your codebase:
+        ```python
+        import compose_sdk as c
+        from database import database
+
+        def view_users_handler(page: c.Page, ui: c.UI):
+            users = database.select_users() # query your database
+            page.add(lambda: ui.table("users-table", users)) # display results in a table
+
+        view_users_app = c.App(route="view-users", handler=view_users_handler)
+        ```
+    </TabItem>
+</Tabs>
+
+In your team's Compose web dashboard:
+
+<IFrame type="get-started-quickstart-table" heightPx={390} />
+
+**The Compose SDK** includes tables, forms, charts, and 40+ other professional-grade components to quickly build apps. Since the SDK is installed into your backend, connecting these components to your own data and logic is as easy as importing functions and calling them within the Compose Apps that you define.
+
+**The Compose web dashboard** renders beautiful, responsive UIs for your apps and enables you to share them with your entire team. It also bundles audit logs, RBAC, and other useful features to manage your tools without any configuration on your end.
+
+When you're ready, Compose scales to support complex, reactive, multi-page internal apps. Existing users have built internal apps to label thousands of PDFs, manage live events, run AI inference on their data, and more.
+
+## Installation
+
+### Add to existing project
+
+The easiest way to use Compose is by installing it as a dependency in your server-side application. That way, your Compose Apps live alongside your existing code - letting you share models, utilities, and logic just by importing them.
+
+#### Node.js guides
+
+<NodeInstallationGrid />
+
+#### Python guides
+
+<PythonInstallationGrid />
+
+:::note
+Don't see your framework? You can still use the general [Node.js](/get-started/installation/node-js) or [Python](/get-started/installation/python) installation guides. The setup is virtually the same for all frameworks.
+:::
+
+### Create a new project
+
+If you're just exploring for now or prefer to start from scratch, you can also create a new project with the SDK and some starter apps.
+
+<NewProjectGrid />
+
+{/* ## Next Steps
+
+<Tabs groupId="sdkLanguage" className="hide_tabs">
+    <TabItem value="node" label="TypeScript / JavaScript">
+        - Try replacing `dbUsers` with real data from your own database!
+        - Skim through Compose's [core concepts](/get-started/concepts) to quickly become productive with the SDK.
+        - Join the [Discord community](https://discord.gg/82rk2N8ZE6) to ask questions and talk to the core team.
+    </TabItem>
+    <TabItem value="python" label="Python">
+        - Try replacing `db_users` with real data from your own database!
+        - Skim through Compose's [core concepts](/get-started/concepts) to quickly become productive with the SDK.
+        - Join the [Discord community](https://discord.gg/82rk2N8ZE6) to ask questions and talk to the core team.
+    </TabItem>
+</Tabs> */}
