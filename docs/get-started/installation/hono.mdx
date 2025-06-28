@@ -14,7 +14,7 @@ import { Introduction, InstallSdkNode } from "../../../src/components/Installati
 
 Compose is not yet supported for Hono.
 
-The Compose SDK requires a long-running server process to maintain a websocket connection to the Compose web dashboard. This is not compatible with Hono, which is designed for a new server process to spin up for each request (i.e. serverless).
+The Compose SDK requires a long-running server process to maintain a websocket connection to the Compose servers. This is not compatible with Hono, which is designed for a new server process to spin up for each request (i.e. serverless).
 
 We recommend deploying a dedicated Node.js project for your Compose apps. Many existing users already do exactly this.
 

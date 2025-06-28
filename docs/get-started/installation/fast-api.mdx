@@ -37,7 +37,7 @@ from contextlib import asynccontextmanager
 
 from .compose import compose_client
 
-# Use the `lifespan` context manager to connect the Compose dashboard once
+# Use the `lifespan` context manager to connect to the Compose servers once
 # when the app starts up, and disconnect when the app shuts down.
 @asynccontextmanager
 async def lifespan(app: FastAPI):
