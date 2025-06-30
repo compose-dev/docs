@@ -1,14 +1,35 @@
 import CodeBlock from "@theme/CodeBlock";
-import Heading from "@theme/Heading";
 import Details from "@theme/Details";
+import Admonition from "@theme/Admonition";
 
-function Introduction({ framework }: { framework: string }) {
+function Introduction({
+  framework,
+  language,
+  newProjectLink,
+}: {
+  framework: string;
+  language: string;
+  newProjectLink: string;
+}) {
   return (
-    <p>
-      Create internal apps directly in your {framework} codebase with the
-      Compose SDK. This guide will get you started with two starter apps in ~3
-      minutes.
-    </p>
+    <>
+      <p>
+        Create internal apps directly in your {framework} codebase with the
+        Compose SDK. This guide will get you started with two starter apps in ~3
+        minutes.
+      </p>
+      <Admonition type="info" title="Want to start from scratch?">
+        <p>
+          This guide helps you install Compose into your existing {framework}{" "}
+          codebase. If you're just exploring for now or prefer to start from
+          scratch, you can also{" "}
+          <a href={newProjectLink}>
+            create a new {language} project with the SDK and some starter apps
+          </a>
+          .
+        </p>
+      </Admonition>
+    </>
   );
 }
 
@@ -22,7 +43,10 @@ pnpm add @composehq/sdk
 function InstallSdkNode() {
   return (
     <>
-      <p>Use your package manager to install the Compose SDK.</p>
+      <p>
+        Use your package manager to install the Compose SDK.{" "}
+        <strong>The SDK requires Node.js 16 or higher.</strong>
+      </p>
       <CodeBlock language="bash">{installSdkNode}</CodeBlock>
     </>
   );
@@ -38,7 +62,10 @@ uv add compose-sdk
 function InstallSdkPython() {
   return (
     <>
-      <p>Use your package manager to install the Compose SDK.</p>
+      <p>
+        Use your package manager to install the Compose SDK.{" "}
+        <strong>The SDK requires Python 3.9 or higher.</strong>
+      </p>
       <CodeBlock language="bash">{installSdkPythonNode}</CodeBlock>
     </>
   );
