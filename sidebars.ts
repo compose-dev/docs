@@ -66,6 +66,11 @@ const sidebars: SidebarsConfig = {
             },
             {
               type: "doc",
+              id: "get-started/installation/nest-js",
+              label: "NestJS",
+            },
+            {
+              type: "doc",
               id: "get-started/installation/new-project/node-js",
               label: "New Node.js Project",
               className: "hidden-sidebar-item",

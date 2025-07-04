@@ -1,6 +1,4 @@
 import { Icon } from "@iconify/react";
-import Link from "@docusaurus/Link";
-
 interface FrameworkCard {
   name: string;
   description: string;
@@ -77,6 +75,13 @@ const nodeFrameworks: FrameworkCard[] = [
     icon: "simple-icons:koa",
     link: `${URL_PREFIX}/koa`,
     color: "#33333d",
+  },
+  {
+    name: "NestJS",
+    description: "Install into your NestJS project",
+    icon: "devicon:nestjs",
+    link: `${URL_PREFIX}/nest-js`,
+    color: "#e0234e",
   },
 ];
 

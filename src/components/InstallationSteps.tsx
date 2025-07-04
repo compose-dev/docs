@@ -71,8 +71,8 @@ function InstallSdkPython() {
   );
 }
 
-const createComposeFileNode = `# From your project root
-touch src/compose.ts
+const createComposeFileNode = (fileName: string) => `# From your project root
+touch src/${fileName}
 `;
 
 const composeStarterCodeNode = `import { Compose } from "@composehq/sdk";
@@ -123,6 +123,64 @@ const composeClient = new Compose.Client({
 });
 
 export { composeClient };`;
+
+const ComposeStarterCodeNestjs = `import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Compose } from '@composehq/sdk';
+
+// For demo purposes. In a real app, you'd use your actual database.
+const dbUsers = [
+  { name: 'John Doe', email: 'john@doe.com' },
+  { name: 'Jane Smith', email: 'jane@smith.com' },
+];
+
+@Injectable()
+export class ComposeService implements OnModuleInit {
+  // Hook into NestJS lifecycle to start the Compose client once all modules are loaded.
+  onModuleInit() {
+    const nav = new Compose.Navigation(['view-users', 'create-user']);
+
+    const viewUsersApp = new Compose.App({
+      route: 'view-users',
+      navigation: nav,
+      handler: ({ page, ui }) => {
+        page.add(() => ui.header('View Users', { size: 'lg' }));
+        const users = [...dbUsers]; // fake database call
+        page.add(() => ui.table('users-table', users));
+      },
+    });
+
+    const createUserApp = new Compose.App({
+      route: 'create-user',
+      navigation: nav,
+      handler: ({ page, ui }) => {
+        page.add(() => ui.header('Create User', { size: 'lg' }));
+        page.add(() =>
+          ui.form(
+            'create-user-form',
+            [ui.textInput('name'), ui.emailInput('email')],
+            {
+              onSubmit: (form) => {
+                dbUsers.push({ name: form.name, email: form.email });
+                page.toast('User created successfully', {
+                  appearance: 'success',
+                });
+                page.link('view-users');
+              },
+            },
+          ),
+        );
+      },
+    });
+
+    const client = new Compose.Client({
+      apiKey: 'API_KEY_HERE', // replace with your own API key
+      apps: [viewUsersApp, createUserApp],
+    });
+
+    client.connect();
+  }
+}
+`;
 
 const ComposeStarterAppsPython = `import compose_sdk as c
 
@@ -221,10 +279,74 @@ function AddStarterAppsNode() {
       <p>
         Create a new file in your codebase, e.g. <code>compose.ts</code>.
       </p>
-      <CodeBlock language="bash">{createComposeFileNode}</CodeBlock>
+      <CodeBlock language="bash">
+        {createComposeFileNode("compose.ts")}
+      </CodeBlock>
       <p>Then add the following starter code into the file:</p>
       <CodeBlock language="typescript">{composeStarterCodeNode}</CodeBlock>
       <ReplaceApiKey />
+    </>
+  );
+}
+
+function AddStarterAppsNestjs() {
+  return (
+    <>
+      <p>
+        The best way to integrate Compose is via a module that will contain all
+        the Compose related code.
+      </p>
+      <p>
+        Create a <code>compose</code> folder in your codebase, and within it
+        create two files: <code>compose.module.ts</code> and{" "}
+        <code>compose.service.ts</code>
+      </p>
+      <CodeBlock language="bash">
+        {`mkdir -p src/compose
+touch src/compose/compose.module.ts
+touch src/compose/compose.service.ts`}
+      </CodeBlock>
+      <h4>
+        <code>compose.service.ts</code>
+      </h4>
+      <p>
+        Our service will contain the Compose client and starter apps. As you
+        build more apps, you can break them out into separate files. Creating a
+        service will also allow you to easily import other services and use them
+        in your Compose apps.
+      </p>
+      <CodeBlock language="typescript">{ComposeStarterCodeNestjs}</CodeBlock>
+      <ReplaceApiKey />
+      <h4>
+        <code>compose.module.ts</code>
+      </h4>
+      <p>Our module will register the service.</p>
+      <CodeBlock language="typescript">{`import { Module } from '@nestjs/common';
+import { ComposeService } from './compose.service';
+
+@Module({
+  providers: [ComposeService],
+  exports: [ComposeService],
+})
+export class ComposeModule {}
+`}</CodeBlock>
+      <h4>
+        <code>src/app.module.ts</code>
+      </h4>
+      <p>Register the Compose module in your main file.</p>
+      <CodeBlock language="typescript">{`import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { ComposeModule } from './compose/compose.module';
+
+@Module({
+  // highlight-next-line
+  imports: [ComposeModule],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+`}</CodeBlock>
     </>
   );
 }
@@ -245,14 +367,16 @@ function StarterCodePython() {
   );
 }
 
-function RunAppNode() {
+function RunAppNode({ command = "npm run dev" }: { command?: string }) {
   return (
     <>
       <p>
         Run your app's normal dev command. Compose will automatically connect in
         the background.
       </p>
-      <CodeBlock language="bash">npm run dev</CodeBlock>
+      <CodeBlock language="bash">
+        {command} # replace with the actual command
+      </CodeBlock>
       <p>
         You should see your apps come online in the{" "}
         <a href="https://app.composehq.com/home" target="_blank">
@@ -351,4 +475,5 @@ export {
   NextStepsPython,
   ReplaceApiKey,
   ConnectClientDetailsPython,
+  AddStarterAppsNestjs,
 };
