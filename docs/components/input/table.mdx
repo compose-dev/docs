@@ -1535,7 +1535,7 @@ A common use case is to take action on a set of selected rows. To do this, it's 
     ))
     
     // Show a refund button if there are selected users
-    page.add(() => ui.cond(selectedUsers.length > 0 {
+    page.add(() => ui.cond(selectedUsers.length > 0, {
         true: ui.button("Refund selected users", onClick: () => {
             selectedUsers.forEach((user) => refundUser(user.uuid));
             selectedUsers = [];
@@ -1568,7 +1568,7 @@ A common use case is to take action on a set of selected rows. To do this, it's 
     # Show a refund button if there are selected users
     page.add(lambda: ui.cond(
         selected_users.length > 0,
-        true: ui.button(
+        true=ui.button(
             "Refund selected users",
             on_click=on_click_refund_users
         )
