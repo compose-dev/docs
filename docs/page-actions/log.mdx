@@ -53,7 +53,7 @@ Hence, for any other logs you want, you can use `page.log()` to record events to
 
 ### Viewing logs
 
-Logs can be viewed, filtered, and searched via the [Compose dashboard](https://app.composehq.com/home/audit-log).
+Logs can be viewed, filtered, and searched via the [Compose dashboard](https://app.composehq.com/home/activity-logs).
 
 ### Exporting logs
 
@@ -64,7 +64,7 @@ You can request a CSV export of your logs by emailing us at atul@composehq.com. 
 Compose enforces limits to prevent abuse of the platform.
 
 - Every organization is rate limited to 200 logs per minute. Reach out to us to increase this limit.
-- Audit log messages are capped at 1024 characters.
+- Audit log event messages are capped at 1024 characters.
 - Audit log metadata is capped at 4 kilobytes.
 
 ## API reference
@@ -75,7 +75,7 @@ Compose enforces limits to prevent abuse of the platform.
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
     page.log(
-        message: string,
+        event: string,
         properties?: Partial<{
             severity: "trace" | "debug" | "info" | "warn" | "error" | "fatal",
             data: Record<string, any>
@@ -86,7 +86,7 @@ Compose enforces limits to prevent abuse of the platform.
     <TabItem value="python" label="Python">
     ```python
     page.log(
-        message: str,
+        event: str,
         *,
         severity: Literal["trace", "debug", "info", "warn", "error", "fatal"] = "info",
         data: Dict[str, Any] = {}
@@ -98,11 +98,11 @@ Compose enforces limits to prevent abuse of the platform.
 ### Parameters
 
 <Parameter
-    name="message"
+    name="event"
     required={true}
     type="string"
     description={<>
-        The message to log.
+        The event to log. Avoid putting variables in the event message, as this restricts the ability to create custom reports that group by event. Instead, use the <code>data</code> parameter to log additional metadata.
     </>}
 />
 
