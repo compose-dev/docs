@@ -16,7 +16,7 @@ Use `page.log()` to log information to audit logs. Only available on Pro plans.
 <Tabs groupId="sdkLanguage">
     <TabItem value="node" label="TypeScript / JavaScript">
     ```js
-    page.log("Deleted database record in user's table", {
+    page.log("database-record-deleted", {
         severity: "info",
         data: {
             userId: 123,
@@ -28,7 +28,7 @@ Use `page.log()` to log information to audit logs. Only available on Pro plans.
     <TabItem value="python" label="Python">
     ```python
     page.log(
-        "Deleted database record in user's table",
+        "database-record-deleted",
         severity="info",
         data={
             "user_id": 123,
